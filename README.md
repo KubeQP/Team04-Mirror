@@ -36,7 +36,7 @@ git fetch backend
 git checkout -b backend-import backend/main
 ```
 
-4. **Gå tillbaka till main-grenen och slå ihop:**
+4. **Gå tillbaka till main-branchen och slå ihop:**
 
 ```bash
 git checkout main
