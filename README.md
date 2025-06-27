@@ -7,7 +7,7 @@ API-endpoints för att hantera tävlande och registrera tider.
 ## Projektstruktur
 
 Ni kommer att ha **ett** repository som innehåller både frontend och backend, i
-katalogerna `frontend/` och `backend/`). Detta repo är endast backend-delen av
+katalogerna `frontend/` och `backend/`. Detta repo är endast backend-delen av
 projektet. Ni ska lägga in denna backend i ert eget projektrepo, i en undermapp
 som heter `backend/`.
 
