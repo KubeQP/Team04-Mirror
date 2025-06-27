@@ -34,7 +34,6 @@ git fetch backend
 
 ```bash
 git checkout -b backend-import backend/main
-git commit -m "Klonade Python-backend i mappen backend/"
 ```
 
 4. **Gå tillbaka till main-grenen och slå ihop:**
