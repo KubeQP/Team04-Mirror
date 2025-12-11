@@ -54,10 +54,12 @@ API:t. T.ex.:
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python -m venv .env
+source .env/bin/activate  # Windows: .env\Scripts\activate
 pip install -r requirements.txt
 ```
+
+**OBS! Du måste aktivera din virtuella miljö i varje ny terminalsession.**
 
 2. Kör API\:t:
 
@@ -89,7 +91,7 @@ Alembic är ett verktyg för att hantera **databasändringar över tid**
 ändrar `schema.py`, kan Alembic:
 
 - Spåra förändringar i tabellerna
-- Generera migrationsfiler (som Git fast för databasen)
+- Generera migrationsfiler (ungefär som diffar i Git fast för databasen)
 - Uppgradera databasen utan att ta bort existerande data
 
 ### Måste vi använda Alembic?
@@ -107,7 +109,7 @@ Men…
 - Du inte vill tappa data när tabeller ändras
 - Du bygger vidare på databasen i flera steg
 
-### 🔧 Exempel på när Alembic behövs:
+### Exempel på när Alembic behövs:
 
 - Du lägger till ett nytt fält i `Competitor`
 - Du byter namn på en kolumn

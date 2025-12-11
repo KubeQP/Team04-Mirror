@@ -1,6 +1,6 @@
-# backend/schema.py
+# backend/app/models.py
 from sqlalchemy import Column, Integer, String, DateTime
-from database import Base
+from .database import Base
 import datetime
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
