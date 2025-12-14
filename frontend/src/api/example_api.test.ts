@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom"
 import { describe, expect, it, vi } from "vitest"
-import { getExampleData, buildRequestPayload } from "./example_api"
+import { buildRequestPayload, getExampleData } from "./example_api"
 
 describe("getExampleData", () => {
   it("hämtar och formaterar data korrekt", async () => {
@@ -41,6 +41,18 @@ describe("getExampleData", () => {
 
 // Snapshot-test för buildRequestPayload
 describe("buildRequestPayload", () => {
+  // Fixa datumet till en specifik tidpunkt för att göra snapshot-testet stabilt
+  const fixedDate = new Date("2025-01-01T12:00:00.000Z")
+
+  beforeAll(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(fixedDate)
+  })
+
+  afterAll(() => {
+    vi.useRealTimers()
+  })
+
   it("har korrekt struktur för API-anropet", () => {
     const payload = buildRequestPayload(42)
     expect(payload).toMatchSnapshot()
