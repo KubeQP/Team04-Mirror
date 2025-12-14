@@ -28,7 +28,7 @@ Detta är huvudingången till appen. Den:
 Innehåller databasuppkopplingen. Här skapas `engine` och `SessionLocal`, som
 används för att kommunicera med databasen.
 
-### `schema.py`
+### `models.py`
 
 Innehåller databasens tabeller. Vi använder SQLAlchemy för att skapa två
 tabeller:
@@ -36,15 +36,25 @@ tabeller:
 - `Competitor` – förarna (med id, startnummer och namn)
 - `TimeEntry` – registrerade tider (med id, competitor_id, timestamp)
 
-### `models.py`
+### `schemas.py`
 
-Här finns de modeller (Pydantic) som används för att skicka och ta emot data i
+Här finns de scheman (Pydantic) som används för att skicka och ta emot data i
 API:t. T.ex.:
 
 - `CompetitorOut` – används som svar från `/competitors`
 - `TimeEntryOut` – används som svar från `/times`
 - `RecordTimeIn` – används som input när ny tidsregistrering skickas till
   `/record_time`
+
+### Kommentar om terminologi
+
+Termen *modell* används ofta i många olika sammanhang. Den kan användas både för
+databasmodeller (`models.py`) och scheman eller *Pydantic-modeller* (`schema.py`).
+Det är viktigt att ni inom teamet har en gemensam terminologi så ni förstår vad
+som faktiskt pratas om.
+
+Scheman, eller Pydantic-modeller, beskriver de datatyper som ska kunna skickas
+och tas emot via API-anrop. De kallas också ofta för *DTO* (Data Transfer Object).
 
 ---
 
@@ -61,10 +71,15 @@ pip install -r requirements.txt
 
 **OBS! Du måste aktivera din virtuella miljö i varje ny terminalsession.**
 
-2. Kör API\:t:
+2. Kör API\:t med antingen:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
+```
+
+eller (genväg):
+```bash
+python -m app.main
 ```
 
 3. Testa endpoints i t.ex. Swagger UI på
@@ -88,7 +103,7 @@ uvicorn main:app --reload
 
 Alembic är ett verktyg för att hantera **databasändringar över tid**
 (migreringar). I stället för att radera databasen och skapa en ny varje gång man
-ändrar `schema.py`, kan Alembic:
+ändrar `models.py`, kan Alembic:
 
 - Spåra förändringar i tabellerna
 - Generera migrationsfiler (ungefär som diffar i Git fast för databasen)
