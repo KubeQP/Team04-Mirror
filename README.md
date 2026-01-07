@@ -37,7 +37,7 @@ git checkout main
 git merge frontend/main --allow-unrelated-histories
 ```
 
-Nu finns frontend-koden i mappen `frontend/` i ert eget repo!
+Nu finns frontend-koden i mappen `frontend/` i ert eget repo! Glöm inte att göra `git push` när du är klar.
 
 4. **Ta bort den temporära remoten:**
 
@@ -45,14 +45,19 @@ Nu finns frontend-koden i mappen `frontend/` i ert eget repo!
 git remote remove frontend
 ```
 
----
+## Köra och testa frontend
 
-## Alternativ: Starta projektet från grunden
+Se README.md inuti `frontend/`-katalogen för instruktioner om hur du kör
+frontend-appen och kör tester.
 
-Om du inte vill klona exemplet kan du sätta upp projektet själv genom att följa
-stegen nedan.
 
-### 1. Installera Node.js
+# Alternativ: Starta projektet från grunden
+
+Om ni inte vill klona exemplet men fortfarande använda en webbaserad frontend
+med TypeScript och React, kan ni så klart sätta upp projektet själv. Följ då 
+stegen nedan, eller anpassa efter eget tycke.
+
+## 1. Installera Node.js
 
 Du behöver ha **Node.js** installerat. Om du inte har det redan så ladda ner och installera från: 👉
 [https://nodejs.org/](https://nodejs.org/)
@@ -64,16 +69,16 @@ node -v
 npm -v
 ```
 
-### 2. Skapa nytt Vite-projekt med React + TypeScript
+## 2. Skapa nytt Vite-projekt med React + TypeScript
 
 ```bash
 npm create vite@latest frontend -- --template react-ts
 cd frontend
 ```
 
-> Detta skapar en katalog `frontend/` med ett grundprojekt.
+> Detta skapar en katalog `frontend/` med ett grundprojekt. Glöm inte att gå in i katalogen med `cd frontend`.
 
-### 3. Installera beroenden
+## 3. Installera beroenden
 
 Installera först de paket som Vite-projektet behöver:
 
@@ -81,15 +86,17 @@ Installera först de paket som Vite-projektet behöver:
 npm install
 ```
 
-### 4. Lägg till ytterligare beroenden
+## 4. Lägg till ytterligare beroenden
 
-#### React Router (för navigering)
+> Du kan förstås välja till/bort paket efter behov.
+
+### React Router (för navigering)
 
 ```bash
 npm install react-router-dom
 ```
 
-#### ESLint och Vitest (för testning och kodstil)
+### ESLint och Vitest (för testning och kodstil)
 
 ```bash
 npm install --save-dev \
@@ -98,10 +105,3 @@ npm install --save-dev \
   typescript typescript-eslint @types/react @types/react-dom \
   jest jsdom globals
 ```
-
-> Du kan förstås välja till/bort paket efter behov.
-
-## Köra och testa frontend
-
-Se README.md inuti `frontend/`-katalogen för instruktioner om hur du kör
-frontend-appen och kör tester.
