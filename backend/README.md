@@ -66,9 +66,9 @@ och tas emot via API-anrop. De kallas också ofta för *DTO* (Data Transfer Obje
 
 ```bash
 cd backend
-python -m venv .env       # Skapa en virtuell python environment
-source .env/bin/activate  # Aktivera en virtuella miljön (Mac/Linux)
-                          # Windows, gör istället: .env\Scripts\activate
+python -m venv venv       # Skapa en virtuell python environment
+source venv/bin/activate  # Aktivera en virtuella miljön (Mac/Linux)
+                          # Windows, gör istället: venv\Scripts\activate
 pip install -r requirements.txt  # Installera beroenden
 ```
 
