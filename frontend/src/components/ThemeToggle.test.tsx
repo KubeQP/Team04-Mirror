@@ -1,74 +1,75 @@
-import { describe, it, beforeEach, afterEach, expect, vi } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
-import ThemeToggle from "./ThemeToggle"
+import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-describe("ThemeToggle", () => {
-  const getTheme = () => document.documentElement.dataset.theme
+import ThemeToggle from './ThemeToggle';
 
-  beforeEach(() => {
-    localStorage.clear()
-    delete document.documentElement.dataset.theme
-  })
+describe('ThemeToggle', () => {
+	const getTheme = () => document.documentElement.dataset.theme;
 
-  afterEach(() => {
-    localStorage.clear()
-    delete document.documentElement.dataset.theme
-  })
+	beforeEach(() => {
+		localStorage.clear();
+		delete document.documentElement.dataset.theme;
+	});
 
-  it("visas med korrekt initial text baserat på systeminställning", () => {
-    // Vi simulerar att systemet är i dark mode
-    vi.spyOn(globalThis, "matchMedia").mockReturnValue({
-      matches: true,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-      media: "",
-    })
+	afterEach(() => {
+		localStorage.clear();
+		delete document.documentElement.dataset.theme;
+	});
 
-    render(<ThemeToggle />)
-    expect(getTheme()).toBe("dark")
-    expect(screen.getByRole("button")).toHaveTextContent("☀️ Light mode")
-  })
+	it('visas med korrekt initial text baserat på systeminställning', () => {
+		// Vi simulerar att systemet är i dark mode
+		vi.spyOn(globalThis, 'matchMedia').mockReturnValue({
+			matches: true,
+			onchange: null,
+			addListener: vi.fn(),
+			removeListener: vi.fn(),
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
+			dispatchEvent: vi.fn(),
+			media: '',
+		});
 
-  it("växlar mellan dark och light mode vid klick", () => {
-    render(<ThemeToggle />)
+		render(<ThemeToggle />);
+		expect(getTheme()).toBe('dark');
+		expect(screen.getByRole('button')).toHaveTextContent('☀️ Light mode');
+	});
 
-    const button = screen.getByRole("button")
+	it('växlar mellan dark och light mode vid klick', () => {
+		render(<ThemeToggle />);
 
-    // Initialt läge
-    const initialTheme = getTheme()
-    expect(["light", "dark"]).toContain(initialTheme)
+		const button = screen.getByRole('button');
 
-    // Klick för att växla
-    fireEvent.click(button)
-    const toggledTheme = getTheme()
-    expect(toggledTheme).not.toBe(initialTheme)
+		// Initialt läge
+		const initialTheme = getTheme();
+		expect(['light', 'dark']).toContain(initialTheme);
 
-    // Texten uppdateras
-    if (toggledTheme === "dark") {
-      expect(button).toHaveTextContent("☀️ Light mode")
-    } else {
-      expect(button).toHaveTextContent("🌙 Dark mode")
-    }
-  })
+		// Klick för att växla
+		fireEvent.click(button);
+		const toggledTheme = getTheme();
+		expect(toggledTheme).not.toBe(initialTheme);
 
-  it("sparar valt tema i localStorage", () => {
-    render(<ThemeToggle />)
-    const button = screen.getByRole("button")
+		// Texten uppdateras
+		if (toggledTheme === 'dark') {
+			expect(button).toHaveTextContent('☀️ Light mode');
+		} else {
+			expect(button).toHaveTextContent('🌙 Dark mode');
+		}
+	});
 
-    fireEvent.click(button)
-    const currentTheme = getTheme()
-    expect(localStorage.getItem("theme")).toBe(currentTheme)
-  })
+	it('sparar valt tema i localStorage', () => {
+		render(<ThemeToggle />);
+		const button = screen.getByRole('button');
 
-  it("respekterar tidigare sparat tema från localStorage", () => {
-    localStorage.setItem("theme", "light")
+		fireEvent.click(button);
+		const currentTheme = getTheme();
+		expect(localStorage.getItem('theme')).toBe(currentTheme);
+	});
 
-    render(<ThemeToggle />)
-    expect(getTheme()).toBe("light")
-    expect(screen.getByRole("button")).toHaveTextContent("🌙 Dark mode")
-  })
-})
+	it('respekterar tidigare sparat tema från localStorage', () => {
+		localStorage.setItem('theme', 'light');
+
+		render(<ThemeToggle />);
+		expect(getTheme()).toBe('light');
+		expect(screen.getByRole('button')).toHaveTextContent('🌙 Dark mode');
+	});
+});

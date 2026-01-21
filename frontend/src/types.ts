@@ -1,4 +1,4 @@
 export interface ExampleData {
-  title: string
-  body: string
+	title: string;
+	body: string;
 }

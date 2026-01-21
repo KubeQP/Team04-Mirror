@@ -1,5 +1,5 @@
 // frontend/src/setupTests.ts
-import "@testing-library/jest-dom"
+import '@testing-library/jest-dom';
 
 /*
   Denna fil används för att konfigurera testmiljön. Här kan du lägga till

@@ -1,16 +1,17 @@
-import { render, screen } from "@testing-library/react"
-import ExamplePost from "./ExamplePost"
+import { render, screen } from '@testing-library/react';
 
-describe("ExamplePost", () => {
-  it("visar titel och text när data ges", () => {
-    const mockData = {
-      title: "Hej världen",
-      body: "Detta är en testpost",
-    }
+import ExamplePost from './ExamplePost';
 
-    render(<ExamplePost exampleData={mockData} />)
+describe('ExamplePost', () => {
+	it('visar titel och text när data ges', () => {
+		const mockData = {
+			title: 'Hej världen',
+			body: 'Detta är en testpost',
+		};
 
-    expect(screen.getByText("Hej världen")).toBeInTheDocument()
-    expect(screen.getByText("Detta är en testpost")).toBeInTheDocument()
-  })
-})
+		render(<ExamplePost exampleData={mockData} />);
+
+		expect(screen.getByText('Hej världen')).toBeInTheDocument();
+		expect(screen.getByText('Detta är en testpost')).toBeInTheDocument();
+	});
+});

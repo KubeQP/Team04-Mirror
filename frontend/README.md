@@ -153,23 +153,23 @@ Anta att vi har en enkel komponent:
 
 ```tsx
 function Hello({ name }: { name: string }) {
-  return <h1>Hej {name}!</h1>
+	return <h1>Hej {name}!</h1>;
 }
 ```
 
 Då kan vi testa den så här:
 
 ```tsx
-import { render, screen } from "@testing-library/react"
-import { describe, it, expect } from "vitest"
-import Hello from "./Hello"
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import Hello from './Hello';
 
-describe("Hello", () => {
-  it("visar namnet som skickas in", () => {
-    render(<Hello name="Lisa" />)
-    expect(screen.getByText("Hej Lisa!")).toBeInTheDocument()
-  })
-})
+describe('Hello', () => {
+	it('visar namnet som skickas in', () => {
+		render(<Hello name="Lisa" />);
+		expect(screen.getByText('Hej Lisa!')).toBeInTheDocument();
+	});
+});
 ```
 
 **Förklaring:**
@@ -214,14 +214,14 @@ kan skickas till ett API kan se ut som nedan. Testet finns också i
 `frontend/src/api/example_api.test.ts`.
 
 ```ts
-import { describe, it, expect } from "vitest"
-import { buildRequestPayload } from "./example_api"
-describe("buildRequestPayload", () => {
-  it("har korrekt struktur för API-anropet", () => {
-    const payload = buildRequestPayload(42)
-    expect(payload).toMatchSnapshot()
-  })
-})
+import { describe, it, expect } from 'vitest';
+import { buildRequestPayload } from './example_api';
+describe('buildRequestPayload', () => {
+	it('har korrekt struktur för API-anropet', () => {
+		const payload = buildRequestPayload(42);
+		expect(payload).toMatchSnapshot();
+	});
+});
 ```
 
 Vitest sparar automatiskt en ”snapshot”-fil med den förväntade strukturen i en

@@ -1,5 +1,5 @@
 // frontend/src/components/ExamplePost.tsx
-import type { ExampleData } from "../types"
+import type { ExampleData } from '../types';
 
 /*
   Här skapar vi en egen komponent som representerar ett inlägg.
@@ -10,16 +10,14 @@ import type { ExampleData } from "../types"
 */
 
 export interface ExamplePostProps {
-  exampleData: ExampleData
+	exampleData: ExampleData;
 }
 
-export default function ExamplePost({
-  exampleData,
-}: Readonly<ExamplePostProps>) {
-  return (
-    <div className="example-post">
-      <h3>{exampleData.title}</h3>
-      <p>{exampleData.body}</p>
-    </div>
-  )
+export default function ExamplePost({ exampleData }: Readonly<ExamplePostProps>) {
+	return (
+		<div className="example-post">
+			<h3>{exampleData.title}</h3>
+			<p>{exampleData.body}</p>
+		</div>
+	);
 }
