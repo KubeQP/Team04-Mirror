@@ -1,17 +1,18 @@
 # backend/tests/test_competitors.py
+from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app import models
 
 
-def test_get_competitors_empty(client):
+def test_get_competitors_empty(client: TestClient) -> None:
     """Om det inte finns några tävlande ska vi få en tom lista."""
     response = client.get("/competitors")
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_get_competitors_with_data(client, db_session: Session):
+def test_get_competitors_with_data(client: TestClient, db_session: Session) -> None:
     """Endpointen ska returnera de tävlande som finns i databasen."""
     c1 = models.Competitor(start_number="1001", name="Team 1")
     c2 = models.Competitor(start_number="1002", name="Team 2")

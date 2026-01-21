@@ -4,7 +4,7 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.database import Base, get_db
 from app.main import app
@@ -21,7 +21,7 @@ print("Setting up test database...")
 
 
 @pytest.fixture
-def db_session() -> Generator:
+def db_session() -> Generator[Session]:
     """Skapa en ren databas för varje testfunktion."""
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -33,13 +33,13 @@ def db_session() -> Generator:
 
 
 @pytest.fixture
-def client(db_session) -> Generator[TestClient]:
+def client(db_session: Session) -> Generator[TestClient]:
     """
     TestClient där FastAPIs get_db dependency
     override:as till att använda vår test-session.
     """
 
-    def override_get_db():
+    def override_get_db() -> Generator[Session]:
         try:
             yield db_session
         finally:

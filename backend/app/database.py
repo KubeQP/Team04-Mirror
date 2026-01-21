@@ -1,6 +1,12 @@
 # backend/app/database.py
+from collections.abc import Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Session,
+    sessionmaker,
+)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./race.db"  # hamnar i projektroten
 
@@ -9,10 +15,15 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+
+# Base: DeclarativeMeta = declarative_base()
 
 
-def get_db():
+class Base(DeclarativeBase):
+    pass
+
+
+def get_db() -> Generator[Session]:
     db = SessionLocal()
     try:
         yield db

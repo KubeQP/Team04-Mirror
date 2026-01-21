@@ -8,17 +8,17 @@ from sqlalchemy.orm import Session
 from .models import Competitor, TimeEntry
 
 
-def get_competitors(db: Session):
+def get_competitors(db: Session) -> list[Competitor]:
     """Hämta alla tävlande från databasen."""
     return db.query(Competitor).all()
 
 
-def get_times(db: Session):
+def get_times(db: Session) -> list[TimeEntry]:
     """Hämta alla tidsregistreringar från databasen."""
     return db.query(TimeEntry).all()
 
 
-def get_times_by_start_number(db: Session, start_number: str):
+def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]:
     """Hämta tidsregistreringar för en specifik tävlande baserat på startnummer."""
     return (
         db.query(TimeEntry)

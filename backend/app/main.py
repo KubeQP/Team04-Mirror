@@ -1,5 +1,6 @@
 # backend/app/main.py
 import os
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime
 
@@ -13,7 +14,7 @@ from .routers import competitors, times
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # Körs vid uppstart
     # Lägg till temporär testdata, om databasen är tom.
     # Bra under utveckling/testining, men ta bort i produktion!
