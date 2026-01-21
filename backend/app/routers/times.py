@@ -1,11 +1,12 @@
 # backend/app/routers/competitors.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from .. import crud
 from ..database import get_db
 from ..schemas import (
-    TimeEntryOut,
     RecordTimeIn,
+    TimeEntryOut,
 )
 
 router = APIRouter(prefix="/times", tags=["times"])

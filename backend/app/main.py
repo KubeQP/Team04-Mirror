@@ -1,15 +1,15 @@
 # backend/app/main.py
 import os
-from datetime import datetime
 from contextlib import asynccontextmanager
+from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .routers import competitors, times
-from .database import Base, engine, SessionLocal
+from .database import Base, SessionLocal, engine
 from .models import Competitor, TimeEntry
+from .routers import competitors, times
 
 
 @asynccontextmanager

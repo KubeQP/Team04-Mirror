@@ -1,13 +1,13 @@
 # backend/tests/conftest.py
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.main import app
 from app.database import Base, get_db
+from app.main import app
 
 # Separat testdatabas
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -33,7 +33,7 @@ def db_session() -> Generator:
 
 
 @pytest.fixture
-def client(db_session) -> Generator[TestClient, None, None]:
+def client(db_session) -> Generator[TestClient]:
     """
     TestClient där FastAPIs get_db dependency
     override:as till att använda vår test-session.

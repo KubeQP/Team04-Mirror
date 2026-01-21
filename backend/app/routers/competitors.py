@@ -1,7 +1,8 @@
 # backend/app/routers/competitors.py
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from .. import schemas, crud
+
+from .. import crud, schemas
 from ..database import get_db
 
 router = APIRouter(prefix="/competitors", tags=["competitors"])

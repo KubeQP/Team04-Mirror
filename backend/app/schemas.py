@@ -1,6 +1,7 @@
 # backend/app/schemas.py
-from pydantic import BaseModel, ConfigDict
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
 
 
 class RecordTimeIn(BaseModel):

@@ -1,9 +1,10 @@
 # backend/app/models.py
-from sqlalchemy import Column, Integer, String, DateTime
-from .database import Base
 import datetime
-from sqlalchemy import ForeignKey
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
+from .database import Base
 
 
 class Competitor(Base):
@@ -17,6 +18,6 @@ class TimeEntry(Base):
     __tablename__ = "times"
     id = Column(Integer, primary_key=True, index=True)
     competitor_id = Column(Integer, ForeignKey("competitors.id"), index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    timestamp = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
 
     competitor = relationship("Competitor")

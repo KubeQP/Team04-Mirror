@@ -4,6 +4,7 @@
 # funktioner för att interagera med databasen, som anropas från routrar.
 
 from sqlalchemy.orm import Session
+
 from .models import Competitor, TimeEntry
 
 
