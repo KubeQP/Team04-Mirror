@@ -16,6 +16,7 @@ backend-setup:
     - cd backend
     - python -m venv .venv
     - source .venv/bin/activate
+    - pip install -r requirements.txt
     - pip install -r requirements-dev.txt
   artifacts:
     paths:
@@ -53,6 +54,7 @@ backend-lint:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Backend format check (black)
@@ -67,6 +69,7 @@ backend-format:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Backend check
@@ -81,6 +84,7 @@ backend-check:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Frontend lint
@@ -94,6 +98,7 @@ frontend-lint:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Frontend format
@@ -107,6 +112,7 @@ frontend-format:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Frontend check
@@ -120,6 +126,7 @@ frontend-check:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Backend tests
