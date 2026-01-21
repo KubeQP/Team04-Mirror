@@ -1,0 +1,25 @@
+{
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit",
+		"source.organizeImports": "explicit"
+	},
+	"eslint.validate": [
+		"javascript",
+		"typescript",
+		"typescriptreact",
+		"javascriptreact"
+	],
+	"eslint.run": "onSave",
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"prettier.requireConfig": true,
+	"prettier.enableDebugLogs": false,
+	"files.exclude": {
+		"**/dist": true,
+		"**/node_modules": true
+	},
+	"files.watcherExclude": {
+		"**/node_modules": true,
+		"**/dist": true
+	}
+}
