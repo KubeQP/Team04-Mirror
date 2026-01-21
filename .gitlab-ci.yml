@@ -1,0 +1,161 @@
+stages:
+  - setup
+  - lint
+  - format
+  - check
+  - test
+  - build
+
+# ---------------------------
+# Backend setup (Python deps)
+# ---------------------------
+backend-setup:
+  stage: setup
+  image: python:3.14
+  script:
+    - cd backend
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install -r requirements-dev.txt
+  artifacts:
+    paths:
+      - backend/.venv
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend setup (Node deps)
+# ---------------------------
+frontend-setup:
+  stage: setup
+  image: node:24
+  script:
+    - cd frontend
+    - npm ci
+  artifacts:
+    paths:
+      - frontend/node_modules
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Backend lint (ruff + mypy)
+# ---------------------------
+backend-lint:
+  stage: lint
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make lint-ci
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Backend format check (black)
+# ---------------------------
+backend-format:
+  stage: format
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make format-ci
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Backend check
+# ---------------------------
+backend-check:
+  stage: check
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make check-ci
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend lint
+# ---------------------------
+frontend-lint:
+  stage: lint
+  image: node:24
+  script:
+    - cd frontend
+    - npm run lint
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend format
+# ---------------------------
+frontend-format:
+  stage: format
+  image: node:24
+  script:
+    - cd frontend
+    - npm run format
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend check
+# ---------------------------
+frontend-check:
+  stage: check
+  image: node:24
+  script:
+    - cd frontend
+    - npm run check
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Backend tests
+# ---------------------------
+backend-test:
+  stage: test
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make test
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend tests
+# ---------------------------
+frontend-test:
+  stage: test
+  image: node:24
+  script:
+    - cd frontend
+    - npm run test
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend build (main branch only)
+# ---------------------------
+frontend-build:
+  stage: build
+  image: node:24
+  script:
+    - cd frontend
+    - npm run build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
