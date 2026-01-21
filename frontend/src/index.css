@@ -1,0 +1,241 @@
+/* Basinställningar ------------------------------------------------------- */
+
+:root {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Dark mode som default (om inget data-theme är satt) ---------------- */
+    /* Grundläggande färger */
+    --color-bg: #04060c;
+    --color-bg-elevated: #020617;
+    --color-header-bg: #210831;
+    --color-card-bg: #020617;
+
+    --color-text: #e5e7eb;
+    --color-header-text: #f9fafb;
+    --color-muted: #9ca3af;
+
+    /* Länkar och accenter (cyan-toner) */
+    --color-link: #7dd3fc;
+    --color-link-hover: #bae6fd;
+    --color-header-link: #e0f2fe;
+    --color-header-link-hover: #ffffff;
+
+    /* Knappar */
+    --color-button-bg: #111827;
+    --color-button-border: #e0f2fe;
+    --color-button-border-hover: #38bdf8;
+
+    /* Header knapp */
+    --color-header-button-bg: #4d3055;
+    --color-header-button-border: #311834;
+    --color-header-button-bg-hover: #612f6e;
+    --color-header-button-border-hover: #96489d;
+
+    --color-shadow: 0 2px 14px rgba(49, 21, 62, 0.9);
+}
+
+/* Tvingat ljusläge ------------------------------------------------------ */
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    /* Grundfärger */
+    --color-bg: #fffafc;
+    --color-bg-elevated: #ffffff;
+    --color-card-bg: #ffffff;
+
+    /* Header med accentfärg */
+    --color-header-bg: #8d2a60;
+    --color-header-text: #ffffff;
+    --color-header-link: #ffe6f1;
+    --color-header-link-hover: #ffffff;
+
+    /* Textfärger */
+    --color-text: #1f1f1f;
+    --color-muted: #6b6b6b;
+
+    /* Länkar och accenter */
+    --color-link: #b83280;
+    --color-link-hover: #a21d6a;
+
+    /* Knappar */
+    --color-button-bg: #fbe7f1;
+    --color-button-border: #c7adba;
+    --color-button-border-hover: #ed3993;
+
+    /* Header knapp */
+    --color-header-button-bg: #88466b;
+    --color-header-button-border: #893161;
+    --color-header-button-bg-hover: #56203e;
+    --color-header-button-border-hover: #900b54;
+
+    /* Skuggor */
+    --color-shadow: 0 2px 10px rgba(141, 42, 96, 0.15);
+}
+
+/* Tvingat mörkt läge ---------------------------------------------------- */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    /* använder variablerna definierade i :root ovan */
+}
+
+/* Globala element -------------------------------------------------------- */
+
+body {
+    margin: 0;
+    display: flex;
+    place-items: flex-start;
+    justify-content: center;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+a {
+    font-weight: 500;
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-link-hover);
+}
+
+h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+    margin: 0;
+}
+
+button {
+    border-radius: 8px;
+    border: 1px solid var(--color-button-border);
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: var(--color-button-bg);
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.1s ease;
+}
+
+button:hover {
+    border-color: var(--color-button-border-hover);
+}
+
+#theme-toggle-button {
+    background-color: var(--color-header-button-bg);
+    border-color: var(--color-header-button-border);
+    color: var(--color-header-text);
+}
+
+#theme-toggle-button:hover {
+    background-color: var(--color-header-button-bg-hover);
+    border-color: var(--color-header-button-border-hover);
+}
+
+/* App-layout ------------------------------------------------------------- */
+
+#app-container {
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: min(100vw, 800px);
+    margin: 2rem auto;
+    padding: 0;
+    min-height: 80vh;
+    border-radius: 0.5rem;
+    background-color: var(--color-bg-elevated);
+    box-shadow: var(--color-shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header --------------------------------------------------------------- */
+
+#app-container>header {
+    position: relative;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: var(--color-header-bg);
+    color: var(--color-header-text);
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+#app-container>header h1 {
+    padding: 2rem;
+}
+
+/* Tema-knapp (placerad uppe till höger) */
+#app-container>header .theme-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+
+/* Header-länkar (huvudnavigationen) ------------------------------------- */
+
+header a {
+    font-size: 1.3rem;
+    color: var(--color-header-link);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+header a:hover {
+    color: var(--color-header-link-hover);
+}
+
+/* Main ------------------------------------------------------------------- */
+
+#app-container>main {
+    padding: 1rem 2rem 2rem;
+    margin: 0;
+}
+
+/* Navigation ------------------------------------------------------------- */
+
+#main-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background-color: var(--color-header-bg);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Kort/sektioner --------------------------------------------------------- */
+
+.card {
+    background-color: var(--color-card-bg);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* Hjälpklasser ----------------------------------------------------------- */
+
+.text-muted {
+    color: var(--color-muted);
+}
+
+.text-semibold {
+    font-weight: 600;
+}
+
+.text-bold {
+    font-weight: 900;
+}
