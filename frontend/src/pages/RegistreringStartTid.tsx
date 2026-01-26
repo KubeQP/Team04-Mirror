@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-export default function RegisteringSida(){
+export default function RegisteringStartTid(){
 
 
   const [reg, setReg] = useState("");
@@ -59,7 +59,7 @@ export default function RegisteringSida(){
         <thead>
           <tr>
             <th>Startnummer</th>
-            <th>Tid</th>
+            <th>Starttid</th>
           </tr>
         </thead>
         <tbody>

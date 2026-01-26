@@ -2,7 +2,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from './App';
-import RegisteringSida from './pages/RegistreringSida';
+import RegistreringStartTid from './pages/RegistreringStartTid';
+import RegistreringStoppTid from './pages/RegistreringStoppTid';
 import Sida1 from './pages/Sida1';
 import Sida2 from './pages/Sida2';
 
@@ -33,8 +34,12 @@ const router = createBrowserRouter([
 				element: <Sida2 />,
 			},
 			{
-				path: 'RegistreringSida',
-				element: <RegisteringSida/>
+				path: 'RegistreringStartTid',
+				element: <RegistreringStartTid/>
+			},
+			{
+				path: 'RegistreringStoppTid',
+				element: <RegistreringStoppTid/>
 			}
 		],
 	},
