@@ -11,7 +11,7 @@ export interface CompetitorData {
 
 export interface TimeData {
 	id: number;
-	competitor_id: string;
+	competitor_id: number;
 	timestamp: string;
 }
 

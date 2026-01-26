@@ -50,6 +50,15 @@ export default function Resultatvisare() {
 		fetchData();
 	}, []);
 
+	const mappedData = competitorData?.map((competitor) => (
+		<div key={competitor.id}>
+			<h3>Name: {competitor.name}</h3>
+			<h3>Start number: {competitor.start_number}</h3>
+			<h3>Timestamp: {timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp}</h3>
+			<hr />
+		</div>
+	));
+
 	return (
 		<div>
 			<h2>Innehåll på Resultatvisare</h2>
@@ -59,17 +68,9 @@ export default function Resultatvisare() {
 			</p>
 
 			<div className="card">
-				{competitorLoading && <p>Laddar innehåll...</p>}
-				{competitorError && <p style={{ color: 'red' }}>Fel: {competitorError}</p>}
-				{competitorData && <p>{competitorData[0].id}</p>}
-			</div>
-
-			<hr />
-
-			<div className="card">
-				{timeLoading && <p>Laddar innehåll...</p>}
-				{timeError && <p style={{ color: 'red' }}>Fel: {competitorError}</p>}
-				{timeData && <p>{timeData[0].id}</p>}
+				{(competitorLoading || timeLoading) && <p>Laddar innehåll...</p>}
+				{(competitorError || timeError) && <p style={{ color: 'red' }}>Fel: {competitorError || timeError}</p>}
+				{competitorData && mappedData}
 			</div>
 		</div>
 	);
