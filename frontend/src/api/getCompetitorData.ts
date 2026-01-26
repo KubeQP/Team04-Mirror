@@ -1,8 +1,6 @@
-import type { CompetitorData } from "../types";
+import type { CompetitorData } from '../types';
 
 export async function getCompetitorData(): Promise<CompetitorData> {
-	// Simulera en fördröjning för att efterlikna ett långsamt API-anrop
-
 	const response = await fetch(`http://127.0.0.1:8000/competitors`);
 
 	if (!response.ok) {
@@ -10,5 +8,4 @@ export async function getCompetitorData(): Promise<CompetitorData> {
 	}
 
 	return response.json();
-}   
-
+}
