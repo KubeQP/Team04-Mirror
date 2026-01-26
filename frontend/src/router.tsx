@@ -2,9 +2,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import Resultatvisare from './pages/Resultatvisare';
 import Sida1 from './pages/Sida1';
 import Sida2 from './pages/Sida2';
-import Resultatvisare from './pages/Resultatvisare';
 
 /*
   Detta är routerkonfigurationen för vår React-applikation. Den definierar hur
@@ -33,9 +33,9 @@ const router = createBrowserRouter([
 				element: <Sida2 />,
 			},
 			{
-				path: "Resultatvisare",
-				element: <Resultatvisare />
-			}
+				path: 'Resultatvisare',
+				element: <Resultatvisare />,
+			},
 		],
 	},
 ]);
