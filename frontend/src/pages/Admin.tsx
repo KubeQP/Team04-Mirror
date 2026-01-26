@@ -50,7 +50,7 @@ export default function Admin() {
 			}
 		};
 		fetchData();
-	});
+	}, []);
 
 	//dynamic table creation
 	function createTable(tableData: string[][]) {
