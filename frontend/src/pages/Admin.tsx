@@ -86,6 +86,8 @@ export default function Admin() {
 		TempArray2.push(competitor.start_number);
 		TempArray2.push(competitor.name);
 		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp);
+		TempArray2.push("-");
+		TempArray2.push("-");
 		Array2.push(TempArray2);
 		TempArray2 = [];
 	});
