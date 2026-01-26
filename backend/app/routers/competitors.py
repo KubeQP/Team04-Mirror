@@ -12,4 +12,5 @@ router = APIRouter(prefix="/competitors", tags=["competitors"])
 
 @router.get("/", response_model=list[schemas.CompetitorOut])
 def read_competitors(db: Session = Depends(get_db)) -> list[Competitor]:
+    """Hämta alla tävlande från databasen."""
     return crud.get_competitors(db)
