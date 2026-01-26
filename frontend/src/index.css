@@ -240,7 +240,7 @@ header a:hover {
 }
 
 /* Admin page styles ----------------------------------------------------- */
-div.a {
+div.Admin-tables {
 	border: 1px solid rgba(17, 13, 236, 0.685);
 	flex-direction: row;
 	display: flex;
@@ -253,6 +253,7 @@ div.a {
 	width: 670px;
 }
 
+/* Global table styles -------------------------------------------------------*/
 table,
 th,
 td {
