@@ -12,6 +12,7 @@ class CompetitorOut(BaseModel):
     id: int
     start_number: str
     name: str
+    created_time: datetime
 
     model_config = ConfigDict(from_attributes=True)
 

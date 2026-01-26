@@ -13,6 +13,11 @@ export default function RegisteringSida(){
     const regWithoutInitialZeros = reg.replace(/^0+/, '');
     const formattedReg = regWithoutInitialZeros.padStart(3, "0");
 
+    const exists = regLista.some(r => r[0] === formattedReg);
+      if (exists) {
+        return;
+      }
+
 
     const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
     setRegLista((prev) => [...prev, [formattedReg, name,String(time)]]);

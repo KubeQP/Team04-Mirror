@@ -12,6 +12,7 @@ class Competitor(Base):
     id = Column(Integer, primary_key=True, index=True)
     start_number = Column(String, unique=True, index=True)
     name = Column(String)
+    created_time = Column(DateTime, default=datetime.datetime.now(datetime.UTC))
 
 
 class TimeEntry(Base):
