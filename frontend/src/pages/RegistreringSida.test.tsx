@@ -10,7 +10,9 @@ describe('RegisteringSida', () => {
 
     // Skriv in siffror fältet
     const input = screen.getByPlaceholderText('Skriv startnummer här');
+	const namn = screen.getByPlaceholderText('Skriv namn här');
     fireEvent.change(input, { target : { value: '001'}})
+	fireEvent.change(namn, { target : { value: 'William'}})
 		
 	// Klicka på knappen
 	fireEvent.click(screen.getByText('Registrera'));
@@ -31,6 +33,7 @@ describe('RegisteringSida', () => {
 
 		// Efter klick kolla listan
 		expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
+		expect(screen.getByText('Namn: William', {exact:false})).toBeInTheDocument();
 	});
 
 });
