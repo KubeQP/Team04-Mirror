@@ -14,8 +14,6 @@ beforeEach(() => {
 describe('RegisteringSida', () => {
 	it('Testar korrekt registrering', () => {
 
-		// Skriv in siffror i fältet
-		fireEvent.change(input, { target : { value: '001'}})
 			
 		// Klicka på knappen
 		fireEvent.click(screen.getByText('Registrera'));
