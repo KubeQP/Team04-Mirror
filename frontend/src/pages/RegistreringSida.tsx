@@ -9,10 +9,6 @@ export default function RegisteringSida(){
   const [regLista, setRegLista] = useState<string[][]>([]);
   const addReg = () => {
     if (!reg.trim()) return;
-    const date = new Date();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
     const time = new Date().toLocaleTimeString('sv-SE');
     setRegLista((prev) => [...prev, [reg,String(time)]]);
     setReg('');
