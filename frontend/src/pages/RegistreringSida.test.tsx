@@ -3,32 +3,67 @@ import { describe, expect, it } from 'vitest';
 
 import RegistreringSida from './RegistreringSida';
 
+const input = screen.getByPlaceholderText('Skriv startnummer här');
+
 describe('RegisteringSida', () => {
-	it('låter användaren skriva in och skicka registreringsnummret vid knapptryck', () => {
+	it('Testar korrekt registrering', () => {
 
 		render(<RegistreringSida />);
 
-    // Skriv in siffror fältet
-    const input = screen.getByPlaceholderText('Skriv startnummer här');
-    fireEvent.change(input, { target : { value: '001'}})
+		// Skriv in siffror fältet
 		
-	// Klicka på knappen
-	fireEvent.click(screen.getByText('Registrera'));
+		fireEvent.change(input, { target : { value: '001'}})
+			
+		// Klicka på knappen
+		fireEvent.click(screen.getByText('Registrera'));
 
-	// Efter klick kolla listan
-	expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
-
+		// Efter klick kolla listan
+		expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
+		
+	});
 	
+	it('Testar felaktig registrering med bokstäver', () => {
 
-	// Skriv in bokstäver i fältet
-	fireEvent.change(input, { target : { value: 'abc'}})
+		render(<RegistreringSida />);
+	
+			// Skriv in bokstäver i fältet
+		fireEvent.change(input, { target : { value: 'abc'}})
 
-	// Klicka på knappen
-	fireEvent.click(screen.getByText('Registrera'));
+		// Klicka på knappen
+		fireEvent.click(screen.getByText('Registrera'));
 
-	// Efter klick kolla listan
-	expect(screen.queryByText('abc')).not.toBeInTheDocument();
+		// Efter klick kolla listan
+		expect(screen.queryByText('abc')).not.toBeInTheDocument();
 
 	});
 
+	it('Testar registrering med extra nollor framför', () => {
+
+		render(<RegistreringSida />);
+		
+			// Skriv in med nollor framför
+		fireEvent.change(input, { target : { value: '000210'}})
+
+		// Klicka på knappen
+		fireEvent.click(screen.getByText('Registrera'));
+
+		// Efter klick kolla listan
+		expect(screen.getByText('Startnummer: 210', {exact:false})).not.toBeInTheDocument();
+	
+	});
+
+	it('Testar registrering med färre än tre siffror', () => {
+
+		render(<RegistreringSida />);
+		
+			// Skriv in utan extra nollor
+		fireEvent.change(input, { target : { value: '13'}})
+
+		// Klicka på knappen
+		fireEvent.click(screen.getByText('Registrera'));
+
+		// Efter klick kolla listan
+		expect(screen.getByText('Startnummer: 013', {exact:false})).not.toBeInTheDocument();
+	
+	});
 });
