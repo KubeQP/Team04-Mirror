@@ -12,7 +12,5 @@ export async function getCompetitorData(): Promise<Array<CompetitorData>> {
 		throw new Error('Nätverksfel: ' + response.statusText);
 	}
 
-	console.log(response);
-
 	return response.json();
 }
