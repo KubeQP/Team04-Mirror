@@ -1,8 +1,9 @@
 // frontend/src/pages/Admin.tsx
 import { useEffect, useState } from 'react';
+
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getTimeData } from '../api/getTimeData';
-import type { CompetitorData , TimeData} from '../types';
+import type { CompetitorData, TimeData } from '../types';
 
 // src/pages/Admin.tsx
 export default function Admin() {
@@ -16,13 +17,12 @@ export default function Admin() {
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
-	
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const result = await getCompetitorData();
 				setCompetitorData(result);
-				console.log("fetched data")
+				console.log('fetched data');
 			} catch (err: unknown) {
 				if (err instanceof Error) {
 					setCompetitorError(err.message);
@@ -47,41 +47,39 @@ export default function Admin() {
 					setTimeError('Ett okänt fel inträffade');
 				}
 			} finally {
-				
 				setTimeLoading(false);
 			}
 		};
 
 		fetchData();
-		
 	}, []);
 
-    //Table - Stations
+	//Table - Stations
 	let TempArray1: string[] = [];
-	let Array1: string[][] = [];
-	Array1.push(["station", "Nbr.","tid"]);
+	const Array1: string[][] = [];
+	Array1.push(['station', 'Nbr.', 'tid']);
 	competitorData?.forEach((competitor) => {
-		TempArray1.push("-");
+		TempArray1.push('-');
 		TempArray1.push(competitor.start_number);
-		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? "-");
+		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? '-');
 		Array1.push(TempArray1);
 		TempArray1 = [];
 	});
 
-    //Table - Competitors
+	//Table - Competitors
 	let TempArray2: string[] = [];
-	let Array2: string[][] = [];
-	Array2.push(["Nr.","Namn","Start","Mål","Totalt"]);
+	const Array2: string[][] = [];
+	Array2.push(['Nr.', 'Namn', 'Start', 'Mål', 'Totalt']);
 	competitorData?.forEach((competitor) => {
 		TempArray2.push(competitor.start_number);
 		TempArray2.push(competitor.name);
-		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? "-");
-		TempArray2.push("-");
-		TempArray2.push("-");
+		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? '-');
+		TempArray2.push('-');
+		TempArray2.push('-');
 		Array2.push(TempArray2);
 		TempArray2 = [];
 	});
-	
+
 	//dynamic table creation
 	function createTable(tableData: string[][]) {
 		if (tableData.length === 0) return null;

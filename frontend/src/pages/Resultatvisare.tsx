@@ -50,7 +50,6 @@ export default function Resultatvisare() {
 		};
 
 		fetchData();
-		
 	}, []);
 
 	const mappedData = competitorData?.map((competitor) => (
@@ -63,7 +62,7 @@ export default function Resultatvisare() {
 	));
 
 	console.log(competitorData);
-	
+
 	return (
 		<div>
 			<h2>Innehåll på Resultatvisare</h2>
