@@ -4,6 +4,8 @@
 // src/pages/Admin.tsx
 export default function Admin(){
 
+    
+
     return(
         <div>
             <h2>Admin Sida</h2>
@@ -29,6 +31,7 @@ export default function Admin(){
                             <td>-</td>
                             <td>-</td>
                             <td>-</td>
+                            <td>-</td>
                         </tr>
                         <tr>
                             <td>2</td>
@@ -36,10 +39,12 @@ export default function Admin(){
                             <td>-</td>
                             <td>2 tider!</td>
                             <td>-</td>
+                            <td>-</td>
                         </tr>
                         <tr>
                             <td>3</td>
                             <td>CC</td>
+                            <td>-</td>
                             <td>-</td>
                             <td>-</td>
                             <td>-</td>
@@ -50,6 +55,7 @@ export default function Admin(){
                             <td>-</td>
                             <td>X</td>
                             <td>?</td>
+                            <td>-</td>
                         </tr>
                     </tbody>
                 </table>

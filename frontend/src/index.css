@@ -239,6 +239,9 @@ header a:hover {
 	font-weight: 900;
 }
 
+
+
+/* Admin page styles ----------------------------------------------------- */
 div.a {
 	border: 1px solid rgba(17, 13, 236, 0.685);
 	flex-direction: row;
@@ -247,12 +250,24 @@ div.a {
 	align-items: flex-start;
 	gap: 100px;
 	margin: 2rem auto;
+    background-color:rgba(185, 181, 186, 0.9);
+    justify-content: center;
+    width: 670px;
 }
 
-table.b {
-	border: 1px solid rgba(236, 13, 102, 0.685);
+table, th, td {
+	border: 1px solid rgba(255, 255, 255, 0.685);
+    background-color: rgba(255, 255, 255, 0.685);
+    border-block: 1px solid rgba(255, 255, 255, 0.685);
+    text-align: center;
 }
 
-table.test {
-	border: 1px solid rgba(236, 13, 102, 0.685);
+/* th = Header, td = data*/
+th {
+    background-color: rgba(17, 13, 236, 0.685);
+    height: 40px;
+    width: 50px;
+}
+td {
+    background-color: rgb(177, 187, 234);
 }
