@@ -1,17 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import RegistreringSida from './RegistreringSida';
+import RegistreringStartTid from './RegistreringStartTid';
 
 let input: HTMLElement;
 
 beforeEach(() => {	
-	render(<RegistreringSida />);
+	render(<RegistreringStartTid />);
 	input = screen.getByPlaceholderText('Skriv startnummer här');
 });
 
 
-describe('RegisteringSida', () => {
+describe('RegisteringStartTid', () => {
 
 	it('registrerar ett korrekt startnummer', () => {
 		fireEvent.change(input, { target: { value: '001' }});
