@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import Sida1 from './pages/Sida1';
 import Sida2 from './pages/Sida2';
+import Resultatvisare from './pages/Resultatvisare';
 
 /*
   Detta är routerkonfigurationen för vår React-applikation. Den definierar hur
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
 				path: 'sida2',
 				element: <Sida2 />,
 			},
+			{
+				path: "Resultatvisare",
+				element: <Resultatvisare />
+			}
 		],
 	},
 ]);

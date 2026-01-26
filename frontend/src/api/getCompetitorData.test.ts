@@ -23,7 +23,7 @@ describe('getCompetitorData', () => {
 		const result = await getCompetitorData();
 
 		// Kontrollera att fetch anropades med rätt URL.
-		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/competitors');
+		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/competitors/');
 
 		// Kontrollera att resultatet är som vi förväntar oss
 		// och att getExampleData formaterar datan korrekt.
