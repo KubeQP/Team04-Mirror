@@ -5,12 +5,14 @@ export default function RegisteringSida(){
 
 
   const [reg, setReg] = useState("");
-  //const regLista: string[] = [];
   const [regLista, setRegLista] = useState<string[]>([]);
   const addReg = () => {
     if (!reg.trim()) return;
+    if (isNaN(Number(reg))) return;
+    const regWithoutInitialZeros = reg.replace(/^0+/, '');
+    const formattedReg = regWithoutInitialZeros.padStart(3, "0");
 
-    setRegLista((prev) => [...prev, reg]);
+    setRegLista((prev) => [...prev, formattedReg]);
     setReg('');
   };
 

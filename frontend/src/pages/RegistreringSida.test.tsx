@@ -8,18 +8,27 @@ describe('RegisteringSida', () => {
 
 		render(<RegistreringSida />);
 
-
-    // Skriv in i fältet
+    // Skriv in siffror fältet
     const input = screen.getByPlaceholderText('Skriv startnummer här');
     fireEvent.change(input, { target : { value: '001'}})
-    
 		
-		// Klicka på knappen
-		fireEvent.click(screen.getByText('Registrera'));
+	// Klicka på knappen
+	fireEvent.click(screen.getByText('Registrera'));
 
+	// Efter klick kolla listan
+	expect(screen.getByText('001')).toBeInTheDocument();
 
+	
 
-		// Efter klick kolla listan
-		expect(screen.getByText('Nummer: 001')).toBeInTheDocument();
+	// Skriv in bokstäver i fältet
+	fireEvent.change(input, { target : { value: 'abc'}})
+
+	// Klicka på knappen
+	fireEvent.click(screen.getByText('Registrera'));
+
+	// Efter klick kolla listan
+	expect(screen.getByText('Nummer: abc')).not.toBeInTheDocument();
+
 	});
+
 });
