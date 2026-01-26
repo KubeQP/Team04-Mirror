@@ -14,7 +14,7 @@ beforeEach(() => {
 describe('RegisteringSida', () => {
 	it('Testar korrekt registrering', () => {
 
-		// Skriv in siffror fältet
+		// Skriv in siffror i fältet
 		fireEvent.change(input, { target : { value: '001'}})
 			
 		// Klicka på knappen
@@ -27,7 +27,7 @@ describe('RegisteringSida', () => {
 	
 	it('Testar felaktig registrering med bokstäver', () => {
 	
-		// Skriv in bokstäver i fältet
+		// Skriv in bokstäver i startnummerfältet
 		fireEvent.change(input, { target : { value: 'abc'}})
 
 		// Klicka på knappen
@@ -66,7 +66,7 @@ describe('RegisteringSida', () => {
 
 	it('Testar registrering med fler än tre siffror', () => {
 
-		// Skriv in utan extra nollor
+		// Skriv in med extra nollor och tal större än 1000
 		fireEvent.change(input, { target : { value: '0001111'}})
 
 		// Klicka på knappen
@@ -75,5 +75,21 @@ describe('RegisteringSida', () => {
 		// Efter klick kolla listan
 		expect(screen.getByText('Startnummer: 1111', {exact:false})).toBeInTheDocument();
 	
+	});
+
+	it('Testar registrering med dubletter', () => {
+
+		// Försöker registrera två likadana tal
+
+		for (let i = 0; i < 2; i++) {
+  			fireEvent.change(input, { target: { value: '011' }});
+  			fireEvent.click(screen.getByText('Registrera'));
+		}
+
+		// Hämta alla registreringar med startnummer 011
+  		const matches = screen.getAllByText(/Startnummer: 011/i);
+
+  		// Ska bara finnas EN
+  		expect(matches.length).toBe(1);
 	});
 });
