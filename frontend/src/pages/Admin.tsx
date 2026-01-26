@@ -51,28 +51,44 @@ export default function Admin(){
 
     //dynamic table creation
     function createTable(tableData: string[][]) {
-        return (
-            <table>
-            <tbody>
-                {tableData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
-                    <td key={cellIndex}>{cell}</td>
-                    ))}
-                </tr>
-                ))}
-            </tbody>
-            </table>
-        );
-    }
+  if (tableData.length === 0) return null;
+
+  const [headerRow, ...bodyRows] = tableData;
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          {headerRow.map((header, index) => (
+            <th key={index}>{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {bodyRows.map((row, rowIndex) => (
+          <tr key={rowIndex}>
+            {row.map((cell, cellIndex) => (
+              <td key={cellIndex}>{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+    
 
 
     return(
         <div>
             <h2>Admin Sida</h2>
             <p>Välkommen till administrationssidan.</p>
-            {data1 && createTable(data1)}
-            {data2 && createTable(data2)}
+            <div className='a'>
+                {data1 && createTable(data1)}
+                {data2 && createTable(data2)}
+            </div>
+            
         </div>
     )
 }
