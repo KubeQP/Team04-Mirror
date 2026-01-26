@@ -44,10 +44,13 @@ export default function Resultatvisare() {
 				}
 			} finally {
 				setTimeLoading(false);
+				console.log(competitorData);
+				console.log(mappedData);
 			}
 		};
 
 		fetchData();
+		
 	}, []);
 
 	const mappedData = competitorData?.map((competitor) => (
@@ -59,6 +62,8 @@ export default function Resultatvisare() {
 		</div>
 	));
 
+	console.log(competitorData);
+	
 	return (
 		<div>
 			<h2>Innehåll på Resultatvisare</h2>
