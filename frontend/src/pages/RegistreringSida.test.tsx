@@ -63,4 +63,17 @@ describe('RegisteringSida', () => {
 		expect(screen.getByText('Startnummer: 013', {exact:false})).toBeInTheDocument();
 	
 	});
+
+	it('Testar registrering med fler än tre siffror', () => {
+
+		// Skriv in utan extra nollor
+		fireEvent.change(input, { target : { value: '0001111'}})
+
+		// Klicka på knappen
+		fireEvent.click(screen.getByText('Registrera'));
+
+		// Efter klick kolla listan
+		expect(screen.getByText('Startnummer: 1111', {exact:false})).toBeInTheDocument();
+	
+	});
 });
