@@ -59,8 +59,6 @@ Base.metadata.create_all(bind=engine)
 # Skapa FastAPI appen
 app = FastAPI(lifespan=lifespan, title="Race Timing Backend API")
 
-app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -86,14 +84,6 @@ else:
     print(
         "Make sure to build the frontend with 'npm run build' in the frontend directory."
     )
-
-# Sätt på CORS för dev om frontend körs separat
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 # Tillåter att starta appen med "python -m app.main"
