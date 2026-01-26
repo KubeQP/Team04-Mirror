@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 
-export default function RegisteringSida(){
+export default function RegistreringStoppTid(){
 
 
   const [reg, setReg] = useState("");
@@ -25,14 +25,14 @@ export default function RegisteringSida(){
 
   return (
     <div>
-			<h2>Registrering:</h2>
-			<input id="startNbrInput" value={reg} onChange= { (e) => setReg(e.target.value)} type="text" placeholder="Skriv startnummer här" />
+            <h2>Registrering:</h2>
+            <input id="startNbrInput" value={reg} onChange= { (e) => setReg(e.target.value)} type="text" placeholder="Skriv startnummer här" />
       <button onClick={addReg} disabled={!reg}>Registrera</button>
       <table>
         <thead>
           <tr>
             <th>Startnummer</th>
-            <th>Tid</th>
+            <th>Stopptid</th>
           </tr>
         </thead>
         <tbody>
@@ -45,7 +45,7 @@ export default function RegisteringSida(){
         </tbody>
       </table>
 
-		</div>
+        </div>
   );
 
 }

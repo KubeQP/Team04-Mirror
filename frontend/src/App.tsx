@@ -15,7 +15,8 @@ export default function App() {
 					<Link to="/">Startsida</Link>
 					<Link to="/sida1">Sida 1</Link>
 					<Link to="/sida2">Sida 2</Link>
-					<Link to="/registreringsida">RegistreringSida</Link>
+					<Link to="/registreringstarttid">RegistreringStartTid</Link>
+					<Link to="/registreringstopptid">RegistreringStoppTid</Link>
 				</nav>
 				<hr />
 			</header>
