@@ -68,17 +68,26 @@ export default function Admin() {
 		
 	}, []);
 
-	
-
-	let TempArray: string[] = [];
-	let Array: string[][] = [];
-	Array.push(["Nr.","Namn","Start","Mål","Totalt"]);
+	let TempArray1: string[] = [];
+	let Array1: string[][] = [];
+	Array1.push(["station", "Nbr.","tid"]);
 	competitorData?.forEach((competitor) => {
-		TempArray.push(competitor.start_number);
-		TempArray.push(competitor.name);
-		TempArray.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp);
-		Array.push(TempArray);
-		TempArray = [];
+		TempArray1.push("-");
+		TempArray1.push(competitor.start_number);
+		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp);
+		Array1.push(TempArray1);
+		TempArray1 = [];
+	});
+
+	let TempArray2: string[] = [];
+	let Array2: string[][] = [];
+	Array2.push(["Nr.","Namn","Start","Mål","Totalt"]);
+	competitorData?.forEach((competitor) => {
+		TempArray2.push(competitor.start_number);
+		TempArray2.push(competitor.name);
+		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp);
+		Array2.push(TempArray2);
+		TempArray2 = [];
 	});
 	
 	//dynamic table creation
@@ -114,7 +123,8 @@ export default function Admin() {
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
 			<div className="a">
-				{Array && createTable(Array)}
+				{Array1 && createTable(Array1)}
+				{Array2 && createTable(Array2)}
 			</div>
 		</div>
 	);
