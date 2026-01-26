@@ -24,6 +24,6 @@ class TimeEntryOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class CompetitorReg(BaseModel):
-    start_nummer: int
+    start_number: int
     timestamp: datetime
 
