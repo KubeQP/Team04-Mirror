@@ -5,16 +5,16 @@ export default function RegisteringSida(){
 
 
   const [reg, setReg] = useState("");
-  const [regLista, setRegLista] = useState<string[]>([]);
+  const [regLista, setRegLista] = useState<string[][]>([]);
   const addReg = () => {
     if (!reg.trim()) return;
     if (isNaN(Number(reg))) return;
     const regWithoutInitialZeros = reg.replace(/^0+/, '');
     const formattedReg = regWithoutInitialZeros.padStart(3, "0");
 
-    setRegLista((prev) => [...prev, formattedReg]);
+
     const time = new Date().toLocaleTimeString('sv-SE');
-    setRegLista((prev) => [...prev, [reg,String(time)]]);
+    setRegLista((prev) => [...prev, [formattedReg,String(time)]]);
     setReg('');
   };
 

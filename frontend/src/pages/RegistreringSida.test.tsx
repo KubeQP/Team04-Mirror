@@ -29,6 +29,8 @@ describe('RegisteringSida', () => {
 	// Efter klick kolla listan
 	expect(screen.getByText('Nummer: abc')).not.toBeInTheDocument();
 
+		// Efter klick kolla listan
+		expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
 	});
 
 });
