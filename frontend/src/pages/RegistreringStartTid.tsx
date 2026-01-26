@@ -19,8 +19,10 @@ export default function RegisteringStartTid(){
 
 
     //const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
-    const time = new Date().toISOString();
-    setRegLista((prev) => [...prev, [formattedReg,String(time)]]);
+    const now = new Date();
+    const time = now.toISOString();
+    const formattedTime = now.toLocaleTimeString('sv-SE');
+    setRegLista((prev) => [...prev, [formattedReg,String(formattedTime)]]);
     setReg('');
 
     

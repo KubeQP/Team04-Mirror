@@ -18,8 +18,12 @@ export default function RegistreringStoppTid(){
       }
 
 
-    const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
-    setRegLista((prev) => [...prev, [formattedReg,String(time)]]);
+    //kommer inte behövas sen, byts ut mot tiden från databasen.
+    const now = new Date();
+    //const time = now.toISOString(); will be used later
+    const formattedTime = now.toLocaleTimeString('sv-SE');
+
+    setRegLista((prev) => [...prev, [formattedReg,String(formattedTime)]]);
     setReg('');
   };
 
