@@ -34,7 +34,7 @@ const router = createBrowserRouter([
 				element: <Sida2 />,
 			},
 			{
-				path: 'Resultatvisare',
+				path: 'resultatvisare',
 				element: <Resultatvisare />,
 			},
 			{
