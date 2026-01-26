@@ -14,3 +14,8 @@ export interface TimeData {
 	competitor_id: string;
 	timestamp: string;
 }
+
+export interface ExampleTable {
+	headings: [string];
+	body: [[string]];
+}
