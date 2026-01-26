@@ -4,6 +4,8 @@ import type { ExampleTable } from '../types';
 
 // src/pages/Admin.tsx
 export default function Admin(){
+    //declaring constants for the tables
+
     const exampleData1 = [["Nr", "Namn", "Start", "Mål", "Tid", "Totalt"], 
     ["1", "AA", "-", "-", "-"]];
     const exampleData2 = [["Station","Nr","Tid"], 
@@ -17,6 +19,7 @@ export default function Admin(){
     const [loading2, setLoading2] = useState(false);
     const [error2, setError2] = useState<string | null>(null);
     
+    //fetching data from api OR setting to the example data
     useEffect(() =>{
         const fetchData = async()=>{
         try{
@@ -46,6 +49,7 @@ export default function Admin(){
     fetchData();
     })
 
+    //dynamic table creation
     function createTable(tableData: string[][]) {
         return (
             <table>
