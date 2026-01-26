@@ -11,3 +11,15 @@ router = APIRouter(prefix="/competitors", tags=["competitors"])
 @router.get("/", response_model=list[schemas.CompetitorOut])
 def read_competitors(db: Session = Depends(get_db)):
     return crud.get_competitors(db)
+
+@router.post("/register", response_model=schemas.CompetitorReg)
+def reg_competitor(data : schemas.CompetitorOut, db: Session = Depends(get_db)):
+    competitor = crud.record_new_reg(db, data.start_number)
+    time_entry = crud.record_time_for_start_number(db, data.start_number)
+    return {
+        "start_number": competitor.start_number,
+        "timestamp": time_entry.timestamp,
+    }
+    
+    
+    

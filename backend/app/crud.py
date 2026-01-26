@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from .models import Competitor, TimeEntry
 
+import datetime
+
 
 def get_competitors(db: Session):
     """Hämta alla tävlande från databasen."""
@@ -38,3 +40,15 @@ def record_time_for_start_number(db: Session, start_number: str) -> TimeEntry | 
     db.commit()
     db.refresh(entry)
     return entry
+
+def record_new_reg(db: Session, start_number: str):
+    """Registrerar en ny competitor med starttid"""
+    entry = Competitor(start_number = start_number)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
+
+

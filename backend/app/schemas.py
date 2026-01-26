@@ -12,7 +12,6 @@ class CompetitorOut(BaseModel):
     id: int
     start_number: str
     name: str
-    created_time: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -23,3 +22,8 @@ class TimeEntryOut(BaseModel):
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class CompetitorReg(BaseModel):
+    Start_nummer: int
+    timeStamp: datetime
+
