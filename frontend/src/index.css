@@ -267,6 +267,7 @@ th {
 	background-color: rgba(17, 13, 236, 0.685);
 	height: 40px;
 	width: 50px;
+	padding: 5px;
 }
 td {
 	background-color: rgb(177, 187, 234);
