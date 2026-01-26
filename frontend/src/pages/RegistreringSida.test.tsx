@@ -16,7 +16,7 @@ describe('RegisteringSida', () => {
 	fireEvent.click(screen.getByText('Registrera'));
 
 	// Efter klick kolla listan
-	expect(screen.getByText('001')).toBeInTheDocument();
+	expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
 
 	
 
@@ -27,10 +27,8 @@ describe('RegisteringSida', () => {
 	fireEvent.click(screen.getByText('Registrera'));
 
 	// Efter klick kolla listan
-	expect(screen.getByText('Nummer: abc')).not.toBeInTheDocument();
+	expect(screen.queryByText('abc')).not.toBeInTheDocument();
 
-		// Efter klick kolla listan
-		expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
 	});
 
 });
