@@ -11,7 +11,7 @@ class Competitor(Base):
     __tablename__ = "competitors"
     id = Column(Integer, primary_key=True, index=True)
     start_number = Column(String, unique=True, index=True)
-    name = Column(String)
+    #name = Column(String)
 
 
 class TimeEntry(Base):

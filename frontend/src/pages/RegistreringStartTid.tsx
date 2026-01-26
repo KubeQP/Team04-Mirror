@@ -18,13 +18,14 @@ export default function RegisteringStartTid(){
       }
 
 
-    const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
+    //const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
+    const time = new Date().toISOString();
     setRegLista((prev) => [...prev, [formattedReg,String(time)]]);
     setReg('');
 
     
     try {
-      const res = await fetch("http://localhost:5173/competitor/register", {
+      const res = await fetch("http://localhost:8000/competitors/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
