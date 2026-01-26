@@ -8,3 +8,9 @@ export interface CompetitorData {
 	start_number: string;
 	name: string;
 }
+
+export interface TimeData {
+	id: number;
+	competitor_id: string;
+	timestamp: Date;
+}
