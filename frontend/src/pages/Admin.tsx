@@ -4,9 +4,9 @@ import type { ExampleTable } from '../types';
 
 // src/pages/Admin.tsx
 export default function Admin(){
-    var exampleData1 = [["Nr", "Namn", "Start", "Mål", "Tid", "Totalt"], 
+    const exampleData1 = [["Nr", "Namn", "Start", "Mål", "Tid", "Totalt"], 
     ["1", "AA", "-", "-", "-"]];
-    var exampleData2 = [["Station","Nr","Tid"], 
+    const exampleData2 = [["Station","Nr","Tid"], 
     ["s1", "1", "-"]];
 
     const[data1, setData1] = useState<string[][]|null>(null);
@@ -46,77 +46,29 @@ export default function Admin(){
     fetchData();
     })
 
+    function createTable(tableData: string[][]) {
+        return (
+            <table>
+            <tbody>
+                {tableData.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                    <td key={cellIndex}>{cell}</td>
+                    ))}
+                </tr>
+                ))}
+            </tbody>
+            </table>
+        );
+    }
+
+
     return(
         <div>
             <h2>Admin Sida</h2>
             <p>Välkommen till administrationssidan.</p>
-
-            {/* Första table */}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nr.</th>
-                        <th>Namn</th>
-                        <th>Start</th>
-                        <th>Mål</th>
-                        <th>Tid</th>
-                        <th>Totalt</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>AA</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>BB</td>
-                        <td>-</td>
-                        <td>2 tider!</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>CC</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>DD</td>
-                        <td>-</td>
-                        <td>X</td>
-                        <td>?</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            {/* Station table */}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Station</th>
-                        <th>Nr.</th>
-                        <th>Tid</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>S</td>
-                        <td>1</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>S</td>
-                        <td>2</td>
-                        <td>-</td>
-                    </tr>
-                </tbody>
-            </table>
+            {data1 && createTable(data1)}
+            {data2 && createTable(data2)}
         </div>
     )
 }
