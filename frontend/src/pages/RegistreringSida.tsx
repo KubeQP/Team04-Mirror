@@ -6,11 +6,15 @@ export default function RegisteringSida(){
 
   const [reg, setReg] = useState("");
   //const regLista: string[] = [];
-  const [regLista, setRegLista] = useState<string[]>([]);
+  const [regLista, setRegLista] = useState<string[][]>([]);
   const addReg = () => {
     if (!reg.trim()) return;
-
-    setRegLista((prev) => [...prev, reg]);
+    const date = new Date();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const time = new Date().toLocaleTimeString('sv-SE');
+    setRegLista((prev) => [...prev, [reg,String(time)]]);
     setReg('');
   };
 
@@ -20,8 +24,10 @@ export default function RegisteringSida(){
 			<input id="startNbrInput" value={reg} onChange= { (e) => setReg(e.target.value)} type="text" placeholder="Skriv startnummer här" />
       <button onClick={addReg}>Registrera</button>
       <ul>
-        {regLista.map((item, index) => (
-          <li key={index}>{item}</li>
+        {regLista.map((row, index) => (
+          <li key={index}>
+            Startnummer: {row[0]} Tid: {row[1]}
+          </li>
         ))}
       </ul>
 		</div>
