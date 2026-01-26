@@ -50,7 +50,7 @@ export default function Resultatvisare() {
 		};
 
 		fetchData();
-	}, []);
+	});
 
 	const mappedData = competitorData?.map((competitor) => (
 		<div key={competitor.id}>

@@ -113,8 +113,18 @@ export default function Admin() {
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
 			<div className="Admin-tables">
-				{Array1 && createTable(Array1)}
-				{Array2 && createTable(Array2)}
+				{competitorLoading || timeLoading ? (
+					<p>Laddar data...</p>
+				) : competitorError ? (
+					<p>Fel vid hämtning av tävlingsdeltagare: {competitorError}</p>
+				) : timeError ? (
+					<p>Fel vid hämtning av tiddata: {timeError}</p>
+				) : (
+					<div style={{ display: 'flex', gap: '20px' }}>
+						{createTable(Array1)}
+						{createTable(Array2)}
+					</div>
+				)}
 			</div>
 		</div>
 	);
