@@ -57,7 +57,7 @@ export default function Admin() {
 	//Table - Stations
 	let TempArray1: string[] = [];
 	const Array1: string[][] = [];
-	Array1.push(['station', 'Nbr.', 'tid']);
+	Array1.push(['Station', 'Nbr.', 'Tid']);
 	competitorData?.forEach((competitor) => {
 		TempArray1.push('-');
 		TempArray1.push(competitor.start_number);
