@@ -15,7 +15,8 @@ export default function App() {
 					<Link to="/">Startsida</Link>
 					<Link to="/sida1">Sida 1</Link>
 					<Link to="/sida2">Sida 2</Link>
-                    <Link to="/admin">Admin</Link>
+					<Link to="/Resultatvisare">Resultatvisare</Link>
+					<Link to="/admin">Admin</Link>
 				</nav>
 				<hr />
 			</header>

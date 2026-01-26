@@ -2,9 +2,10 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import Admin from './pages/Admin';
+import Resultatvisare from './pages/Resultatvisare';
 import Sida1 from './pages/Sida1';
 import Sida2 from './pages/Sida2';
-import Admin from './pages/Admin';
 
 /*
   Detta är routerkonfigurationen för vår React-applikation. Den definierar hur
@@ -32,10 +33,14 @@ const router = createBrowserRouter([
 				path: 'sida2',
 				element: <Sida2 />,
 			},
-            {
-                path: 'admin',
-                element: <Admin />,
-            }
+			{
+				path: 'Resultatvisare',
+				element: <Resultatvisare />,
+			},
+			{
+				path: 'admin',
+				element: <Admin />,
+			},
 		],
 	},
 ]);
