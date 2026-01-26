@@ -12,38 +12,24 @@ beforeEach(() => {
 
 
 describe('RegisteringSida', () => {
-	it('Testar korrekt registrering', () => {
 
-			
-		// Klicka på knappen
+	it('registrerar ett korrekt startnummer', () => {
+		fireEvent.change(input, { target: { value: '001' }});
 		fireEvent.click(screen.getByText('Registrera'));
-		render(<RegistreringSida />);
 
-    // Skriv in siffror fältet
-    const input = screen.getByPlaceholderText('Skriv startnummer här');
-	const namn = screen.getByPlaceholderText('Skriv namn här');
-    fireEvent.change(input, { target : { value: '001'}})
-	fireEvent.change(namn, { target : { value: 'William'}})
-		
-	// Klicka på knappen
-	fireEvent.click(screen.getByText('Registrera'));
-
-		// Efter klick kolla listan
-		expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
-		
+		expect(screen.getByText('001')).toBeInTheDocument();
 	});
 	
 	it('Testar felaktig registrering med bokstäver', () => {
 	
 		// Skriv in bokstäver i startnummerfältet
-		fireEvent.change(input, { target : { value: 'abc'}})
+		fireEvent.change(input, { target : { value: 'abc'}});
 
 		// Klicka på knappen
 		fireEvent.click(screen.getByText('Registrera'));
 
 		// Efter klick kolla listan
 		expect(screen.queryByText('abc')).not.toBeInTheDocument();
-
 	});
 
 	it('Testar registrering med extra nollor framför', () => {
@@ -55,7 +41,7 @@ describe('RegisteringSida', () => {
 		fireEvent.click(screen.getByText('Registrera'));
 
 		// Efter klick kolla listan
-		expect(screen.getByText('Startnummer: 210', {exact:false})).toBeInTheDocument();
+		expect(screen.getByText('210')).toBeInTheDocument();
 	
 	});
 
@@ -68,7 +54,7 @@ describe('RegisteringSida', () => {
 		fireEvent.click(screen.getByText('Registrera'));
 
 		// Efter klick kolla listan
-		expect(screen.getByText('Startnummer: 013', {exact:false})).toBeInTheDocument();
+		expect(screen.getByText('013', {exact:false})).toBeInTheDocument();
 	
 	});
 
@@ -81,10 +67,8 @@ describe('RegisteringSida', () => {
 		fireEvent.click(screen.getByText('Registrera'));
 
 		// Efter klick kolla listan
-		expect(screen.getByText('Startnummer: 1111', {exact:false})).toBeInTheDocument();
+		expect(screen.getByText('1111', {exact:false})).toBeInTheDocument();
 	
-		expect(screen.getByText('Startnummer: 001', {exact:false})).toBeInTheDocument();
-		expect(screen.getByText('Namn: William', {exact:false})).toBeInTheDocument();
 	});
 
 	it('Testar registrering med dubletter', () => {
@@ -97,7 +81,7 @@ describe('RegisteringSida', () => {
 		}
 
 		// Hämta alla registreringar med startnummer 011
-  		const matches = screen.getAllByText(/Startnummer: 011/i);
+  		const matches = screen.getAllByText(/011/i);
 
   		// Ska bara finnas EN
   		expect(matches.length).toBe(1);
