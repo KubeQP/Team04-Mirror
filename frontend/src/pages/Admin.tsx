@@ -2,20 +2,11 @@
 import { useEffect, useState } from 'react';
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getTimeData } from '../api/getTimeData';
-import type { ExampleTable } from '../types';
+import type { CompetitorData , TimeData} from '../types';
 
 // src/pages/Admin.tsx
 export default function Admin() {
-	//declaring constants for the tables
-
-	const exampleData1 = [
-		['Nr', 'Namn', 'Start', 'Mål', 'Tid', 'Totalt'],
-		['1', 'AA', '-', '-', '-'],
-	];
-	const exampleData2 = [
-		['Station', 'Nr', 'Tid'],
-		['s1', '1', '-'],
-	];
+	//declaring constants for the imports
 
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
@@ -58,9 +49,6 @@ export default function Admin() {
 			} finally {
 				
 				setTimeLoading(false);
-				console.log(competitorData);
-				
-				console.log(Array);
 			}
 		};
 
@@ -75,7 +63,7 @@ export default function Admin() {
 	competitorData?.forEach((competitor) => {
 		TempArray1.push("-");
 		TempArray1.push(competitor.start_number);
-		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp);
+		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? "-");
 		Array1.push(TempArray1);
 		TempArray1 = [];
 	});
@@ -87,7 +75,7 @@ export default function Admin() {
 	competitorData?.forEach((competitor) => {
 		TempArray2.push(competitor.start_number);
 		TempArray2.push(competitor.name);
-		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp);
+		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? "-");
 		TempArray2.push("-");
 		TempArray2.push("-");
 		Array2.push(TempArray2);
