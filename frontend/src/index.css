@@ -238,3 +238,21 @@ header a:hover {
 .text-bold {
 	font-weight: 900;
 }
+
+div.a {
+	border: 1px solid rgba(17, 13, 236, 0.685);
+	flex-direction: row;
+	display: flex;
+	padding: 5%;
+	align-items: flex-start;
+	gap: 100px;
+	margin: 2rem auto;
+}
+
+table.b {
+	border: 1px solid rgba(236, 13, 102, 0.685);
+}
+
+table.test {
+	border: 1px solid rgba(236, 13, 102, 0.685);
+}
