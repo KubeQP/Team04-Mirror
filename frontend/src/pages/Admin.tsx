@@ -68,6 +68,7 @@ export default function Admin() {
 		
 	}, []);
 
+    //Table - Stations
 	let TempArray1: string[] = [];
 	let Array1: string[][] = [];
 	Array1.push(["station", "Nbr.","tid"]);
@@ -79,6 +80,7 @@ export default function Admin() {
 		TempArray1 = [];
 	});
 
+    //Table - Competitors
 	let TempArray2: string[] = [];
 	let Array2: string[][] = [];
 	Array2.push(["Nr.","Namn","Start","Mål","Totalt"]);
@@ -124,7 +126,7 @@ export default function Admin() {
 		<div>
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
-			<div className="a">
+			<div className="Admin-tables">
 				{Array1 && createTable(Array1)}
 				{Array2 && createTable(Array2)}
 			</div>
