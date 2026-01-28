@@ -5,10 +5,14 @@ export default function RegisteringStartTid(){
 
 
   const [reg, setReg] = useState("");
-  const [regLista, setRegLista] = useState<string[][]>([]);
+  const [name, setName] = useState("");
+  const [regLista, setRegLista] = useState<[string, string, string][]>([]);
   const addReg = async () => {
+
     if (!reg.trim()) return;
     if (isNaN(Number(reg))) return;
+    if (!name.trim()) return;
+
     const regWithoutInitialZeros = reg.replace(/^0+/, '');
     const formattedReg = regWithoutInitialZeros.padStart(3, "0");
 
@@ -22,8 +26,9 @@ export default function RegisteringStartTid(){
     const now = new Date();
     const time = now.toISOString();
     const formattedTime = now.toLocaleTimeString('sv-SE');
-    setRegLista((prev) => [...prev, [formattedReg,String(formattedTime)]]);
+    setRegLista((prev) => [...prev, [formattedReg,String(formattedTime),name]]);
     setReg('');
+    setName('');
 
     
     try {
@@ -34,7 +39,8 @@ export default function RegisteringStartTid(){
         },
         body: JSON.stringify({
           start_number: formattedReg,
-          timestamp: time
+          timestamp: time,
+          name: name
         })
       });
 
@@ -55,22 +61,36 @@ export default function RegisteringStartTid(){
   return (
     <div>
 			<h2>Registrering:</h2>
-			<input id="startNbrInput" value={reg} onChange= { (e) => setReg(e.target.value)} type="text" placeholder="Skriv startnummer här" />
+			<input 
+      id="startNbrInput" 
+      value={reg} onChange= { (e) => setReg(e.target.value)} 
+      type="text" 
+      placeholder="Skriv startnummer här" 
+      />
+      <input
+        id="nameInput"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        type="text"
+        placeholder="Skriv namn här"
+      />
       <button onClick={addReg} disabled={!reg}>Registrera</button>
       <table>
         <thead>
           <tr>
             <th>Startnummer</th>
             <th>Starttid</th>
+            <th>Namn</th>
           </tr>
         </thead>
         <tbody>
-          {regLista.map((row, index) => (
-            <tr key={index}>
-              <td>{row[0]}</td>
-              <td>{row[1]}</td>
-            </tr>
-          ))}
+            {regLista.map(([startNbr, time, name], index) => (
+              <tr key={index}>
+                <td>{startNbr}</td>
+                <td>{time}</td>
+                <td>{name}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
 
