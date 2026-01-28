@@ -35,15 +35,15 @@ def record_time_for_start_number(db: Session, start_number: str, timestamp: date
     competitor = db.query(Competitor).filter_by(start_number=start_number).first()
     if competitor is None:
         return None  # hanteras i router
-    entry = TimeEntry(competitor_id=competitor.id, timestamp = datetime)
+    entry = TimeEntry(competitor_id=competitor.id, timestamp = timestamp)
     db.add(entry)
     db.commit()
     db.refresh(entry)
     return entry
 
-def record_new_reg(db: Session, start_number: str) -> Competitor:
+def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
     """Registrerar en ny competitor med starttid"""
-    entry = Competitor(start_number = start_number)
+    entry = Competitor(start_number = start_number, name = name)
     db.add(entry)
     db.commit()
     db.refresh(entry)
