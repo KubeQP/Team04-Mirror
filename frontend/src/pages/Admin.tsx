@@ -14,7 +14,7 @@ function formatRegisteredTime(timestamp?: string): string {
 
 	const [h, m, s] = timePart.split(':');
 
-	return `${datePart}, ${Number(h)}:${Number(m)}:${Number(s)}`;
+	return `${datePart}, ${Number(h)}:${Number(m)}:${Number(s.split('.')[0])}`;
 }
 
 export default function Admin() {
