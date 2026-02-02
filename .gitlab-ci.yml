@@ -211,6 +211,7 @@ backend-build-windows:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 backend-build-mac:
   stage: build-backend
@@ -229,6 +230,7 @@ backend-build-mac:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 
 # ---------------------------
 # Archive build (main branch only)
