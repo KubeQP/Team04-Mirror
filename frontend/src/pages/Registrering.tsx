@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
-type competitor = {
+type Competitor = {
 	start_number: string;
 	name: string;
 };
@@ -16,7 +16,7 @@ export default function Registrering() {
 
 	const [reg, setReg] = useState('');
 	const [name, setName] = useState('');
-	const [competitors, setCompetitors] = useState<competitor[]>([]);
+	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
 	const fetchCompetitors = async () => {
 		const res = await fetch('http://localhost:8000/competitors/');
