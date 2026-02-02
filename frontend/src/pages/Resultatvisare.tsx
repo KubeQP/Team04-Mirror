@@ -14,6 +14,15 @@ export default function Resultatvisare() {
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
+	const mappedData = competitorData?.map((competitor) => (
+		<div key={competitor.id}>
+			<h3>Name: {competitor.name}</h3>
+			<h3>Start number: {competitor.start_number}</h3>
+			<h3>Timestamp: {timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp}</h3>
+			<hr />
+		</div>
+	));
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -50,16 +59,7 @@ export default function Resultatvisare() {
 		};
 
 		fetchData();
-	}, []);
-
-	const mappedData = competitorData?.map((competitor) => (
-		<div key={competitor.id}>
-			<h3>Name: {competitor.name}</h3>
-			<h3>Start number: {competitor.start_number}</h3>
-			<h3>Timestamp: {timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp}</h3>
-			<hr />
-		</div>
-	));
+	}, [competitorData, mappedData]);
 
 	console.log(competitorData);
 

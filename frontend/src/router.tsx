@@ -2,9 +2,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from './App';
+import Admin from './pages/Admin';
 import Registrering from './pages/Registrering';
 import RegistreringStoppTid from './pages/RegistreringStoppTid';
-import Admin from './pages/Admin';
 import Resultatvisare from './pages/Resultatvisare';
 import Sida1 from './pages/Sida1';
 import Sida2 from './pages/Sida2';
@@ -37,11 +37,11 @@ const router = createBrowserRouter([
 			},
 			{
 				path: 'Registrering',
-				element: <Registrering/>
+				element: <Registrering />,
 			},
 			{
 				path: 'RegistreringStoppTid',
-				element: <RegistreringStoppTid/>
+				element: <RegistreringStoppTid />,
 			},
 			{
 				path: 'resultatvisare',
@@ -50,8 +50,7 @@ const router = createBrowserRouter([
 			{
 				path: 'admin',
 				element: <Admin />,
-			}
-
+			},
 		],
 	},
 ]);

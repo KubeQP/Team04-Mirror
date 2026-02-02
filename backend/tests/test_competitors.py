@@ -7,7 +7,7 @@ from app import models
 
 def test_get_competitors_empty(client: TestClient) -> None:
     """Om det inte finns några tävlande ska vi få en tom lista."""
-    response = client.get("/competitors")
+    response = client.get("/api/competitors")
     assert response.status_code == 200
     assert response.json() == []
 
@@ -19,7 +19,7 @@ def test_get_competitors_with_data(client: TestClient, db_session: Session) -> N
     db_session.add_all([c1, c2])
     db_session.commit()
 
-    response = client.get("/competitors")
+    response = client.get("/api/competitors")
     assert response.status_code == 200
 
     data = response.json()

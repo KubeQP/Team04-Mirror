@@ -1,7 +1,7 @@
 import type { TimeData } from '../types';
 
 export async function getTimeData(): Promise<Array<TimeData>> {
-	const response = await fetch('http://127.0.0.1:8000/times/', {
+	const response = await fetch('http://127.0.0.1:8000/api/times/', {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',

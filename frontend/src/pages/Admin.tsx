@@ -17,8 +17,6 @@ export default function Admin() {
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
-	
-	
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
