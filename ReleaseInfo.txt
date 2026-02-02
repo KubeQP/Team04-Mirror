@@ -1,0 +1,7 @@
+Denna release innehåller:
+
+Färdigt:
+B1, B2, B3, B5, B6, B7, B8, F1, F4, F17
+
+Delvis implementerad:
+B4, B9, F0

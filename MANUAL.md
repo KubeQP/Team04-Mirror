@@ -1,5 +1,8 @@
 # MANUAL
 
+# Körning av hela programmet
+För att köra hela programmet, klicka in på Pipeline, sedan zip-build. Därefter välj Job Artifacts and Download för att få en zip-folder. Denna kan unzipas och `cd app/backend`, och därefter kör `./run` i terminalen
+
 # Backend
 
 ## 1. Översikt
@@ -51,6 +54,7 @@ eller
 python -m venv
 ```
 vars endpoints man kan testa i [http://localhost:8000/docs](http://localhost:8000/docs)
+
 
 ### Information
 `--reload` för att uppdatera endpoint localhost.
