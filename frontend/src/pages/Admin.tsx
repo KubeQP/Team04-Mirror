@@ -99,7 +99,9 @@ export default function Admin() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex}>{cell}</td>
+								<td key={cellIndex}>{cell}
+								<input defaultValue={cell}/>
+								</td>
 							))}
 						</tr>
 					))}
