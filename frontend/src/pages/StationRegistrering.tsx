@@ -57,7 +57,7 @@ export default function Registrering(){
 
     
     try {
-      const res = await fetch("http://localhost:8000/competitors/register", {
+      const res = await fetch("http://localhost:8000/stations/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -92,45 +92,7 @@ export default function Registrering(){
   };
 
   return (
-    <div>
-			<h2>Registrering:</h2>
-			<input 
-      id="startNbrInput" 
-      value={reg} onChange= { (e) => setReg(e.target.value)} 
-      type="text" 
-      placeholder="Skriv startnummer här" 
-      />
-      <input
-        id="nameInput"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        type="text"
-        placeholder="Skriv namn här"
-      />
-      <button 
-      onClick={addReg}
-      disabled={!reg.trim() || !name.trim()}
-      >
-        Registrera
-        </button>
-      <table>
-        <thead>
-          <tr>
-            <th>Startnummer</th>
-            <th>Namn</th>
-          </tr>
-        </thead>
-        <tbody>
-            {competitors.map((c) => (
-              <tr key={c.start_number}>
-                <td>{c.start_number}</td>
-                <td>{c.name}</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-
-		</div>
+    <div></div>
   );
 
 }

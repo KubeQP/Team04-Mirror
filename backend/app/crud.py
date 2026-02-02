@@ -5,7 +5,7 @@
 
 from sqlalchemy.orm import Session
 
-from .models import Competitor, TimeEntry
+from .models import Competitor, TimeEntry, Station
 
 import datetime
 
@@ -50,5 +50,15 @@ def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
     return entry
 
 
+def record_new_station(db: Session, name: str, order: str) -> Station:
+    """Registrera en ny station"""
+    entry = Station(name = name, order = order)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
 
+def get_stations(db: Session) -> list[Station]:
+    """Hämta alla stationer från databasen."""
+    return db.query(Station).all()
 

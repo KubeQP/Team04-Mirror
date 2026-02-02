@@ -28,5 +28,15 @@ class TimeEntryOut(BaseModel):
 
 class CompetitorReg(BaseModel):
     start_number: str
-    name: str 
+    name: str
+
+class StationReg(BaseModel):
+    name: str
+    order: str
+
+class StationOut(BaseModel):
+    id: int
+    name: str
+    order: str
+
 

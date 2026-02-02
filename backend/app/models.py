@@ -20,11 +20,16 @@ class TimeEntry(Base):
     __tablename__ = "times"
     id = Column(Integer, primary_key=True, index=True)
     competitor_id = Column(Integer, ForeignKey("competitors.id"), index=True)
-    timestamp = Column(
-    DateTime(timezone=True),
-    nullable=False,
-    default=lambda: datetime.now(timezone.utc),
-    )
+    station_id = Column(Integer, ForeignKey("station_id"), index=True)
+    timestamp = Column(DateTime(timezone=True),nullable=False,default=lambda: datetime.now(timezone.utc))
 
 
     competitor = relationship("Competitor")
+    station = relationship("Station")
+
+
+class Station(Base):
+    __tablename__ = "stations"
+    id = Column(Integer, primary_key=True, index=True)
+    station_name = Column(String)
+    order = (Column(String))
