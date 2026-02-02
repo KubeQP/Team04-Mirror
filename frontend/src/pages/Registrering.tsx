@@ -1,13 +1,41 @@
 
-import { useState } from 'react';
+import { useEffect,useState } from 'react';
+import { useOutletContext } from "react-router-dom";
 
-export default function RegisteringStartTid(){
+type competitor = {
+  start_number: string;
+  name: string;
+}
 
+type OutletCtx = {
+  competitorsVersion: number;
+  notifyCompetitorAdded: () => void;
+};
+
+export default function Registering(){
+
+  const { notifyCompetitorAdded } = useOutletContext<OutletCtx>();
 
   const [reg, setReg] = useState("");
   const [name, setName] = useState("");
-  const [regLista, setRegLista] = useState<[string, string, string][]>([]);
+  const [competitors, setCompetitors] = useState<competitor[]>([]);
+
+  const fetchCompetitors = async () => {
+    const res = await fetch("http://localhost:8000/competitors/");
+    if (!res.ok) return;
+    const data = await res.json();
+    setCompetitors(data);
+  };
+
+  useEffect(() => {
+    fetchCompetitors();
+  }, []);
+
+
   const addReg = async () => {
+
+    console.log("add reg");
+
 
     if (!reg.trim()) return;
     if (isNaN(Number(reg))) return;
@@ -16,19 +44,16 @@ export default function RegisteringStartTid(){
     const regWithoutInitialZeros = reg.replace(/^0+/, '');
     const formattedReg = regWithoutInitialZeros.padStart(3, "0");
 
-    const exists = regLista.some(r => r[0] === formattedReg);
+    const exists = competitors.some(r => r.start_number === formattedReg);
       if (exists) {
         return;
       }
 
 
     //const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
-    const now = new Date();
-    const time = now.toISOString();
-    const formattedTime = now.toLocaleTimeString('sv-SE');
-    setRegLista((prev) => [...prev, [formattedReg,String(formattedTime),name]]);
-    setReg('');
-    setName('');
+    //const now = new Date();
+    //const time = now.toISOString();
+    //const formattedTime = now.toLocaleTimeString('sv-SE');
 
     
     try {
@@ -39,7 +64,6 @@ export default function RegisteringStartTid(){
         },
         body: JSON.stringify({
           start_number: formattedReg,
-          timestamp: time,
           name: name
         })
       });
@@ -49,10 +73,19 @@ export default function RegisteringStartTid(){
         console.error("Error:", err.detail);
         return;
       }
+      
 
       const data = await res.json();
       console.log("Time registered:", data);
 
+      // NU uppdaterar vi från databasen
+      await fetchCompetitors();
+
+      
+      setReg("");
+      setName("");
+
+      notifyCompetitorAdded();
     } catch (err) {
       console.error("Fetch error:", err);
     }
@@ -74,21 +107,24 @@ export default function RegisteringStartTid(){
         type="text"
         placeholder="Skriv namn här"
       />
-      <button onClick={addReg} disabled={!reg}>Registrera</button>
+      <button 
+      onClick={addReg}
+      disabled={!reg.trim() || !name.trim()}
+      >
+        Registrera
+        </button>
       <table>
         <thead>
           <tr>
             <th>Startnummer</th>
-            <th>Starttid</th>
             <th>Namn</th>
           </tr>
         </thead>
         <tbody>
-            {regLista.map(([startNbr, time, name], index) => (
-              <tr key={index}>
-                <td>{startNbr}</td>
-                <td>{time}</td>
-                <td>{name}</td>
+            {competitors.map((c) => (
+              <tr key={c.start_number}>
+                <td>{c.start_number}</td>
+                <td>{c.name}</td>
               </tr>
             ))}
         </tbody>

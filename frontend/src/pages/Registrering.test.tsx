@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import RegistreringStartTid from './RegistreringStartTid';
+import RegistreringStartTid from './Registrering';
 
 let input: HTMLElement;
 
