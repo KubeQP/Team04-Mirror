@@ -6,8 +6,7 @@ import Admin from './pages/Admin';
 import Registrering from './pages/Registrering';
 import RegistreringStoppTid from './pages/RegistreringStoppTid';
 import Resultatvisare from './pages/Resultatvisare';
-import Sida1 from './pages/Sida1';
-import Sida2 from './pages/Sida2';
+import StationRegistrering from './pages/StationRegistrering';
 
 /*
   Detta är routerkonfigurationen för vår React-applikation. Den definierar hur
@@ -28,12 +27,8 @@ const router = createBrowserRouter([
 				element: <h2>Välkommen till startsidan!</h2>,
 			},
 			{
-				path: 'sida1',
-				element: <Sida1 />,
-			},
-			{
-				path: 'sida2',
-				element: <Sida2 />,
+				path: 'StationRegistrering',
+				element: <StationRegistrering />,
 			},
 			{
 				path: 'Registrering',

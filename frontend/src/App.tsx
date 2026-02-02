@@ -19,6 +19,7 @@ export default function App() {
 				<h1>Tidtagning</h1>
 				<nav id="main-nav">
 					<Link to="/">Startsida</Link>
+					<Link to="/stationregistrering">StationRegistrering</Link>
 					<Link to="/sida1">Sida 1</Link>
 					<Link to="/sida2">Sida 2</Link>
 					<Link to="/registrering">Registrering</Link>
