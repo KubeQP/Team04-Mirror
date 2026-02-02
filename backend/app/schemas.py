@@ -33,6 +33,7 @@ class CompetitorReg(BaseModel):
     start_number: str
     name: str
 
+
 class StationReg(BaseModel):
     station_name: str
     order: str

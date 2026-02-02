@@ -1,5 +1,6 @@
 # backend/app/routers/stations.py
 from fastapi import APIRouter, Depends
+from sqlalchemy import Column
 from sqlalchemy.orm import Session
 
 from app.models import Station
@@ -16,6 +17,8 @@ def read_stations(db: Session = Depends(get_db)) -> list[Station]:
 
 
 @router.post("/registerstation", response_model=schemas.StationReg)
-def reg_station(data: schemas.StationReg, db: Session = Depends(get_db)):
+def reg_station(
+    data: schemas.StationReg, db: Session = Depends(get_db)
+) -> dict[str, Column[str]]:
     station = crud.record_new_station(db, data.station_name, data.order)
     return {"station_name": station.station_name, "order": station.order}
