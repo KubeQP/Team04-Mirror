@@ -186,8 +186,8 @@ backend-build-linux:
     - source .venv/bin/activate
     - pip install pyinstaller
     - pyinstaller --onefile run.py
-    - mkdir app/backend
-    - cp dist/run app/backend
+    - mkdir ../app/backend
+    - cp dist/run ../app/backend
   artifacts:
     paths:
       - app
