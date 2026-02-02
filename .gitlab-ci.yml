@@ -197,7 +197,7 @@ backend-build-linux:
 
 backend-build-windows:
   stage: build-backend
-  image: wine:latest
+  image: mcr.microsoft.com/windows:ltsc2019
   script:
     - cd backend
     - source .venv/bin/activate
@@ -236,8 +236,9 @@ backend-build-mac:
 # ---------------------------
 zip-build:
   stage: build-zip
-  image: busybox:latest
+  image: alpine:latest
   script:
+    - apk add --no-cache zip
     - zip -r build.zip app
   artifacts:
     paths:
