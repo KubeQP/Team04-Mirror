@@ -71,6 +71,31 @@ export default function Admin() {
 		return matches ? matches.length : 0;
 	}
 
+	type EditableCellProps = {
+		value: Cell;
+		onChange: (value: string) => void;
+	};
+
+	function EditableCell({ value, onChange }: EditableCellProps) {
+		return (
+			<td 
+				contentEditable
+				suppressContentEditableWarning
+				onBlur={e =>
+					onChange(e.currentTarget.textContent ?? "")
+				}
+				style={{
+					padding: "0.5rem",
+					border: "1px solid #ddd",
+					whiteSpace: "nowrap",
+					backgroundColor: value.correct === false ? 'red' : undefined 
+				}}
+				>
+				{value.value}
+    		</td>
+		);
+	}
+
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],
 		stopTimes: { timestamp: string | number | Date }[],
@@ -201,9 +226,23 @@ export default function Admin() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex} style={{ backgroundColor: cell.correct === false ? 'red' : undefined }}>
-									{cell.value}{' '}
+								// <td key={cellIndex} style={{ backgroundColor: cell.correct === false ? 'red' : undefined }}>
+								// 	{cell.value}{' '}
+								// </td>
+								<td key={cellIndex}>
+									<EditableCell
+										value = {cell}
+										onChange={(newValue) =>{
+											const newData = [...tableData];
+											newData[rowIndex + 1][cellIndex] = {
+											value: newValue,
+											correct: cell.correct,
+											};
+											tableData = newData;
+										}}
+									/>
 								</td>
+
 							))}
 						</tr>
 					))}
