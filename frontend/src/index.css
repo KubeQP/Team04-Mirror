@@ -238,3 +238,39 @@ header a:hover {
 .text-bold {
 	font-weight: 900;
 }
+
+/* Admin page styles ----------------------------------------------------- */
+div.Admin-tables {
+	border: 1px solid rgba(17, 13, 236, 0.685);
+	flex-direction: row;
+	display: flex;
+	padding: 5%;
+	align-items: flex-start;
+	gap: 100px;
+	margin: 2rem auto;
+	background-color: rgba(185, 181, 186, 0.9);
+	justify-content: center;
+	width: 670px;
+}
+
+/* Global table styles -------------------------------------------------------*/
+table,
+th,
+td {
+	border: 1px solid rgba(255, 255, 255, 0.685);
+	background-color: rgba(255, 255, 255, 0.685);
+	border-block: 1px solid rgba(255, 255, 255, 0.685);
+	text-align: center;
+}
+
+/* th = Header, td = data*/
+th {
+	background-color: rgba(17, 13, 236, 0.685);
+	height: 40px;
+	width: 50px;
+	padding: 5px;
+}
+td {
+	background-color: rgb(177, 187, 234);
+	padding: 3px;
+}

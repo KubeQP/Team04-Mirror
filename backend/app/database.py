@@ -10,6 +10,7 @@ from sqlalchemy.orm import (
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./race.db"  # hamnar i projektroten
 
+# Enginge hanterar kopplingen till databasen
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
@@ -23,6 +24,7 @@ class Base(DeclarativeBase):
     pass
 
 
+# Hämta en databas-session
 def get_db() -> Generator[Session]:
     db = SessionLocal()
     try:
