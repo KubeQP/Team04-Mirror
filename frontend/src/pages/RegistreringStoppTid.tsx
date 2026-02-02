@@ -8,8 +8,6 @@ import { getStationData } from '../api/getStationData';
 type Competitor = {
 	start_number: string;
 	name: string;
-	start_number: string;
-	name: string;
 };
 
 type Station = {
@@ -28,12 +26,9 @@ type TimeEntryOut = {
 type OutletCtx = {
 	competitorsVersion: number;
 	notifyCompetitorAdded: () => void; // finns, men används inte här
-	competitorsVersion: number;
-	notifyCompetitorAdded: () => void; // finns, men används inte här
 };
 
 export default function RegistreringStoppTid() {
-	const { competitorsVersion } = useOutletContext<OutletCtx>();
 	const { competitorsVersion } = useOutletContext<OutletCtx>();
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
@@ -114,10 +109,6 @@ export default function RegistreringStoppTid() {
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
 		[competitors, selectedStartNumber],
 	);
-	const selectedCompetitor = useMemo(
-		() => competitors.find((c) => c.start_number === selectedStartNumber),
-		[competitors, selectedStartNumber],
-	);
 
 	const recordStopTimeNow = async () => {
 		if (!selectedStartNumber) {
@@ -145,8 +136,6 @@ export default function RegistreringStoppTid() {
 
 			// Läs text först så du alltid kan se fel även om backend inte skickar JSON
 			const text = await res.text();
-			// Läs text först så du alltid kan se fel även om backend inte skickar JSON
-			const text = await res.text();
 
 			if (!res.ok) {
 				// backend kan skicka {"detail": "..."} men ibland bara text
@@ -176,18 +165,7 @@ export default function RegistreringStoppTid() {
 			} catch {
 				saved = null;
 			}
-			// Om du vill använda svaret:
-			let saved: TimeEntryOut | null = null;
-			try {
-				saved = JSON.parse(text);
-			} catch {
-				saved = null;
-			}
 
-			const who = selectedCompetitor ? `${selectedCompetitor.name} (${selectedStartNumber})` : selectedStartNumber;
-			const when = saved?.timestamp
-				? new Date(saved.timestamp).toLocaleTimeString('sv-SE')
-				: new Date().toLocaleTimeString('sv-SE');
 			const who = selectedCompetitor ? `${selectedCompetitor.name} (${selectedStartNumber})` : selectedStartNumber;
 			const when = saved?.timestamp
 				? new Date(saved.timestamp).toLocaleTimeString('sv-SE')
@@ -200,107 +178,100 @@ export default function RegistreringStoppTid() {
 			setMsg('Kunde inte kontakta servern för att registrera tid.');
 		}
 	};
-			setMsg(`Stopptid registrerad för ${who} kl ${when}`);
-			console.log('Saved time entry:', saved);
-		} catch (err) {
-			console.error(err);
-			setMsg('Kunde inte kontakta servern för att registrera tid.');
-		}
-	};
 
 	return (
 		<div>
 			<h2>Registrering Stopptid</h2>
-	return (
-		<div>
-			<h2>Registrering Stopptid</h2>
+			return (
+			<div>
+				<h2>Registrering Stopptid</h2>
 
-			<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-				<label>
-					Välj tävlande:&nbsp;
-					<select
-						value={selectedStartNumber}
-						onChange={(e) => setSelectedStartNumber(e.target.value)}
-						disabled={competitors.length === 0}
-					>
+				<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+					<label>
+						Välj tävlande:&nbsp;
+						<select
+							value={selectedStartNumber}
+							onChange={(e) => setSelectedStartNumber(e.target.value)}
+							disabled={competitors.length === 0}
+						>
+							{competitors.map((c) => (
+								<option key={c.start_number} value={c.start_number}>
+									{c.start_number} — {c.name}
+								</option>
+							))}
+						</select>
+					</label>
+					<label>
+						Välj station:&nbsp;
+						<select
+							value={selectedStationId}
+							onChange={(e) => setSelectedStationId(Number(e.target.value))}
+							disabled={stations.length === 0}
+						>
+							{stations.map((c) => (
+								<option key={c.id} value={c.id}>
+									{c.station_name}
+								</option>
+							))}
+						</select>
+					</label>
+
+					<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
+						Registrera stopptid nu
+					</button>
+					<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
+						Registrera stopptid nu
+					</button>
+
+					<button type="button" onClick={fetchData}>
+						Uppdatera lista
+					</button>
+				</div>
+
+				{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
+				{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
+
+				<hr />
+				<hr />
+
+				<h3>Alla tävlande</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>Startnummer</th>
+							<th>Namn</th>
+						</tr>
+					</thead>
+					<tbody>
 						{competitors.map((c) => (
-							<option key={c.start_number} value={c.start_number}>
-								{c.start_number} — {c.name}
-							</option>
+							<tr key={c.start_number}>
+								<td>{c.start_number}</td>
+								<td>{c.name}</td>
+							</tr>
 						))}
-					</select>
-				</label>
-				<label>
-					Välj station:&nbsp;
-					<select
-						value={selectedStationId}
-						onChange={(e) => setSelectedStationId(Number(e.target.value))}
-						disabled={stations.length === 0}
-					>
-						{stations.map((c) => (
-							<option key={c.id} value={c.id}>
-								{c.station_name}
-							</option>
+					</tbody>
+				</table>
+				<h3>Alla tävlande</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>Startnummer</th>
+							<th>Namn</th>
+						</tr>
+					</thead>
+					<tbody>
+						{competitors.map((c) => (
+							<tr key={c.start_number}>
+								<td>{c.start_number}</td>
+								<td>{c.name}</td>
+							</tr>
 						))}
-					</select>
-				</label>
+					</tbody>
+				</table>
 
-				<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
-					Registrera stopptid nu
-				</button>
-				<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
-					Registrera stopptid nu
-				</button>
-
-				<button type="button" onClick={fetchData}>
-					Uppdatera lista
-				</button>
+				{competitors.length === 0 && <p>Inga tävlande hittades. Registrera någon först.</p>}
 			</div>
-
-			{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
-			{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
-
-			<hr />
-			<hr />
-
-			<h3>Alla tävlande</h3>
-			<table>
-				<thead>
-					<tr>
-						<th>Startnummer</th>
-						<th>Namn</th>
-					</tr>
-				</thead>
-				<tbody>
-					{competitors.map((c) => (
-						<tr key={c.start_number}>
-							<td>{c.start_number}</td>
-							<td>{c.name}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-			<h3>Alla tävlande</h3>
-			<table>
-				<thead>
-					<tr>
-						<th>Startnummer</th>
-						<th>Namn</th>
-					</tr>
-				</thead>
-				<tbody>
-					{competitors.map((c) => (
-						<tr key={c.start_number}>
-							<td>{c.start_number}</td>
-							<td>{c.name}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-
-			{competitors.length === 0 && <p>Inga tävlande hittades. Registrera någon först.</p>}
-		</div>
-	);
+			);
 			{competitors.length === 0 && <p>Inga tävlande hittades. Registrera någon först.</p>}
 		</div>
 	);
