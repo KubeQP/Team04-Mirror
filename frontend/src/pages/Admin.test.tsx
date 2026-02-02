@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, type MockInstance,vi } from "vitest";
+import { beforeEach, describe, expect, it,vi } from "vitest";
 
 import { getCompetitorData } from "../api/getCompetitorData";
 import { getTimeData } from "../api/getTimeData";
