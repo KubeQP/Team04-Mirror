@@ -274,3 +274,12 @@ td {
 	background-color: rgb(177, 187, 234);
 	padding: 3px;
 }
+
+table,
+input {
+    width: 90%;
+}
+
+input {
+    text-overflow: clip;
+}

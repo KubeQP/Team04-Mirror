@@ -5,10 +5,7 @@ import { getCompetitorData } from '../api/getCompetitorData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, TimeData } from '../types';
 
-// src/pages/Admin.tsx
 export default function Admin() {
-	//declaring constants for the imports
-
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
@@ -17,20 +14,19 @@ export default function Admin() {
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
+	// NYA STATE FÖR REDIGERBAR TABELL
+	const [editableArray1, setEditableArray1] = useState<string[][]>([]);
+	const [editableArray2, setEditableArray2] = useState<string[][]>([]);
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const result = await getCompetitorData();
 				setCompetitorData(result);
-				console.log('fetched data');
 			} catch (err: unknown) {
-				if (err instanceof Error) {
-					setCompetitorError(err.message);
-				} else if (typeof err === 'string') {
-					setCompetitorError(err);
-				} else {
-					setCompetitorError('Ett okänt fel inträffade');
-				}
+				if (err instanceof Error) setCompetitorError(err.message);
+				else if (typeof err === 'string') setCompetitorError(err);
+				else setCompetitorError('Ett okänt fel inträffade');
 			} finally {
 				setCompetitorLoading(false);
 			}
@@ -39,13 +35,9 @@ export default function Admin() {
 				const result = await getTimeData();
 				setTimeData(result);
 			} catch (err: unknown) {
-				if (err instanceof Error) {
-					setTimeError(err.message);
-				} else if (typeof err === 'string') {
-					setTimeError(err);
-				} else {
-					setTimeError('Ett okänt fel inträffade');
-				}
+				if (err instanceof Error) setTimeError(err.message);
+				else if (typeof err === 'string') setTimeError(err);
+				else setTimeError('Ett okänt fel inträffade');
 			} finally {
 				setTimeLoading(false);
 			}
@@ -54,7 +46,8 @@ export default function Admin() {
 		fetchData();
 	}, []);
 
-	//Table - Stations
+	
+	// Bygger tabellerna som string[][]
 	let TempArray1: string[] = [];
 	const Array1: string[][] = [];
 	Array1.push(['Station', 'Nbr.', 'Tid']);
@@ -66,7 +59,6 @@ export default function Admin() {
 		TempArray1 = [];
 	});
 
-	//Table - Competitors
 	let TempArray2: string[] = [];
 	const Array2: string[][] = [];
 	Array2.push(['Nr.', 'Namn', 'Start', 'Mål', 'Totalt']);
@@ -80,8 +72,18 @@ export default function Admin() {
 		TempArray2 = [];
 	});
 
-	//dynamic table creation
-	function createTable(tableData: string[][]) {
+	// Initiera editable state när data laddas
+	useEffect(() => {
+		if (Array1.length > 0) setEditableArray1(Array1);
+		if (Array2.length > 0) setEditableArray2(Array2);
+	}, [competitorData, timeData]);
+
+
+	// REDIGERBAR CREATE TABLE
+	function createTable(
+		tableData: string[][],
+		setTableData: React.Dispatch<React.SetStateAction<string[][]>>
+	) {
 		if (tableData.length === 0) return null;
 
 		const [headerRow, ...bodyRows] = tableData;
@@ -99,7 +101,16 @@ export default function Admin() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex}>{cell}</td>
+								<td key={cellIndex}>
+									<input
+										value={cell} // sätter value från cell
+										onChange={(e) => {
+											const newData = [...tableData];
+											newData[rowIndex + 1][cellIndex] = e.target.value;
+											setTableData(newData);
+										}}
+									/>
+								</td>
 							))}
 						</tr>
 					))}
@@ -112,6 +123,7 @@ export default function Admin() {
 		<div>
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
+
 			<div className="Admin-tables">
 				{competitorLoading || timeLoading ? (
 					<p>Laddar data...</p>
@@ -120,12 +132,23 @@ export default function Admin() {
 				) : timeError ? (
 					<p>Fel vid hämtning av tiddata: {timeError}</p>
 				) : (
-					<div style={{ display: 'flex', gap: '20px' }}>
-						{createTable(Array1)}
-						{createTable(Array2)}
+					<div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+						{createTable(editableArray1, setEditableArray1)}
+						{createTable(editableArray2, setEditableArray2)}
 					</div>
 				)}
 			</div>
+            <button
+                onClick={() => {
+                    console.log('Sparar tabell-data...');
+                    console.log('Table 1:', editableArray1);
+                    console.log('Table 2:', editableArray2);
+                    // TODO: här skicka editableArray1 och editableArray2 till backend?
+                }}
+                style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}
+            >
+                Save
+            </button>
 		</div>
 	);
 }
