@@ -7,13 +7,13 @@ from app import models
 
 def test_get_times_empty(client: TestClient) -> None:
     """Om det inte finns några tider ska vi få en tom lista."""
-    response = client.get("/times")
+    response = client.get("/api/times")
     assert response.status_code == 200
     assert response.json() == []
 
 
 def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
-    """GET /times ska returnera alla tider i databasen."""
+    """GET /api/times ska returnera alla tider i databasen."""
     # Skapa två tävlande
     c1 = models.Competitor(start_number="1001", name="Team 1")
     c2 = models.Competitor(start_number="1002", name="Team 2")
@@ -29,7 +29,7 @@ def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
     db_session.add_all([t1, t2, t3])
     db_session.commit()
 
-    response = client.get("/times")
+    response = client.get("/api/times")
     assert response.status_code == 200
 
     data = response.json()
@@ -41,7 +41,7 @@ def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
 
 
 def test_get_times_by_start_number(client: TestClient, db_session: Session) -> None:
-    """GET /times/{start_number} ska bara ge tider för rätt tävlande."""
+    """GET /api/times/{start_number} ska bara ge tider för rätt tävlande."""
     # Skapa tävlande
     c1 = models.Competitor(start_number="1001", name="Team 1")
     c2 = models.Competitor(start_number="1002", name="Team 2")
@@ -60,7 +60,7 @@ def test_get_times_by_start_number(client: TestClient, db_session: Session) -> N
     )
     db_session.commit()
 
-    response = client.get("/times/1001")
+    response = client.get("/api/times/1001")
     assert response.status_code == 200
 
     data = response.json()
@@ -73,7 +73,7 @@ def test_get_times_by_start_number_unknown(
 ) -> None:
     """Vad händer om startnumret inte finns? Här förväntar vi oss tom lista."""
     # Ingen med startnummer 9999
-    response = client.get("/times/9999")
+    response = client.get("/api/times/9999")
     assert response.status_code == 200  # ändra till 404 om du vill that beteende
     data = response.json()
     assert isinstance(data, list)
@@ -84,7 +84,7 @@ def test_get_times_by_start_number_unknown(
 def test_record_time_for_existing_competitor(
     client: TestClient, db_session: Session
 ) -> None:
-    """POST /times/record ska skapa en ny TimeEntry för giltigt startnummer."""
+    """POST /api/times/record ska skapa en ny TimeEntry för giltigt startnummer."""
     # Arrange: skapa en tävlande
     c1 = models.Competitor(start_number="1001", name="Team 1")
     db_session.add(c1)
@@ -94,7 +94,7 @@ def test_record_time_for_existing_competitor(
     payload = {"start_number": "1001"}
 
     # Act
-    response = client.post("/times/record", json=payload)
+    response = client.post("/api/times/record", json=payload)
 
     # Assert
     assert response.status_code == 200
@@ -113,12 +113,12 @@ def test_record_time_for_existing_competitor(
 
 
 def test_record_time_for_unknown_competitor_returns_404(client: TestClient) -> None:
-    """POST /times/record ska ge 404 om startnumret inte finns."""
+    """POST /api/times/record ska ge 404 om startnumret inte finns."""
     # Arrange: skicka ett startnummer som inte finns i databasen
     payload = {"start_number": "9999"}
 
     # Act
-    response = client.post("/times/record", json=payload)
+    response = client.post("/api/times/record", json=payload)
 
     # Assert
     assert response.status_code == 404
