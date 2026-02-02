@@ -172,7 +172,6 @@ frontend-build:
     paths:
       - app
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
@@ -192,7 +191,6 @@ backend-build-linux:
     paths:
       - app
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
@@ -208,5 +206,4 @@ zip-build:
     paths:
       - build.zip
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
