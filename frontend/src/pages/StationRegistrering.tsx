@@ -1,70 +1,48 @@
 
 import { useEffect,useState } from 'react';
-import { useOutletContext } from "react-router-dom";
 
-type Competitor = {
-  start_number: string;
-  name: string;
+type Station = {
+  station_name: string;
+  order: string;
 }
 
-type OutletCtx = {
-  competitorsVersion: number;
-  notifyCompetitorAdded: () => void;
-};
+export default function StationRegistrering(){
 
-export default function Registrering(){
+  const [stationName, setStationName] = useState("");
+  const [order, setOrder] = useState("");
+  const [stations, setStations] = useState<Station[]>([]);
 
-  const { notifyCompetitorAdded } = useOutletContext<OutletCtx>();
-
-  const [reg, setReg] = useState("");
-  const [name, setName] = useState("");
-  const [competitors, setCompetitors] = useState<Competitor[]>([]);
-
-  const fetchCompetitors = async () => {
-    const res = await fetch("http://localhost:8000/competitors/");
+  const fetchStations = async () => {
+    const res = await fetch("http://localhost:8000/stations/getstations");
     if (!res.ok) return;
     const data = await res.json();
-    setCompetitors(data);
+    setStations(data);
   };
 
   useEffect(() => {
-    fetchCompetitors();
+    fetchStations();
   }, []);
 
 
-  const addReg = async () => {
+  const addStation = async () => {
 
-    console.log("add reg");
-
-
-    if (!reg.trim()) return;
-    if (isNaN(Number(reg))) return;
-    if (!name.trim()) return;
-
-    const regWithoutInitialZeros = reg.replace(/^0+/, '');
-    const formattedReg = regWithoutInitialZeros.padStart(3, "0");
-
-    const exists = competitors.some(r => r.start_number === formattedReg);
-      if (exists) {
-        return;
-      }
+    console.log("add station");
 
 
-    //const time = new Date().toLocaleTimeString('sv-SE'); //kommer inte behövas sen, byts ut mot tiden från databasen.
-    //const now = new Date();
-    //const time = now.toISOString();
-    //const formattedTime = now.toLocaleTimeString('sv-SE');
+    if (!stationName.trim()) return;
+    if (!order.trim()) return;
+
 
     
     try {
-      const res = await fetch("http://localhost:8000/stations/", {
+      const res = await fetch("http://localhost:8000/stations/registerstation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          start_number: formattedReg,
-          name: name
+          station_name: stationName,
+          order: order
         })
       });
 
@@ -76,23 +54,60 @@ export default function Registrering(){
       
 
       const data = await res.json();
-      console.log("Time registered:", data);
+      console.log("Station registered:", data);
 
       // NU uppdaterar vi från databasen
-      await fetchCompetitors();
+      await fetchStations();
 
       
-      setReg("");
-      setName("");
+      setOrder("");
+      setStationName("");
 
-      notifyCompetitorAdded();
     } catch (err) {
       console.error("Fetch error:", err);
     }
   };
 
   return (
-    <div></div>
+    <div>
+			<h2>StationRegistrering:</h2>
+			<input 
+      id="stationNamnInput" 
+      value={stationName} onChange= { (e) => setStationName(e.target.value)} 
+      type="text" 
+      placeholder="Skriv stationsnamn här" 
+      />
+      <input
+        id="orderInput"
+        value={order}
+        onChange={(e) => setOrder(e.target.value)}
+        type="text"
+        placeholder="Skriv ordning här"
+      />
+      <button 
+      onClick={addStation}
+      disabled={!order.trim() || !stationName.trim()}
+      >
+        Registrera Station
+        </button>
+      <table>
+        <thead>
+          <tr>
+            <th>Station</th>
+            <th>ordning</th>
+          </tr>
+        </thead>
+        <tbody>
+            {stations.map((c) => (
+              <tr key={c.station_name}>
+                <td>{c.station_name}</td>
+                <td>{c.order}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+
+		</div>
   );
 
 }

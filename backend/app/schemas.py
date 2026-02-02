@@ -22,7 +22,7 @@ class CompetitorOut(BaseModel):
 class TimeEntryOut(BaseModel):
     id: int
     competitor_id: int
-    station_id: int
+    station_id: Optional[int] = None
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)
