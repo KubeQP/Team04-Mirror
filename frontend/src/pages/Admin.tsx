@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getTimeData } from '../api/getTimeData';
-import type { CompetitorData, TimeData } from '../types';
+import { getStationData } from '../api/getStationData';
+import type { CompetitorData, TimeData, StationData } from '../types';
 
 // src/pages/Admin.tsx
 export default function Admin() {
@@ -17,42 +18,55 @@ export default function Admin() {
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
+	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
+	const [stationLoading, setStationLoading] = useState(true);
+	const [stationError, setStationError] = useState<string | null>(null);
+
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const result = await getCompetitorData();
-				setCompetitorData(result);
-				console.log('fetched data');
-			} catch (err: unknown) {
-				if (err instanceof Error) {
-					setCompetitorError(err.message);
-				} else if (typeof err === 'string') {
-					setCompetitorError(err);
-				} else {
-					setCompetitorError('Ett okänt fel inträffade');
-				}
-			} finally {
-				setCompetitorLoading(false);
-			}
+	const fetchData = async () => {
+		// Competitor data
+		try {
+		const result = await getCompetitorData();
+		setCompetitorData(result);
+		console.log('Fetched competitor data');
+		} catch (err: unknown) {
+		if (err instanceof Error) setCompetitorError(err.message);
+		else if (typeof err === 'string') setCompetitorError(err);
+		else setCompetitorError('Ett okänt fel inträffade');
+		} finally {
+		setCompetitorLoading(false);
+		}
 
-			try {
-				const result = await getTimeData();
-				setTimeData(result);
-			} catch (err: unknown) {
-				if (err instanceof Error) {
-					setTimeError(err.message);
-				} else if (typeof err === 'string') {
-					setTimeError(err);
-				} else {
-					setTimeError('Ett okänt fel inträffade');
-				}
-			} finally {
-				setTimeLoading(false);
-			}
-		};
+		// Time data
+		try {
+		const result = await getTimeData();
+		setTimeData(result);
+		console.log('Fetched time data');
+		} catch (err: unknown) {
+		if (err instanceof Error) setTimeError(err.message);
+		else if (typeof err === 'string') setTimeError(err);
+		else setTimeError('Ett okänt fel inträffade');
+		} finally {
+		setTimeLoading(false);
+		}
 
-		fetchData();
+		// Station data
+		try {
+		const result = await getStationData();
+		setStationData(result);
+		console.log('Fetched station data');
+		} catch (err: unknown) {
+		if (err instanceof Error) setStationError(err.message);
+		else if (typeof err === 'string') setStationError(err);
+		else setStationError('Ett okänt fel inträffade');
+		} finally {
+		setStationLoading(false);
+		}
+	};
+
+	fetchData();
 	}, []);
+
 
 	interface Cell {
 		value: string;
@@ -118,7 +132,7 @@ export default function Admin() {
 	Array1.push(headerRow1);
 	timeData?.forEach((timeSlot) => {
 		const stationValue: Cell = {
-			value: timeSlot.station_id !== undefined ? timeSlot.station_id.toString() : '-',
+			value: stationData?.find((station) => station.id === timeSlot.station_id)?.order ?? '-',
 			correct: true,
 		}; //måste lägga till station //timeSlot.station_id
 		const startNumber: Cell = {
@@ -132,7 +146,7 @@ export default function Admin() {
 				t.id !== timeSlot.id &&
 				(competitorData?.find((competitor) => competitor.id === t.competitor_id)?.start_number ?? '-') ===
 					startNumber.value &&
-				(t.station_id !== undefined ? t.station_id.toString() : '-') === stationValue.value,
+				(t.station_id !== undefined ? t.station_id : '-') === timeSlot.station_id
 		);
 
 		if (duplicates.length > 0) {
@@ -157,15 +171,14 @@ export default function Admin() {
 	competitorData?.forEach((competitor) => {
 		const startNumber = { value: competitor.start_number, correct: true };
 		const name = { value: competitor.name, correct: true };
-		const matchingStartTimes =
-			timeData?.filter((time) => time.competitor_id === competitor.id && time.station_id === 0) || [];
+		const matchingStartTimes = timeData?.filter(time => time.competitor_id === competitor.id && stationData?.find(station => station.id === time.station_id)?.order === '0') || [];
 		const startTime = {
 			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
 			value: matchingStartTimes.length > 0 ? matchingStartTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
 			correct: true,
 		};
 		const matchingStopTimes =
-			timeData?.filter((time) => time.competitor_id === competitor.id && time.station_id === 1) || [];
+			timeData?.filter(time => time.competitor_id === competitor.id && stationData?.find(station => station.id === time.station_id)?.order === '1') || [];
 		const stopTime = {
 			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
 			value: matchingStopTimes.length > 0 ? matchingStopTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
