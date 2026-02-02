@@ -19,7 +19,7 @@ export default function Registrering() {
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
 	const fetchCompetitors = async () => {
-		const res = await fetch('http://localhost:8000/competitors/');
+		const res = await fetch('http://localhost:8000/api/competitors/');
 		if (!res.ok) return;
 		const data = await res.json();
 		setCompetitors(data);
@@ -50,7 +50,7 @@ export default function Registrering() {
 		//const formattedTime = now.toLocaleTimeString('sv-SE');
 
 		try {
-			const res = await fetch('http://localhost:8000/competitors/register', {
+			const res = await fetch('http://localhost:8000/api/competitors/register', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

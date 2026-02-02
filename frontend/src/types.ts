@@ -13,7 +13,7 @@ export interface TimeData {
 	id: number;
 	competitor_id: number;
 	timestamp: string;
-	station_id: number
+	station_id: number;
 }
 
 export interface StationData {
