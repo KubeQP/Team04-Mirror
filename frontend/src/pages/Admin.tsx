@@ -78,7 +78,31 @@ export default function Admin() {
 		if (Array2.length > 0) setEditableArray2(Array2);
 	}, [competitorData, timeData]);
 
+	type EditableCellProps = {
+		value: string;
+		onChange: (value: string) => void;
+	};
 
+	function EditableCell({ value, onChange }: EditableCellProps) {
+		return (
+			<td
+				contentEditable
+				suppressContentEditableWarning
+				onBlur={e =>
+					onChange(e.currentTarget.textContent ?? "")
+				}
+				style={{
+					padding: "0.5rem",
+					border: "1px solid #ddd",
+					whiteSpace: "nowrap",
+				}}
+				>
+				{value}
+    		</td>
+		);
+	}
+
+	
 	// REDIGERBAR CREATE TABLE
 	function createTable(
 		tableData: string[][],
@@ -102,11 +126,11 @@ export default function Admin() {
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
 								<td key={cellIndex}>
-									<input
-										value={cell} // sätter value från cell
-										onChange={(e) => {
+									<EditableCell
+										value = {cell}
+										onChange={(newValue) =>{
 											const newData = [...tableData];
-											newData[rowIndex + 1][cellIndex] = e.target.value;
+											newData[rowIndex + 1][cellIndex] = newValue;
 											setTableData(newData);
 										}}
 									/>
@@ -132,13 +156,12 @@ export default function Admin() {
 				) : timeError ? (
 					<p>Fel vid hämtning av tiddata: {timeError}</p>
 				) : (
-					<div style={{ display: 'flex', flexDirection: 'row', gap: '100px' }}>
-						<div>
+					<div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+						
 						{createTable(editableArray1, setEditableArray1)}
-						</div>
-						<div>
+						
 						{createTable(editableArray2, setEditableArray2)}
-						</div>
+						
 					</div>
 				)}
 			</div>
