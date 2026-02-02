@@ -24,4 +24,5 @@ class TimeEntry(Base):
     default=lambda: datetime.now(timezone.utc),
     )
 
+
     competitor = relationship("Competitor")

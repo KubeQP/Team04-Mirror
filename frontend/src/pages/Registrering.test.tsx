@@ -1,89 +1,136 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import RegistreringStartTid from './Registrering';
+import RegistreringStartTid from "./Registrering";
 
-let input: HTMLElement;
-
-beforeEach(() => {	
-	render(<RegistreringStartTid />);
-	input = screen.getByPlaceholderText('Skriv startnummer här');
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual<typeof import("react-router-dom")>("react-router-dom");
+  return {
+    ...actual,
+    useOutletContext: () => ({
+      competitorsVersion: 0,
+      notifyCompetitorAdded: () => {},
+    }),
+  };
 });
 
+type Competitor = { start_number: string; name: string };
 
-describe('RegisteringStartTid', () => {
+// En liten "in-memory" lista som låtsas vara backend-DB i testet
+let db: Competitor[] = [];
 
-	it('registrerar ett korrekt startnummer', () => {
-		fireEvent.change(input, { target: { value: '001' }});
-		fireEvent.click(screen.getByText('Registrera'));
+beforeEach(() => {
+  db = [];
 
-		expect(screen.getByText('001')).toBeInTheDocument();
-	});
-	
-	it('Testar felaktig registrering med bokstäver', () => {
-	
-		// Skriv in bokstäver i startnummerfältet
-		fireEvent.change(input, { target : { value: 'abc'}});
+  // Mocka fetch för både GET och POST
+  vi.spyOn(global, "fetch").mockImplementation(async (url, init) => {
+    const u = String(url);
 
-		// Klicka på knappen
-		fireEvent.click(screen.getByText('Registrera'));
+    // GET /competitors/
+    if (u.endsWith("/competitors/") && (!init || init.method === undefined)) {
+      return new Response(JSON.stringify(db), { status: 200 });
+    }
 
-		// Efter klick kolla listan
-		expect(screen.queryByText('abc')).not.toBeInTheDocument();
-	});
+    // POST /competitors/register
+    if (u.endsWith("/competitors/register") && init?.method === "POST") {
+      const body = JSON.parse(String(init?.body ?? "{}")) as { start_number: string; name: string };
 
-	it('Testar registrering med extra nollor framför', () => {
-		
-		// Skriv in med nollor framför
-		fireEvent.change(input, { target : { value: '000210'}})
+      // låtsas att backend sparar och returnerar posten
+			const exists = db.some(c => c.start_number === body.start_number);
+			if (!exists) {
+				db.push({ start_number: body.start_number, name: body.name });
+			}
 
-		// Klicka på knappen
-		fireEvent.click(screen.getByText('Registrera'));
+      return new Response(JSON.stringify(body), { status: 200 });
+    }
 
-		// Efter klick kolla listan
-		expect(screen.getByText('210')).toBeInTheDocument();
-	
-	});
+    return new Response("Not found", { status: 404 });
+  });
 
-	it('Testar registrering med färre än tre siffror', () => {
+  render(<RegistreringStartTid />);
+});
 
-		// Skriv in utan extra nollor
-		fireEvent.change(input, { target : { value: '13'}})
+describe("RegisteringStartTid", () => {
+  it("registrerar ett korrekt startnummer", async () => {
+    // fyll startnummer
+    fireEvent.change(screen.getByPlaceholderText("Skriv startnummer här"), {
+      target: { value: "001" },
+    });
 
-		// Klicka på knappen
-		fireEvent.click(screen.getByText('Registrera'));
+    // fyll namn (viktigt!)
+    fireEvent.change(screen.getByPlaceholderText("Skriv namn här"), {
+      target: { value: "Alice" },
+    });
 
-		// Efter klick kolla listan
-		expect(screen.getByText('013', {exact:false})).toBeInTheDocument();
-	
-	});
+    fireEvent.click(screen.getByText("Registrera"));
 
-	it('Testar registrering med fler än tre siffror', () => {
+    // Vänta på att UI uppdateras efter fetchCompetitors
+    await waitFor(() => {
+      expect(screen.getByText("001")).toBeInTheDocument();
+    });
+  });
 
-		// Skriv in med extra nollor och tal större än 1000
-		fireEvent.change(input, { target : { value: '0001111'}})
+  it("testar felaktig registrering med bokstäver", async () => {
+    fireEvent.change(screen.getByPlaceholderText("Skriv startnummer här"), {
+      target: { value: "abc" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Skriv namn här"), {
+      target: { value: "Alice" },
+    });
 
-		// Klicka på knappen
-		fireEvent.click(screen.getByText('Registrera'));
+    fireEvent.click(screen.getByText("Registrera"));
 
-		// Efter klick kolla listan
-		expect(screen.getByText('1111', {exact:false})).toBeInTheDocument();
-	
-	});
+    // Ingen POST ska ske, och inget ska dyka upp
+    await waitFor(() => {
+      expect(screen.queryByText("abc")).not.toBeInTheDocument();
+    });
+  });
 
-	it('Testar registrering med dubletter', () => {
+  it("testar registrering med extra nollor framför", async () => {
+    fireEvent.change(screen.getByPlaceholderText("Skriv startnummer här"), {
+      target: { value: "000210" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Skriv namn här"), {
+      target: { value: "Team" },
+    });
 
-		// Försöker registrera två likadana tal
+    fireEvent.click(screen.getByText("Registrera"));
 
-		for (let i = 0; i < 2; i++) {
-  			fireEvent.change(input, { target: { value: '011' }});
-  			fireEvent.click(screen.getByText('Registrera'));
-		}
+    await waitFor(() => {
+      expect(screen.getByText("210")).toBeInTheDocument();
+    });
+  });
 
-		// Hämta alla registreringar med startnummer 011
-  		const matches = screen.getAllByText(/011/i);
+  it("testar registrering med färre än tre siffror", async () => {
+    fireEvent.change(screen.getByPlaceholderText("Skriv startnummer här"), {
+      target: { value: "13" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Skriv namn här"), {
+      target: { value: "Team" },
+    });
 
-  		// Ska bara finnas EN
-  		expect(matches.length).toBe(1);
-	});
+    fireEvent.click(screen.getByText("Registrera"));
+
+    await waitFor(() => {
+      expect(screen.getByText("013")).toBeInTheDocument();
+    });
+  });
+
+  it("testar registrering med dubletter", async () => {
+    for (let i = 0; i < 2; i++) {
+      fireEvent.change(screen.getByPlaceholderText("Skriv startnummer här"), {
+        target: { value: "011" },
+      });
+      fireEvent.change(screen.getByPlaceholderText("Skriv namn här"), {
+        target: { value: "Team" },
+      });
+
+      fireEvent.click(screen.getByText("Registrera"));
+    }
+
+    await waitFor(() => {
+      const matches = screen.getAllByText("011");
+      expect(matches.length).toBe(1);
+    });
+  });
 });

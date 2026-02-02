@@ -12,7 +12,7 @@ type OutletCtx = {
   notifyCompetitorAdded: () => void;
 };
 
-export default function Registering(){
+export default function Registrering(){
 
   const { notifyCompetitorAdded } = useOutletContext<OutletCtx>();
 
