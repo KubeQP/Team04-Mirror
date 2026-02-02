@@ -2,6 +2,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
+import { getCompetitorData } from "../api/getCompetitorData";
+import { getStationData } from "../api/getStationData";
+
 type Competitor = {
   start_number: string;
   name: string;
@@ -17,6 +20,7 @@ type Station = {
 type TimeEntryOut = {
   id?: number;
   competitor_id?: number;
+  station_id?: number;
   timestamp: string;
 };
 
@@ -38,6 +42,25 @@ export default function RegistreringStoppTid() {
   const [selectedStationId, setSelectedStationId] = useState<number | "">("");
   const [stations, setStations] = useState<Station[]>([]);
 
+const fetchData = async () => {
+    try {
+      const result = await getCompetitorData();
+      setCompetitors(result);
+      console.log('fetched comps');
+    } catch (err: unknown) {
+      console.log(err);
+    }
+
+
+    try{
+      const res = await getStationData();
+      setStations(res);
+      console.log('fetched stations')
+    } catch (err: unknown){
+      console.log(err);
+    }
+  };
+/*
   const fetchStations = async () => {
     const res = await fetch("http://localhost:8000/stations/getstations");
     if (!res.ok) return;
@@ -73,24 +96,18 @@ export default function RegistreringStoppTid() {
       setMsg("Kunde inte kontakta servern för att hämta tävlande.");
     }
   };
+  */
 
   // Hämta vid första mount
   useEffect(() => {
-    fetchCompetitors();
-    fetchStations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchData();
   }, []);
 
   // Hämta igen när någon registrerar en ny tävlande på registreringssidan
   useEffect(() => {
-    fetchCompetitors();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchData();
   }, [competitorsVersion]);
 
-  const selectedStation = useMemo(
-    () => stations.find(c => c.id === selectedStationId),
-    [stations, selectedStationId]
-  )
 
   const selectedCompetitor = useMemo(
     () => competitors.find(c => c.start_number === selectedStartNumber),
@@ -191,7 +208,7 @@ export default function RegistreringStoppTid() {
           Registrera stopptid nu
         </button>
 
-        <button type="button" onClick={fetchStations}>
+        <button type="button" onClick={fetchData}>
           Uppdatera lista
         </button>
       </div>
