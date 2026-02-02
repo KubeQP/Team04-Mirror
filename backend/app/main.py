@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .database import Base, SessionLocal, engine
-from .models import Competitor, TimeEntry
-from .routers import competitors, times
+from .models import Competitor, TimeEntry, Station
+from .routers import competitors, times, stations
 
 
 @asynccontextmanager
@@ -31,19 +31,27 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         db.refresh(comp1)
         db.refresh(comp2)
 
+        station1 = Station(station_name="start", order="0")
+        station2 = Station(station_name="mål", order="1")
+        db.add_all([station1, station2])
+        db.commit()
+
+        db.refresh(station1)
+        db.refresh(station2)
+
         db.add_all(
             [
                 TimeEntry(
-                    competitor_id=comp1.id, timestamp=datetime(2025, 6, 27, 12, 31, 39)
+                    competitor_id=comp1.id, timestamp=datetime(2025, 6, 27, 12, 31, 39),station_id=station1.id
                 ),
                 TimeEntry(
-                    competitor_id=comp2.id, timestamp=datetime(2025, 6, 27, 12, 32, 15)
+                    competitor_id=comp2.id, timestamp=datetime(2025, 6, 27, 12, 32, 15),station_id=station1.id
                 ),
                 TimeEntry(
-                    competitor_id=comp2.id, timestamp=datetime(2025, 6, 27, 12, 47, 38)
+                    competitor_id=comp2.id, timestamp=datetime(2025, 6, 27, 12, 47, 38),station_id=station2.id
                 ),
                 TimeEntry(
-                    competitor_id=comp1.id, timestamp=datetime(2025, 6, 27, 12, 52, 5)
+                    competitor_id=comp1.id, timestamp=datetime(2025, 6, 27, 12, 52, 5),station_id=station2.id
                 ),
             ]
         )
@@ -64,6 +72,8 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5173",
         "http://localhost:5173",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -74,6 +84,7 @@ app.add_middleware(
 # Inkludera routrar. Smidigt att dela upp i flera filer.
 app.include_router(competitors.router)
 app.include_router(times.router)
+app.include_router(stations.router)
 
 # 'Mounta' frontend dist mappen (efter build)
 if os.path.exists("../frontend/dist"):

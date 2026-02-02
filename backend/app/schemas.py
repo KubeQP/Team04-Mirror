@@ -22,6 +22,7 @@ class CompetitorOut(BaseModel):
 class TimeEntryOut(BaseModel):
     id: int
     competitor_id: int
+    station_id: int
     timestamp: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -31,12 +32,14 @@ class CompetitorReg(BaseModel):
     name: str
 
 class StationReg(BaseModel):
-    name: str
+    station_name: str
     order: str
 
 class StationOut(BaseModel):
     id: int
-    name: str
+    station_name: str
     order: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 

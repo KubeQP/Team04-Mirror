@@ -50,9 +50,9 @@ def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
     return entry
 
 
-def record_new_station(db: Session, name: str, order: str) -> Station:
+def record_new_station(db: Session, station_name: str, order: str) -> Station:
     """Registrera en ny station"""
-    entry = Station(name = name, order = order)
+    entry = Station(station_name = station_name, order = order)
     db.add(entry)
     db.commit()
     db.refresh(entry)
