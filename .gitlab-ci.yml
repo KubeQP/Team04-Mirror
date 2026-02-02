@@ -195,41 +195,41 @@ backend-build-linux:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-backend-build-windows:
-  stage: build-backend
-  image: mcr.microsoft.com/windows:ltsc2019
-  script:
-    - cd backend
-    - source .venv/bin/activate
-    - pip install pyinstaller
-    - pyinstaller --onefile run.py
-    - mkdir app/backend
-    - cp dist/run app/backend
-  artifacts:
-    paths:
-      - app
-  rules:
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  allow_failure: true
-
-backend-build-mac:
-  stage: build-backend
-  image: dockurr/macos
-  script:
-    - cd backend
-    - source .venv/bin/activate
-    - pip install pyinstaller
-    - pyinstaller --onefile run.py
-    - mkdir app/backend
-    - cp dist/run app/backend
-  artifacts:
-    paths:
-      - app
-  rules:
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  allow_failure: true
+# backend-build-windows:
+#   stage: build-backend
+#   image: mcr.microsoft.com/windows:ltsc2019
+#   script:
+#     - cd backend
+#     - source .venv/bin/activate
+#     - pip install pyinstaller
+#     - pyinstaller --onefile run.py
+#     - mkdir app/backend
+#     - cp dist/run app/backend
+#   artifacts:
+#     paths:
+#       - app
+#   rules:
+#     - if: "$CI_MERGE_REQUEST_ID"
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#   allow_failure: true
+#
+# backend-build-mac:
+#   stage: build-backend
+#   image: dockurr/macos
+#   script:
+#     - cd backend
+#     - source .venv/bin/activate
+#     - pip install pyinstaller
+#     - pyinstaller --onefile run.py
+#     - mkdir app/backend
+#     - cp dist/run app/backend
+#   artifacts:
+#     paths:
+#       - app
+#   rules:
+#     - if: "$CI_MERGE_REQUEST_ID"
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#   allow_failure: true
 
 # ---------------------------
 # Archive build (main branch only)
