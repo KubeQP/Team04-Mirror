@@ -1,12 +1,10 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from 'vitest';
 
-describe("ThemeToggle", () => {
-  it("dummy", () => {
-    expect(true).toBe(true);
-  });
+describe('ThemeToggle', () => {
+	it('dummy', () => {
+		expect(true).toBe(true);
+	});
 });
-
-
 
 /*
 
