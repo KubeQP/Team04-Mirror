@@ -1,9 +1,9 @@
 stages:
   - setup
-  # - lint
-  # - format
-  # - check
-  # - test
+  - lint
+  - format
+  - check
+  - test
   - build-frontend
   - build-backend
   - build-zip
@@ -43,119 +43,119 @@ frontend-setup:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-# # ---------------------------
-# # Backend lint (ruff + mypy)
-# # ---------------------------
-# backend-lint:
-#   stage: lint
-#   image: python:3.14
-#   script:
-#     - cd backend
-#     - source .venv/bin/activate
-#     - make lint-ci
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# # ---------------------------
-# # Backend format check (black)
-# # ---------------------------
-# backend-format:
-#   stage: format
-#   image: python:3.14
-#   script:
-#     - cd backend
-#     - source .venv/bin/activate
-#     - make format-ci
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# # ---------------------------
-# # Backend check
-# # ---------------------------
-# backend-check:
-#   stage: check
-#   image: python:3.14
-#   script:
-#     - cd backend
-#     - source .venv/bin/activate
-#     - make check-ci
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# # ---------------------------
-# # Frontend lint
-# # ---------------------------
-# frontend-lint:
-#   stage: lint
-#   image: node:24
-#   script:
-#     - cd frontend
-#     - npm run lint
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# # ---------------------------
-# # Frontend format
-# # ---------------------------
-# frontend-format:
-#   stage: format
-#   image: node:24
-#   script:
-#     - cd frontend
-#     - npm run format
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# # ---------------------------
-# # Frontend check
-# # ---------------------------
-# frontend-check:
-#   stage: check
-#   image: node:24
-#   script:
-#     - cd frontend
-#     - npm run check
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# # ---------------------------
-# # Backend tests
-# # ---------------------------
-# backend-test:
-#   stage: test
-#   image: python:3.14
-#   script:
-#     - cd backend
-#     - source .venv/bin/activate
-#     - make test
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#
-# # ---------------------------
-# # Frontend tests
-# # ---------------------------
-# frontend-test:
-#   stage: test
-#   image: node:24
-#   script:
-#     - cd frontend
-#     - npm run test
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
+# ---------------------------
+# Backend lint (ruff + mypy)
+# ---------------------------
+backend-lint:
+  stage: lint
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make lint-ci
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
+
+# ---------------------------
+# Backend format check (black)
+# ---------------------------
+backend-format:
+  stage: format
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make format-ci
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
+
+# ---------------------------
+# Backend check
+# ---------------------------
+backend-check:
+  stage: check
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make check-ci
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
+
+# ---------------------------
+# Frontend lint
+# ---------------------------
+frontend-lint:
+  stage: lint
+  image: node:24
+  script:
+    - cd frontend
+    - npm run lint
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
+
+# ---------------------------
+# Frontend format
+# ---------------------------
+frontend-format:
+  stage: format
+  image: node:24
+  script:
+    - cd frontend
+    - npm run format
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
+
+# ---------------------------
+# Frontend check
+# ---------------------------
+frontend-check:
+  stage: check
+  image: node:24
+  script:
+    - cd frontend
+    - npm run check
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
+
+# ---------------------------
+# Backend tests
+# ---------------------------
+backend-test:
+  stage: test
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - make test
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Frontend tests
+# ---------------------------
+frontend-test:
+  stage: test
+  image: node:24
+  script:
+    - cd frontend
+    - npm run test
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
 # Frontend build (main branch only)
@@ -194,75 +194,6 @@ backend-build-linux:
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
-
-# ---------------------------
-# Backend build for Windows (main branch only)
-# ---------------------------
-backend-build-windows:
-  stage: build-backend
-  image: ubuntu:20.04 # You can use a lightweight image like Ubuntu
-  script:
-    # Install Wine, Python, and PyInstaller
-    - apt-get update
-    - apt-get install -y wine64 python3 python3-pip curl
-    - curl -LO https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe # Download the Windows Python installer
-    - wine python-3.14.2-amd64.exe /quiet InstallAllUsers=1 PrependPath=1 # Install Python inside Wine
-    - wine pip3 install pyinstaller # Install PyInstaller for Windows via Wine
-
-    # Prepare your Python environment and run PyInstaller through Wine
-    - wine cmd /C "python -m venv .venv" # Create a virtual environment inside Wine
-    - wine cmd /C ".\\.venv\\Scripts\\activate" # Activate the environment inside Wine
-    - wine cmd /C "pip install -r requirements.txt" # Install dependencies
-
-    # Build the Windows executable using PyInstaller
-    - wine cmd /C "pyinstaller --onefile run.py" # Use PyInstaller to create the .exe file
-
-    # Copy the executable to the `app/backend` directory
-    - mkdir -p ../app/backend
-    - cp dist/run.exe ../app/backend
-
-  artifacts:
-    paths:
-      - app
-  rules:
-    - if: "$CI_MERGE_REQUEST_ID"
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  allow_failure: true
-# backend-build-windows:
-#   stage: build-backend
-#   image: mcr.microsoft.com/windows:ltsc2019
-#   script:
-#     - cd backend
-#     - source .venv/bin/activate
-#     - pip install pyinstaller
-#     - pyinstaller --onefile run.py
-#     - mkdir app/backend
-#     - cp dist/run app/backend
-#   artifacts:
-#     paths:
-#       - app
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
-#
-# backend-build-mac:
-#   stage: build-backend
-#   image: dockurr/macos
-#   script:
-#     - cd backend
-#     - source .venv/bin/activate
-#     - pip install pyinstaller
-#     - pyinstaller --onefile run.py
-#     - mkdir app/backend
-#     - cp dist/run app/backend
-#   artifacts:
-#     paths:
-#       - app
-#   rules:
-#     - if: "$CI_MERGE_REQUEST_ID"
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   allow_failure: true
 
 # ---------------------------
 # Archive build (main branch only)
