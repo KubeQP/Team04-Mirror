@@ -5,6 +5,18 @@ import { getCompetitorData } from '../api/getCompetitorData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, TimeData } from '../types';
 
+function formatRegisteredTime(timestamp?: string): string {
+	if (!timestamp) return '-';
+
+    const [datePart] = timestamp.split('T');
+	const [, timePart] = timestamp.split('T');
+	if (!timePart) return '-';
+
+	const [h, m, s] = timePart.split(':');
+
+	return `${datePart}, ${Number(h)}:${Number(m)}:${Number(s)}`;
+}
+
 export default function Admin() {
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
@@ -54,7 +66,7 @@ export default function Admin() {
 	competitorData?.forEach((competitor) => {
 		TempArray1.push('-');
 		TempArray1.push(competitor.start_number);
-		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? '-');
+		TempArray1.push(formatRegisteredTime(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp));
 		Array1.push(TempArray1);
 		TempArray1 = [];
 	});
@@ -65,7 +77,7 @@ export default function Admin() {
 	competitorData?.forEach((competitor) => {
 		TempArray2.push(competitor.start_number);
 		TempArray2.push(competitor.name);
-		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? '-');
+		TempArray2.push(formatRegisteredTime(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp));
 		TempArray2.push('-');
 		TempArray2.push('-');
 		Array2.push(TempArray2);
