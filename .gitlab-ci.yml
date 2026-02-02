@@ -186,7 +186,7 @@ backend-build-linux:
     - source .venv/bin/activate
     - pip install pyinstaller
     - pyinstaller --onefile run.py
-    - mkdir build/app/backend
+    - mkdir app/backend
     - cp dist/run build/app/backend
   artifacts:
     paths:
@@ -203,7 +203,7 @@ backend-build-windows:
     - source .venv/bin/activate
     - pip install pyinstaller
     - pyinstaller --onefile run.py
-    - mkdir build/app/backend
+    - mkdir app/backend
     - cp dist/run build/app/backend
   artifacts:
     paths:
@@ -221,7 +221,7 @@ backend-build-mac:
     - source .venv/bin/activate
     - pip install pyinstaller
     - pyinstaller --onefile run.py
-    - mkdir build/app/backend
+    - mkdir app/backend
     - cp dist/run build/app/backend
   artifacts:
     paths:
