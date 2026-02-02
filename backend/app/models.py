@@ -6,6 +6,8 @@ from sqlalchemy.orm import relationship
 
 from .database import Base
 
+# Definierar vad vi lagrar i SQL-databasen
+
 
 class Competitor(Base):
     __tablename__ = "competitors"

@@ -1,0 +1,16 @@
+import type { TimeData } from '../types';
+
+export async function getTimeData(): Promise<Array<TimeData>> {
+	const response = await fetch('http://127.0.0.1:8000/times/', {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error('Nätverksfel: ' + response.statusText);
+	}
+
+	return response.json();
+}

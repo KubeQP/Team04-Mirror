@@ -1,17 +1,18 @@
 # backend/tests/test_times.py
+from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from app import models
 
 
-def test_get_times_empty(client):
+def test_get_times_empty(client: TestClient) -> None:
     """Om det inte finns några tider ska vi få en tom lista."""
     response = client.get("/times")
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_get_times_with_data(client, db_session: Session):
+def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
     """GET /times ska returnera alla tider i databasen."""
     # Skapa två tävlande
     c1 = models.Competitor(start_number="1001", name="Team 1")
@@ -39,7 +40,7 @@ def test_get_times_with_data(client, db_session: Session):
     assert competitor_ids == {c1.id, c2.id}
 
 
-def test_get_times_by_start_number(client, db_session: Session):
+def test_get_times_by_start_number(client: TestClient, db_session: Session) -> None:
     """GET /times/{start_number} ska bara ge tider för rätt tävlande."""
     # Skapa tävlande
     c1 = models.Competitor(start_number="1001", name="Team 1")
@@ -67,7 +68,9 @@ def test_get_times_by_start_number(client, db_session: Session):
     assert all(t["competitor_id"] == c1.id for t in data)
 
 
-def test_get_times_by_start_number_unknown(client, db_session: Session):
+def test_get_times_by_start_number_unknown(
+    client: TestClient, db_session: Session
+) -> None:
     """Vad händer om startnumret inte finns? Här förväntar vi oss tom lista."""
     # Ingen med startnummer 9999
     response = client.get("/times/9999")
@@ -78,7 +81,9 @@ def test_get_times_by_start_number_unknown(client, db_session: Session):
     # assert data == []
 
 
-def test_record_time_for_existing_competitor(client, db_session: Session):
+def test_record_time_for_existing_competitor(
+    client: TestClient, db_session: Session
+) -> None:
     """POST /times/record ska skapa en ny TimeEntry för giltigt startnummer."""
     # Arrange: skapa en tävlande
     c1 = models.Competitor(start_number="1001", name="Team 1")
@@ -107,7 +112,7 @@ def test_record_time_for_existing_competitor(client, db_session: Session):
     assert len(times_in_db) == 1
 
 
-def test_record_time_for_unknown_competitor_returns_404(client):
+def test_record_time_for_unknown_competitor_returns_404(client: TestClient) -> None:
     """POST /times/record ska ge 404 om startnumret inte finns."""
     # Arrange: skicka ett startnummer som inte finns i databasen
     payload = {"start_number": "9999"}
