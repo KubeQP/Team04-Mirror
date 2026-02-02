@@ -64,12 +64,47 @@ export default function Admin() {
 		if (!timestamp) return "-";
 	return new Date(timestamp).toLocaleTimeString("sv-SE", { hour12: false });
 	}
+	const formatDuration = (ms: number): string => {
+		if (ms < 0) return "00:00.00";
+
+		const totalSeconds = Math.floor(ms / 1000);
+		const minutes = Math.floor(totalSeconds / 60);
+		const seconds = totalSeconds % 60;
+		
+		// Vi tar resten av millisekunderna och delar med 10 för att få hundradelar (0-99)
+		const centiseconds = Math.floor((ms % 1000) / 10);
+
+		return `${minutes.toString().padStart(2, '0')}:${seconds
+			.toString()
+			.padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+		};
 
 	// Hjälp-funktion räknar antal tider i en sträng	
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
 		return matches ? matches.length : 0;
 	}
+
+	const calculateTotalTime = (startTimes: any[], stopTimes: any[]): Cell => {
+	// Kontrollera om det finns exakt ett värde i varje
+	if (startTimes.length === 1 && stopTimes.length === 1) {
+		const start = startTimes[0].timestamp;
+		const stop = stopTimes[0].timestamp;
+
+		// Här kan du lägga till din faktiska tidsuträkning (t.ex. stop - start)
+		// Jag använder en placeholder-funktion 'formatDuration' här
+		return {
+		value: formatDuration(stop - start), 
+		correct: true
+		};
+	}
+
+	// Om det finns 0 eller fler än 1 värde
+	return { 
+		value: '-', 
+		correct: startTimes.length === 0 && stopTimes.length === 0 // Sant om tom, falskt om för många
+	};
+	};
 
 
 	//Table - Stations //fel: två tider för samma person i samma station
@@ -81,7 +116,7 @@ export default function Admin() {
 	];
 	Array1.push(headerRow1);
 	timeData?.forEach((timeSlot) => {
-		const stationValue: Cell = {value: "-", correct: true}; //måste lägga till station //timeSlot.station_id
+		const stationValue: Cell = {value: timeSlot.station_id !== undefined ? timeSlot.station_id.toString() : "-", correct: true}; //måste lägga till station //timeSlot.station_id
   		const startNumber: Cell = {value: competitorData?.find(competitor => competitor.id === timeSlot.competitor_id)?.start_number ?? '-', correct: true};
   		const timeStamp: Cell = {value: formatTime(timeSlot.timestamp),correct: true};
 
@@ -89,7 +124,7 @@ export default function Admin() {
 		const duplicates = timeData.filter(
 			(t) => t.id !== timeSlot.id 
 				&& (competitorData?.find(competitor => competitor.id === t.competitor_id)?.start_number ?? '-') === startNumber.value
-				//&& t.station_id === stationValue.value
+				&& (t.station_id !== undefined ? t.station_id.toString() : "-") === stationValue.value
 		);
 
 		if (duplicates.length > 0) {
@@ -120,16 +155,23 @@ export default function Admin() {
 
 		const startNumber = {value: competitor.start_number, correct: true}
 		const name = {value: competitor.name, correct: true}
-		const matchingTimes = timeData?.filter((time) => time.competitor_id === competitor.id) || [];
+		const matchingStartTimes = timeData?.filter((time) => time.competitor_id === competitor.id && time.station_id === 0) || [];
 		const startTime = {
 		// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
-		value: matchingTimes.length > 0 
-			? matchingTimes.map(t => formatTime(t.timestamp)).join(', ') 
+		value: matchingStartTimes.length > 0 
+			? matchingStartTimes.map(t => formatTime(t.timestamp)).join(', ') 
 			: '-', 
 		correct: true 
 		};
-		const stopTime = {value: '-', correct: true}
-		const totalTime = {value: '-', correct: true}
+		const matchingStopTimes = timeData?.filter((time) => time.competitor_id === competitor.id && time.station_id === 1) || [];
+		const stopTime = {
+		// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
+		value: matchingStopTimes.length > 0 
+			? matchingStopTimes.map(t => formatTime(t.timestamp)).join(', ') 
+			: '-', 
+		correct: true 
+		};
+		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes)
 		
 		if (startTime.value === '-') 
 			startTime.correct = false
