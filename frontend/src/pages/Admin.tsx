@@ -54,34 +54,106 @@ export default function Admin() {
 		fetchData();
 	}, []);
 
-	//Table - Stations
-	let TempArray1: string[] = [];
-	const Array1: string[][] = [];
-	Array1.push(['Station', 'Nbr.', 'Tid']);
-	competitorData?.forEach((competitor) => {
-		TempArray1.push('-');
-		TempArray1.push(competitor.start_number);
-		TempArray1.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? '-');
-		Array1.push(TempArray1);
-		TempArray1 = [];
+	interface Cell {
+		value: string
+		correct: boolean
+	}
+
+	//Hjälp-funktion för att skriva tagen tid som HH:MM:SS
+	function formatTime(timestamp?: string): string {
+		if (!timestamp) return "-";
+	return new Date(timestamp).toLocaleTimeString("sv-SE", { hour12: false });
+	}
+
+	// Hjälp-funktion räknar antal tider i en sträng	
+	function countTimesInString(value: string): number {
+		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
+		return matches ? matches.length : 0;
+	}
+
+
+	//Table - Stations //fel: två tider för samma person i samma station
+	const Array1: Cell[][] = [];
+	const headerRow1: Cell[] = [
+		{ value: "Station", correct: true },
+		{ value: "Nr.", correct: true },
+		{ value: "Tid", correct: true }
+	];
+	Array1.push(headerRow1);
+	timeData?.forEach((timeSlot) => {
+		const stationValue: Cell = {value: "-", correct: true}; //måste lägga till station //timeSlot.station_id
+  		const startNumber: Cell = {value: competitorData?.find(competitor => competitor.id === timeSlot.competitor_id)?.start_number ?? '-', correct: true};
+  		const timeStamp: Cell = {value: formatTime(timeSlot.timestamp),correct: true};
+
+
+		const duplicates = timeData.filter(
+			(t) => t.id !== timeSlot.id 
+				&& (competitorData?.find(competitor => competitor.id === t.competitor_id)?.start_number ?? '-') === startNumber.value
+				//&& t.station_id === stationValue.value
+		);
+
+		if (duplicates.length > 0) {
+			stationValue.correct = false;
+			startNumber.correct = false;
+		}
+
+		const competitorRow: Cell[] = [
+			stationValue,
+			startNumber,
+			timeStamp
+		]
+		Array1.push(competitorRow);
+
 	});
 
-	//Table - Competitors
-	let TempArray2: string[] = [];
-	const Array2: string[][] = [];
-	Array2.push(['Nr.', 'Namn', 'Start', 'Mål', 'Totalt']);
+	//Table - Competitors //flera tider för en station, ingen tid.
+	const Array2: Cell[][] = [];
+	const headerRow2: Cell[] = [
+		{value: "Nr.", correct: true},
+		{value: "Namn", correct: true},
+		{value: "Start", correct: true},
+		{value: "Mål", correct: true},
+		{value: "Totalt", correct: true}
+	]
+	Array2.push(headerRow2);
 	competitorData?.forEach((competitor) => {
-		TempArray2.push(competitor.start_number);
-		TempArray2.push(competitor.name);
-		TempArray2.push(timeData?.find((time) => time.competitor_id === competitor.id)?.timestamp ?? '-');
-		TempArray2.push('-');
-		TempArray2.push('-');
-		Array2.push(TempArray2);
-		TempArray2 = [];
+
+		const startNumber = {value: competitor.start_number, correct: true}
+		const name = {value: competitor.name, correct: true}
+		const matchingTimes = timeData?.filter((time) => time.competitor_id === competitor.id) || [];
+		const startTime = {
+		// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
+		value: matchingTimes.length > 0 
+			? matchingTimes.map(t => formatTime(t.timestamp)).join(', ') 
+			: '-', 
+		correct: true 
+		};
+		const stopTime = {value: '-', correct: true}
+		const totalTime = {value: '-', correct: true}
+		
+		if (startTime.value === '-') 
+			startTime.correct = false
+		if (stopTime.value === '-') 
+			stopTime.correct = false
+		if (countTimesInString(startTime.value) > 1) 
+  			startTime.correct = false;
+		if (countTimesInString(stopTime.value) > 1) 
+  			stopTime.correct = false;
+
+
+
+		const competitorRow: Cell[] = [
+			startNumber,
+			name,
+			startTime,
+			stopTime,
+			totalTime
+		]
+		Array2.push(competitorRow);
 	});
 
 	//dynamic table creation
-	function createTable(tableData: string[][]) {
+	function createTable(tableData: Cell[][]) {
 		if (tableData.length === 0) return null;
 
 		const [headerRow, ...bodyRows] = tableData;
@@ -91,7 +163,7 @@ export default function Admin() {
 				<thead>
 					<tr>
 						{headerRow.map((header, index) => (
-							<th key={index}>{header}</th>
+							<th key={index}>{header.value}</th>
 						))}
 					</tr>
 				</thead>
@@ -99,7 +171,7 @@ export default function Admin() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex}>{cell}</td>
+								<td key={cellIndex} style={{backgroundColor: cell.correct === false ? 'red' : undefined}}>{cell.value} </td>
 							))}
 						</tr>
 					))}
