@@ -7,6 +7,13 @@ type Competitor = {
   name: string;
 };
 
+type Station = {
+  id: number;
+  station_name: string;
+  order: string;
+}
+
+
 type TimeEntryOut = {
   id?: number;
   competitor_id?: number;
@@ -18,12 +25,29 @@ type OutletCtx = {
   notifyCompetitorAdded: () => void; // finns, men används inte här
 };
 
+
 export default function RegistreringStoppTid() {
   const { competitorsVersion } = useOutletContext<OutletCtx>();
 
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
+
   const [selectedStartNumber, setSelectedStartNumber] = useState<string>("");
+
   const [msg, setMsg] = useState<string>("");
+
+  const [selectedStationId, setSelectedStationId] = useState<number | "">("");
+  const [stations, setStations] = useState<Station[]>([]);
+
+  const fetchStations = async () => {
+    const res = await fetch("http://localhost:8000/stations/getstations");
+    if (!res.ok) return;
+    const data: Station[] = await res.json();
+    setStations(data);
+
+    if (selectedStationId === "" && data.length > 0) {
+      setSelectedStationId(data[0].id);
+    }
+  };
 
   const fetchCompetitors = async () => {
     try {
@@ -53,6 +77,7 @@ export default function RegistreringStoppTid() {
   // Hämta vid första mount
   useEffect(() => {
     fetchCompetitors();
+    fetchStations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,6 +86,11 @@ export default function RegistreringStoppTid() {
     fetchCompetitors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [competitorsVersion]);
+
+  const selectedStation = useMemo(
+    () => stations.find(c => c.id === selectedStationId),
+    [stations, selectedStationId]
+  )
 
   const selectedCompetitor = useMemo(
     () => competitors.find(c => c.start_number === selectedStartNumber),
@@ -72,6 +102,10 @@ export default function RegistreringStoppTid() {
       setMsg("Välj en tävlande först.");
       return;
     }
+    if (selectedStationId === "") {
+      setMsg("Välj en station först.");
+      return;
+    }
 
     setMsg("Registrerar stopptid...");
 
@@ -81,6 +115,7 @@ export default function RegistreringStoppTid() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           start_number: selectedStartNumber,
+          station_id: selectedStationId,
           timestamp: new Date().toISOString(),
         }),
       });
@@ -137,12 +172,26 @@ export default function RegistreringStoppTid() {
             ))}
           </select>
         </label>
+        <label>
+          Välj station:&nbsp;
+          <select
+            value={selectedStationId}
+            onChange={(e) => setSelectedStationId(Number(e.target.value))}
+            disabled={stations.length === 0}
+          >
+            {stations.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.station_name}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
           Registrera stopptid nu
         </button>
 
-        <button type="button" onClick={fetchCompetitors}>
+        <button type="button" onClick={fetchStations}>
           Uppdatera lista
         </button>
       </div>

@@ -1,12 +1,14 @@
 
 import { useEffect,useState } from 'react';
 
+
 type Station = {
   station_name: string;
   order: string;
 }
 
 export default function StationRegistrering(){
+
 
   const [stationName, setStationName] = useState("");
   const [order, setOrder] = useState("");

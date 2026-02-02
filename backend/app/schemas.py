@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict
 class RecordTimeIn(BaseModel):
     start_number: str
     timestamp: Optional[datetime] = None
+    station_id: Optional[int] = None
 
 
 class CompetitorOut(BaseModel):
