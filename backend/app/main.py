@@ -90,9 +90,9 @@ app.add_middleware(
 
 
 # Inkludera routrar. Smidigt att dela upp i flera filer.
-app.include_router(competitors.router)
-app.include_router(times.router)
-app.include_router(stations.router)
+app.include_router(competitors.router, prefix="/api")
+app.include_router(times.router, prefix="/api")
+app.include_router(stations.router, prefix="/api")
 
 # 'Mounta' frontend dist mappen (efter build)
 if os.path.exists("../frontend/dist"):

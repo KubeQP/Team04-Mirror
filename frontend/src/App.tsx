@@ -20,6 +20,8 @@ export default function App() {
 				<nav id="main-nav">
 					<Link to="/">Startsida</Link>
 					<Link to="/stationregistrering">StationRegistrering</Link>
+					<Link to="/sida1">Sida 1</Link>
+					<Link to="/sida2">Sida 2</Link>
 					<Link to="/registrering">Registrering</Link>
 					<Link to="/registreringstopptid">RegistreringStoppTid</Link>
 					<Link to="/resultatvisare">Resultatvisare</Link>

@@ -1,5 +1,6 @@
 # backend/app/routers/competitors.py
 from fastapi import APIRouter, Depends
+from sqlalchemy import Column
 from sqlalchemy.orm import Session
 
 from app.models import Competitor
@@ -17,6 +18,8 @@ def read_competitors(db: Session = Depends(get_db)) -> list[Competitor]:
 
 
 @router.post("/register", response_model=schemas.CompetitorReg)
-def reg_competitor(data: schemas.CompetitorReg, db: Session = Depends(get_db)):
+def reg_competitor(
+    data: schemas.CompetitorReg, db: Session = Depends(get_db)
+) -> dict[str, Column[str]]:
     competitor = crud.record_new_reg(db, data.start_number, data.name)
     return {"start_number": competitor.start_number, "name": competitor.name}

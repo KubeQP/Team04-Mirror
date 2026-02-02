@@ -4,7 +4,9 @@ stages:
   - format
   - check
   - test
-  - build
+  - build-frontend
+  - build-backend
+  - build-zip
 
 # ---------------------------
 # Backend setup (Python deps)
@@ -159,10 +161,49 @@ frontend-test:
 # Frontend build (main branch only)
 # ---------------------------
 frontend-build:
-  stage: build
+  stage: build-frontend
   image: node:24
   script:
     - cd frontend
     - npm run build
+    - mkdir -p ../app/frontend
+    - cp -r dist ../app/frontend
+  artifacts:
+    paths:
+      - app
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Backend build (main branch only)
+# ---------------------------
+backend-build-linux:
+  stage: build-backend
+  image: python:3.14
+  script:
+    - cd backend
+    - source .venv/bin/activate
+    - pip install pyinstaller
+    - pyinstaller --onefile run.py
+    - mkdir ../app/backend
+    - cp dist/run ../app/backend
+  artifacts:
+    paths:
+      - app
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ---------------------------
+# Archive build (main branch only)
+# ---------------------------
+zip-build:
+  stage: build-zip
+  image: alpine:latest
+  script:
+    - apk add --no-cache zip
+    - zip -r build.zip app
+  artifacts:
+    paths:
+      - build.zip
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
