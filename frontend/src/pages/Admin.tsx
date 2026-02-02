@@ -132,9 +132,13 @@ export default function Admin() {
 				) : timeError ? (
 					<p>Fel vid hämtning av tiddata: {timeError}</p>
 				) : (
-					<div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+					<div style={{ display: 'flex', flexDirection: 'row', gap: '100px' }}>
+						<div>
 						{createTable(editableArray1, setEditableArray1)}
+						</div>
+						<div>
 						{createTable(editableArray2, setEditableArray2)}
+						</div>
 					</div>
 				)}
 			</div>

@@ -254,6 +254,9 @@ div.Admin-tables {
 }
 
 /* Global table styles -------------------------------------------------------*/
+table {
+	table-layout: auto;
+}
 table,
 th,
 td {
@@ -267,7 +270,7 @@ td {
 th {
 	background-color: rgba(17, 13, 236, 0.685);
 	height: 40px;
-	width: 50px;
+	width: auto;
 	padding: 5px;
 }
 td {
@@ -278,6 +281,7 @@ td {
 table,
 input {
     width: 90%;
+	box-sizing: inherit;
 }
 
 input {
