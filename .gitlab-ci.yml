@@ -195,6 +195,28 @@ backend-build-linux:
     - if: "$CI_MERGE_REQUEST_ID"
     - if: '$CI_COMMIT_BRANCH == "main"'
 
+# ---------------------------
+# Backend build for Windows (main branch only)
+# ---------------------------
+backend-build-windows:
+  stage: build-backend
+  tags:
+    - windows
+  image: mcr.microsoft.com/windows/servercore:ltsc2019
+  script:
+    - powershell -Command "python -m venv .venv"
+    - .\.venv\Scripts\activate
+    - pip install pyinstaller
+    - pyinstaller --onefile run.py
+    - mkdir ../app/backend
+    - cp dist/run.exe ../app/backend
+  artifacts:
+    paths:
+      - app
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true
 # backend-build-windows:
 #   stage: build-backend
 #   image: mcr.microsoft.com/windows:ltsc2019
