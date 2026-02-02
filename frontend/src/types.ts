@@ -15,3 +15,9 @@ export interface TimeData {
 	timestamp: string;
 	station_id: number
 }
+
+export interface StationData {
+	id: number;
+	station_name: string;
+	order: string;
+}

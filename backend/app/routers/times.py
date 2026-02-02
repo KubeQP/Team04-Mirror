@@ -32,7 +32,9 @@ def read_times_for_competitor(
 @router.post("/record", response_model=TimeEntryOut)
 def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
     """Posta en ny tidsregistrering för en tävlande med angivet startnummer."""
-    entry = crud.record_time_for_start_number(db, data.start_number, data.timestamp)
+    entry = crud.record_time_for_start_number(
+        db, data.start_number, data.timestamp, data.station_id
+    )
     if entry is None:
         raise HTTPException(status_code=404, detail="Competitor not found")
     return entry
