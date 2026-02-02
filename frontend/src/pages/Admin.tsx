@@ -64,47 +64,51 @@ export default function Admin() {
 		if (!timestamp) return "-";
 	return new Date(timestamp).toLocaleTimeString("sv-SE", { hour12: false });
 	}
-	const formatDuration = (ms: number): string => {
-		if (ms < 0) return "00:00.00";
-
-		const totalSeconds = Math.floor(ms / 1000);
-		const minutes = Math.floor(totalSeconds / 60);
-		const seconds = totalSeconds % 60;
-		
-		// Vi tar resten av millisekunderna och delar med 10 för att få hundradelar (0-99)
-		const centiseconds = Math.floor((ms % 1000) / 10);
-
-		return `${minutes.toString().padStart(2, '0')}:${seconds
-			.toString()
-			.padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
-		};
-
+	
 	// Hjälp-funktion räknar antal tider i en sträng	
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
 		return matches ? matches.length : 0;
 	}
 
-	const calculateTotalTime = (startTimes: any[], stopTimes: any[]): Cell => {
-	// Kontrollera om det finns exakt ett värde i varje
-	if (startTimes.length === 1 && stopTimes.length === 1) {
-		const start = startTimes[0].timestamp;
-		const stop = stopTimes[0].timestamp;
-
-		// Här kan du lägga till din faktiska tidsuträkning (t.ex. stop - start)
-		// Jag använder en placeholder-funktion 'formatDuration' här
-		return {
-		value: formatDuration(stop - start), 
-		correct: true
-		};
+	function calculateTotalTime(
+	startTimes: { timestamp: string | number | Date }[], 
+	stopTimes: { timestamp: string | number | Date }[]
+	): { value: string; correct: boolean } {
+	// Kräver exakt en starttid och exakt en stoptid
+	if (startTimes.length !== 1 || stopTimes.length !== 1) {
+		return { value: "-", correct: false };
 	}
 
-	// Om det finns 0 eller fler än 1 värde
-	return { 
-		value: '-', 
-		correct: startTimes.length === 0 && stopTimes.length === 0 // Sant om tom, falskt om för många
-	};
-	};
+	const start = new Date(startTimes[0].timestamp);
+	const stop = new Date(stopTimes[0].timestamp);
+
+	// Ogiltiga datum eller stop före start → "-"
+	if (isNaN(start.getTime()) || isNaN(stop.getTime()) || stop <= start) {
+		return { value: "-", correct: false };
+	}
+
+	const diffMs = stop.getTime() - start.getTime();
+	const totalSeconds = Math.floor(diffMs / 1000);
+
+	const hours = Math.floor(totalSeconds / 3600);
+	const minutes = Math.floor((totalSeconds % 3600) / 60);
+	const seconds = totalSeconds % 60;
+
+	let formatted: string;
+	formatted = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+
+	//if (hours > 0) {
+		// Format: 1:23:45, 2:05:09, etc.
+		//formatted = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	//} else {
+		// Format: 45:12, 9:05 (inga ledande nollor på minuter om < 10)
+	//	formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+	//}
+
+	return { value: formatted, correct: true };
+	}
+
 
 
 	//Table - Stations //fel: två tider för samma person i samma station
