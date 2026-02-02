@@ -12,18 +12,10 @@ router = APIRouter(prefix="/stations", tags=["stations"])
 
 @router.get("/getstations", response_model=list[schemas.StationOut])
 def read_stations(db: Session = Depends(get_db)) -> list[Station]:
-    return crud.get_stations(db);
-
+    return crud.get_stations(db)
 
 
 @router.post("/registerstation", response_model=schemas.StationReg)
-def reg_station(data : schemas.StationReg, db: Session = Depends(get_db)):
-    station = crud.record_new_station(db,data.station_name,data.order)
-    return {
-        "station_name": station.station_name,
-        "order": station.order
-    }
-
-    
-    
-    
+def reg_station(data: schemas.StationReg, db: Session = Depends(get_db)):
+    station = crud.record_new_station(db, data.station_name, data.order)
+    return {"station_name": station.station_name, "order": station.order}

@@ -28,15 +28,15 @@ const router = createBrowserRouter([
 			},
 			{
 				path: 'StationRegistrering',
-				element: <StationRegistrering/>
+				element: <StationRegistrering />,
 			},
 			{
 				path: 'Registrering',
-				element: <Registrering/>
+				element: <Registrering />,
 			},
 			{
 				path: 'RegistreringStoppTid',
-				element: <RegistreringStoppTid/>
+				element: <RegistreringStoppTid />,
 			},
 			{
 				path: 'resultatvisare',
@@ -45,9 +45,7 @@ const router = createBrowserRouter([
 			{
 				path: 'admin',
 				element: <Admin />,
-			}
-			
-
+			},
 		],
 	},
 ]);

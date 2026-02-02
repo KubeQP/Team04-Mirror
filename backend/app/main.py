@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .database import Base, SessionLocal, engine
-from .models import Competitor, TimeEntry, Station
-from .routers import competitors, times, stations
+from .models import Competitor, Station, TimeEntry
+from .routers import competitors, stations, times
 
 
 @asynccontextmanager
@@ -42,16 +42,24 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         db.add_all(
             [
                 TimeEntry(
-                    competitor_id=comp1.id, timestamp=datetime(2025, 6, 27, 12, 31, 39),station_id=station1.id
+                    competitor_id=comp1.id,
+                    timestamp=datetime(2025, 6, 27, 12, 31, 39),
+                    station_id=station1.id,
                 ),
                 TimeEntry(
-                    competitor_id=comp2.id, timestamp=datetime(2025, 6, 27, 12, 32, 15),station_id=station1.id
+                    competitor_id=comp2.id,
+                    timestamp=datetime(2025, 6, 27, 12, 32, 15),
+                    station_id=station1.id,
                 ),
                 TimeEntry(
-                    competitor_id=comp2.id, timestamp=datetime(2025, 6, 27, 12, 47, 38),station_id=station2.id
+                    competitor_id=comp2.id,
+                    timestamp=datetime(2025, 6, 27, 12, 47, 38),
+                    station_id=station2.id,
                 ),
                 TimeEntry(
-                    competitor_id=comp1.id, timestamp=datetime(2025, 6, 27, 12, 52, 5),station_id=station2.id
+                    competitor_id=comp1.id,
+                    timestamp=datetime(2025, 6, 27, 12, 52, 5),
+                    station_id=station2.id,
                 ),
             ]
         )
