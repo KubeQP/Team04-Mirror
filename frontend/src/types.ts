@@ -14,3 +14,9 @@ export interface TimeData {
 	competitor_id: number;
 	timestamp: string;
 }
+
+export interface StationData {
+	id: number;
+	station_name: string;
+	order: string;
+}

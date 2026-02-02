@@ -121,7 +121,6 @@ export default function RegistreringStoppTid() {
 		}
 
 		setMsg('Registrerar stopptid...');
-		setMsg('Registrerar stopptid...');
 
 		try {
 			const res = await fetch('http://localhost:8000/api/times/record', {
@@ -182,96 +181,74 @@ export default function RegistreringStoppTid() {
 	return (
 		<div>
 			<h2>Registrering Stopptid</h2>
-			return (
-			<div>
-				<h2>Registrering Stopptid</h2>
 
-				<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-					<label>
-						Välj tävlande:&nbsp;
-						<select
-							value={selectedStartNumber}
-							onChange={(e) => setSelectedStartNumber(e.target.value)}
-							disabled={competitors.length === 0}
-						>
-							{competitors.map((c) => (
-								<option key={c.start_number} value={c.start_number}>
-									{c.start_number} — {c.name}
-								</option>
-							))}
-						</select>
-					</label>
-					<label>
-						Välj station:&nbsp;
-						<select
-							value={selectedStationId}
-							onChange={(e) => setSelectedStationId(Number(e.target.value))}
-							disabled={stations.length === 0}
-						>
-							{stations.map((c) => (
-								<option key={c.id} value={c.id}>
-									{c.station_name}
-								</option>
-							))}
-						</select>
-					</label>
-
-					<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
-						Registrera stopptid nu
-					</button>
-					<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber}>
-						Registrera stopptid nu
-					</button>
-
-					<button type="button" onClick={fetchData}>
-						Uppdatera lista
-					</button>
-				</div>
-
-				{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
-				{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
-
-				<hr />
-				<hr />
-
-				<h3>Alla tävlande</h3>
-				<table>
-					<thead>
-						<tr>
-							<th>Startnummer</th>
-							<th>Namn</th>
-						</tr>
-					</thead>
-					<tbody>
+			<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+				<label>
+					Välj tävlande:&nbsp;
+					<select
+						value={selectedStartNumber}
+						onChange={(e) => setSelectedStartNumber(e.target.value)}
+						disabled={competitors.length === 0}
+					>
+						<option value="" disabled selected>
+							...
+						</option>
 						{competitors.map((c) => (
-							<tr key={c.start_number}>
-								<td>{c.start_number}</td>
-								<td>{c.name}</td>
-							</tr>
+							<option key={c.start_number} value={c.start_number}>
+								{c.start_number} — {c.name}
+							</option>
 						))}
-					</tbody>
-				</table>
-				<h3>Alla tävlande</h3>
-				<table>
-					<thead>
-						<tr>
-							<th>Startnummer</th>
-							<th>Namn</th>
-						</tr>
-					</thead>
-					<tbody>
-						{competitors.map((c) => (
-							<tr key={c.start_number}>
-								<td>{c.start_number}</td>
-								<td>{c.name}</td>
-							</tr>
+					</select>
+				</label>
+				<label>
+					Välj station:&nbsp;
+					<select
+						value={selectedStationId}
+						onChange={(e) => setSelectedStationId(Number(e.target.value))}
+						disabled={stations.length === 0}
+					>
+						<option value="" disabled selected>
+							...
+						</option>
+						{stations.map((c) => (
+							<option key={c.id} value={c.id}>
+								{c.station_name}
+							</option>
 						))}
-					</tbody>
-				</table>
+					</select>
+				</label>
 
-				{competitors.length === 0 && <p>Inga tävlande hittades. Registrera någon först.</p>}
+				<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber || !selectedStationId}>
+					Registrera stopptid nu
+				</button>
+
+				<button type="button" onClick={fetchData}>
+					Uppdatera lista
+				</button>
 			</div>
-			);
+
+			{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
+
+			<hr />
+
+			<h3>Alla tävlande</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Startnummer</th>
+						<th>Namn</th>
+					</tr>
+				</thead>
+				<tbody>
+					{competitors.map((c) => (
+						<tr key={c.start_number}>
+							<td>{c.start_number}</td>
+							<td>{c.name}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+
 			{competitors.length === 0 && <p>Inga tävlande hittades. Registrera någon först.</p>}
 		</div>
 	);

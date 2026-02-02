@@ -11,7 +11,7 @@ export default function StationRegistrering() {
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const fetchStations = async () => {
-		const res = await fetch('http://localhost:8000/stations/getstations');
+		const res = await fetch('http://localhost:8000/api/stations/getstations');
 		if (!res.ok) return;
 		const data = await res.json();
 		setStations(data);
@@ -28,7 +28,7 @@ export default function StationRegistrering() {
 		if (!order.trim()) return;
 
 		try {
-			const res = await fetch('http://localhost:8000/stations/registerstation', {
+			const res = await fetch('http://localhost:8000/api/stations/registerstation', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

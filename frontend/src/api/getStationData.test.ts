@@ -28,7 +28,7 @@ describe('getStationData', () => {
 		const result = await getStationData();
 
 		// Kontrollera att fetch anropas med rätt URL
-		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/stations/getstations', {
+		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/api/stations/getstations', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
