@@ -111,13 +111,6 @@ export default function Admin() {
 
 		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-		//if (hours > 0) {
-		// Format: 1:23:45, 2:05:09, etc.
-		//formatted = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-		//} else {
-		// Format: 45:12, 9:05 (inga ledande nollor på minuter om < 10)
-		//	formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-		//}
 
 		return { value: formatted, correct: true };
 	}
@@ -132,7 +125,7 @@ export default function Admin() {
 	Array1.push(headerRow1);
 	timeData?.forEach((timeSlot) => {
 		const stationValue: Cell = {
-			value: stationData?.find((station) => station.id === timeSlot.station_id)?.order ?? '-',
+			value: stationData?.find((station) => station.id === timeSlot.station_id)?.station_name ?? '-',
 			correct: true,
 		}; //måste lägga till station //timeSlot.station_id
 		const startNumber: Cell = {
