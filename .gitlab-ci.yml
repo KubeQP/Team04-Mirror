@@ -14,9 +14,9 @@ backend-setup:
     - source .venv/bin/activate
     - pip install -r requirements.txt
     - pip install -r requirements-dev.txt
-  # artifacts:
-  #   paths:
-  #     - backend/.venv
-  # rules:
-  #   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  #   - if: '$CI_COMMIT_BRANCH == "main"'
+  artifacts:
+    paths:
+      - backend/.venv
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
