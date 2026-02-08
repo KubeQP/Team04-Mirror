@@ -1,24 +1,28 @@
-stages:
-  - setup
-
-# ---------------------------
-# Backend setup (Python deps)
-# ---------------------------
-backend-setup:
-  stage: setup
-  image: python:3.14
-  script:
-    - echo "TEST"
-    - cd backend
-    - python -m venv .venv
-    - source .venv/bin/activate
-    - pip install -r requirements.txt
-    - pip install -r requirements-dev.txt
-  artifacts:
-    paths:
-      - backend/.venv
+job:
+  script: echo "Hello, Rules!"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  # rules:
-  # - if: "$CI_MERGE_REQUEST_ID"
-  # - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+#   - setup
+#
+# # ---------------------------
+# # Backend setup (Python deps)
+# # ---------------------------
+# backend-setup:
+#   stage: setup
+#   image: python:3.14
+#   script:
+#     - echo "TEST"
+#     - cd backend
+#     - python -m venv .venv
+#     - source .venv/bin/activate
+#     - pip install -r requirements.txt
+#     - pip install -r requirements-dev.txt
+#   artifacts:
+#     paths:
+#       - backend/.venv
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#   # rules:
+#   # - if: "$CI_MERGE_REQUEST_ID"
+#   # - if: '$CI_COMMIT_BRANCH == "main"'
