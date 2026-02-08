@@ -2,9 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCompetitorData } from '../api/getCompetitorData';
-import { getTimeData } from '../api/getTimeData';
 import { getStationData } from '../api/getStationData';
-import type { CompetitorData, TimeData, StationData } from '../types';
+import { getTimeData } from '../api/getTimeData';
+import type { CompetitorData, StationData,TimeData } from '../types';
 import Admin from './Admin';
 
 vi.mock('react-router-dom', async () => {

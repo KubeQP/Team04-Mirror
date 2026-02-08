@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react';
 
 import { getCompetitorData } from '../api/getCompetitorData';
-import { getTimeData } from '../api/getTimeData';
 import { getStationData } from '../api/getStationData';
-import type { CompetitorData, TimeData, StationData } from '../types';
+import { getTimeData } from '../api/getTimeData';
+import type { CompetitorData, StationData,TimeData } from '../types';
 
 // src/pages/Admin.tsx
 export default function Admin() {
@@ -223,13 +223,16 @@ export default function Admin() {
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
 			<div className="Admin-tables">
-				{competitorLoading || timeLoading ? (
+				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
 				) : competitorError ? (
 					<p>Fel vid hämtning av tävlingsdeltagare: {competitorError}</p>
 				) : timeError ? (
 					<p>Fel vid hämtning av tiddata: {timeError}</p>
-				) : (
+				) : stationError ? (
+					<p>Fel vid hämtning av station data: {stationError}</p>
+				) :
+				(
 					<div style={{ display: 'flex', gap: '20px' }}>
 						{createTable(Array1)}
 						{createTable(Array2)}
