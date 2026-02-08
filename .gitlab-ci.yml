@@ -24,7 +24,7 @@ backend-setup:
     paths:
       - backend/.venv
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
@@ -40,7 +40,7 @@ frontend-setup:
     paths:
       - frontend/node_modules
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
@@ -54,7 +54,7 @@ backend-lint:
     - source .venv/bin/activate
     - make lint-ci
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
   allow_failure: true
 
@@ -69,7 +69,7 @@ backend-format:
     - source .venv/bin/activate
     - make format-ci
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
   allow_failure: true
 
@@ -84,7 +84,7 @@ backend-check:
     - source .venv/bin/activate
     - make check-ci
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
   allow_failure: true
 
@@ -98,7 +98,7 @@ frontend-lint:
     - cd frontend
     - npm run lint
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
   allow_failure: true
 
@@ -112,7 +112,7 @@ frontend-format:
     - cd frontend
     - npm run format
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
   allow_failure: true
 
@@ -126,7 +126,7 @@ frontend-check:
     - cd frontend
     - npm run check
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
   allow_failure: true
 
@@ -141,7 +141,7 @@ backend-test:
     - source .venv/bin/activate
     - make test
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
@@ -154,7 +154,7 @@ frontend-test:
     - cd frontend
     - npm run test
   rules:
-    - if: "$CI_MERGE_REQUEST_ID"
+    - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # ---------------------------
