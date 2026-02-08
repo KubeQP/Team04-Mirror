@@ -17,6 +17,6 @@ backend-setup:
   artifacts:
     paths:
       - backend/.venv
-  rules:
-    # - if: "$CI_MERGE_REQUEST_ID"
-    # - if: '$CI_COMMIT_BRANCH == "main"'
+  # rules:
+  # - if: "$CI_MERGE_REQUEST_ID"
+  # - if: '$CI_COMMIT_BRANCH == "main"'
