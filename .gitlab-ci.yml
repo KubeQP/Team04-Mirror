@@ -5,7 +5,7 @@ stages:
 # Backend setup (Python deps)
 # ---------------------------
 backend-setup:
-  stage: setup
+  stage: .pre
   image: python:3.14
   script:
     - echo "TEST"
