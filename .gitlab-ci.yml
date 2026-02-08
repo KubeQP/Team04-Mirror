@@ -9,11 +9,11 @@ backend-setup:
   image: python:3.14
   script:
     - echo "TEST"
-    # - cd backend
-    # - python -m venv .venv
-    # - source .venv/bin/activate
-    # - pip install -r requirements.txt
-    # - pip install -r requirements-dev.txt
+    - cd backend
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install -r requirements.txt
+    - pip install -r requirements-dev.txt
   # artifacts:
   #   paths:
   #     - backend/.venv
