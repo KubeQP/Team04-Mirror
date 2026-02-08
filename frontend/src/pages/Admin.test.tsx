@@ -2,8 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getCompetitorData } from '../api/getCompetitorData';
+import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
-import type { CompetitorData, TimeData } from '../types';
+import type { CompetitorData, StationData, TimeData } from '../types';
 import Admin from './Admin';
 
 vi.mock('react-router-dom', async () => {
@@ -25,9 +26,14 @@ vi.mock('../api/getTimeData', () => ({
 	getTimeData: vi.fn(),
 }));
 
+vi.mock('../api/getStationData', () => ({
+	getStationData: vi.fn(),
+}));
+
 // En liten "in-memory" lista som låtsas vara backend-DB i testet
 let competitors: CompetitorData[] = [];
 let times: TimeData[] = [];
+let stations: StationData[] = [];
 
 beforeEach(() => {
 	competitors = [
@@ -38,9 +44,14 @@ beforeEach(() => {
 		{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:31:39', station_id: 0 },
 		{ id: 1, competitor_id: 1, timestamp: '2025-06-27T12:32:15', station_id: 0 },
 	];
+	stations = [
+		{ id: 0, station_name: 'start', order: '0' },
+		{ id: 1, station_name: 'stop', order: '1' },
+	];
 
 	vi.mocked(getCompetitorData).mockResolvedValue(competitors);
 	vi.mocked(getTimeData).mockResolvedValue(times);
+	vi.mocked(getStationData).mockResolvedValue(stations);
 
 	render(<Admin />);
 });
