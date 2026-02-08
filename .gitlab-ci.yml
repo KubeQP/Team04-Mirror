@@ -19,4 +19,4 @@ backend-setup:
       - backend/.venv
   rules:
     # - if: "$CI_MERGE_REQUEST_ID"
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    # - if: '$CI_COMMIT_BRANCH == "main"'
