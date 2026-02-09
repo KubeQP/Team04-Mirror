@@ -1,5 +1,6 @@
 # backend/app/schemas.py
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -45,3 +46,12 @@ class StationOut(BaseModel):
     order: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class CompetitorUpdate(BaseModel):
+    start_number: Optional[str] = None
+    name: Optional[str] = None
+
+class TimeEntryUpdate(BaseModel):
+	competitor_id: Optional[int] = None
+	timestamp: Optional[datetime] = None
+	station_id: Optional[int] = None

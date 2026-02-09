@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
+import { editCompetitorData} from '../api/putCompetitorData';
+import { editTimeData} from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
 // src/pages/Admin.tsx
@@ -73,6 +75,7 @@ export default function Admin() {
 		value: string;
 		correct: boolean;
 		mutable: boolean;
+		id: number;
 	}
 
 	type EditableCellProps = {
@@ -95,10 +98,10 @@ export default function Admin() {
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],
 		stopTimes: { timestamp: string | number | Date }[],
-	): { value: string; correct: boolean, mutable: false } {
+	): { value: string; correct: boolean, mutable: false, id : 0 } {
 		// Kräver exakt en starttid och exakt en stoptid
 		if (startTimes.length !== 1 || stopTimes.length !== 1) {
-			return { value: '-', correct: false, mutable: false };
+			return { value: '-', correct: false, mutable: false,  id : 0  };
 		}
 
 		const start = new Date(startTimes[0].timestamp);
@@ -106,7 +109,7 @@ export default function Admin() {
 
 		// Ogiltiga datum eller stop före start → "-"
 		if (isNaN(start.getTime()) || isNaN(stop.getTime()) || stop <= start) {
-			return { value: '-', correct: false, mutable: false};
+			return { value: '-', correct: false, mutable: false,  id : 0 };
 		}
 
 		const diffMs = stop.getTime() - start.getTime();
@@ -118,10 +121,10 @@ export default function Admin() {
 
 		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-		return { value: formatted, correct: true, mutable: false };
+		return { value: formatted, correct: true, mutable: false ,  id : 0 };
 	}
 
-	function EditableCell({ cell, onChange }: EditableCellProps) {
+	function EditableCell({cell, onChange, rowIndex }: EditableCellProps & { rowIndex: number }) {
 		if (cell.mutable == true){
 			return (
 				<td 
@@ -129,7 +132,8 @@ export default function Admin() {
 					suppressContentEditableWarning
 					onBlur={e =>{
 						onChange(e.currentTarget.textContent ?? "")
-						sendData(tableDataGlobal);
+						sendData(tableDataGlobal[rowIndex]);
+
 					}}
 					className={cell.correct === false ? 'incorrect-cell' : ''}
 					>
@@ -149,30 +153,44 @@ export default function Admin() {
 		}
 	}
 
-	function sendData (table : Cell[][]){
+	function sendData (table : Cell[]){
+		console.log("send data");
+		console.log(table);
 
+		if (table.length == 3){
+			const data: TimeData = {
+				id: table[2].id,
+				competitor_id: table[1].id,
+				timestamp: table[2].value,
+				station_id: table[0].id,
+			};
+
+			editTimeData(data.id, data);
+		}
 	}
 	
 	//Table - Stations //fel: två tider för samma person i samma station
 	const Array1: Cell[][] = [];
 	const headerRow1: Cell[] = [
-		{ value: 'Station', correct: true, mutable: false },
-		{ value: 'Nr.', correct: true, mutable: false},
-		{ value: 'Tid', correct: true, mutable: false},
+		{ value: 'Station', correct: true, mutable: false, id: 0 },
+		{ value: 'Nr.', correct: true, mutable: false, id: 0},
+		{ value: 'Tid', correct: true, mutable: false, id: 0},
 	];
 	Array1.push(headerRow1);
 	timeData?.forEach((timeSlot) => {
 		const stationValue: Cell = {
 			value: stationData?.find((station) => station.id === timeSlot.station_id)?.station_name ?? '-',
 			correct: true,
-			mutable: true
+			mutable: false,
+			id: stationData?.find((station) => station.id === timeSlot.station_id)?.id ?? 0
 		}; //måste lägga till station //timeSlot.station_id
 		const startNumber: Cell = {
 			value: competitorData?.find((competitor) => competitor.id === timeSlot.competitor_id)?.start_number ?? '-',
 			correct: true,
-			mutable: true
+			mutable: true,
+			id: competitorData?.find((competitor) => competitor.id === timeSlot.competitor_id)?.id ?? 0,
 		};
-		const timeStamp: Cell = { value: formatTime(timeSlot.timestamp), correct: true, mutable: false };
+		const timeStamp: Cell = { value: formatTime(timeSlot.timestamp), correct: true, mutable: false, id: timeSlot.id };
 
 		const duplicates = timeData.filter(
 			(t) =>
@@ -194,16 +212,16 @@ export default function Admin() {
 	//Table - Competitors //flera tider för en station, ingen tid.
 	const Array2: Cell[][] = [];
 	const headerRow2: Cell[] = [
-		{ value: 'Nr.', correct: true, mutable: false },
-		{ value: 'Namn', correct: true, mutable: false },
-		{ value: 'Start', correct: true, mutable: false },
-		{ value: 'Mål', correct: true, mutable: false },
-		{ value: 'Totalt', correct: true, mutable: false },
+		{ value: 'Nr.', correct: true, mutable: false , id: 0 },
+		{ value: 'Namn', correct: true, mutable: false, id:0 },
+		{ value: 'Start', correct: true, mutable: false, id:0 },
+		{ value: 'Mål', correct: true, mutable: false, id:0 },
+		{ value: 'Totalt', correct: true, mutable: false, id:0 },
 	];
 	Array2.push(headerRow2);
 	competitorData?.forEach((competitor) => {
-		const startNumber = { value: competitor.start_number, correct: true, mutable: true };
-		const name = { value: competitor.name, correct: true, mutable: true };
+		const startNumber = { value: competitor.start_number, correct: true, mutable: true, id : competitor.id };
+		const name = { value: competitor.name, correct: true, mutable: true, id : competitor.id};
 		const matchingStartTimes =
 			timeData?.filter(
 				(time) =>
@@ -214,7 +232,8 @@ export default function Admin() {
 			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
 			value: matchingStartTimes.length > 0 ? matchingStartTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
 			correct: true,
-			mutable: false
+			mutable: false,
+			id : competitor.id
 		};
 		const matchingStopTimes =
 			timeData?.filter(
@@ -226,7 +245,8 @@ export default function Admin() {
 			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
 			value: matchingStopTimes.length > 0 ? matchingStopTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
 			correct: true,
-			mutable: false
+			mutable: false,
+			id : competitor.id
 		};
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
@@ -264,11 +284,13 @@ export default function Admin() {
 										newData[rowIndex + 1][cellIndex] = {
 										value: newValue,
 										correct: cell.correct,
-										mutable: cell.mutable
+										mutable: cell.mutable,
+										id: cell.id
 										};
 										tableData = newData;
 										tableDataGlobal = tableData;
 									}}
+									rowIndex= {rowIndex}
 								/>
 
 							))}

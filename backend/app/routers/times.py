@@ -9,6 +9,7 @@ from ..database import get_db
 from ..schemas import (
     RecordTimeIn,
     TimeEntryOut,
+    TimeEntryUpdate,
 )
 
 router = APIRouter(prefix="/times", tags=["times"])
@@ -38,3 +39,16 @@ def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
     if entry is None:
         raise HTTPException(status_code=404, detail="Competitor not found")
     return entry
+
+@router.put("/{time_id}/", response_model=TimeEntryOut)
+def update_time_entry(
+	time_id: int,
+	data: TimeEntryUpdate,
+	db: Session = Depends(get_db),
+):
+	entry = crud.update_time_entry(db, time_id, data)
+
+	if entry is None:
+		raise HTTPException(status_code=404, detail="Time entry not found")
+
+	return entry
