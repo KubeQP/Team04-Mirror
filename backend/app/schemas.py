@@ -52,6 +52,7 @@ class CompetitorUpdate(BaseModel):
     name: Optional[str] = None
 
 class TimeEntryUpdate(BaseModel):
-	competitor_id: Optional[int] = None
-	timestamp: Optional[datetime] = None
-	station_id: Optional[int] = None
+    id: Optional[int] = None
+    competitor_id: Optional[int] = None
+    timestamp: Optional[datetime] = None
+    station_id: Optional[int] = None

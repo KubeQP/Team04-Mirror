@@ -42,11 +42,10 @@ def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
 
 @router.put("/{time_id}/", response_model=TimeEntryOut)
 def update_time_entry(
-	time_id: int,
 	data: TimeEntryUpdate,
 	db: Session = Depends(get_db),
 ):
-	entry = crud.update_time_entry(db, time_id, data)
+	entry = crud.update_time_entry(db, data)
 
 	if entry is None:
 		raise HTTPException(status_code=404, detail="Time entry not found")

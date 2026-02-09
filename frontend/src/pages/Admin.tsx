@@ -132,7 +132,7 @@ export default function Admin() {
 					suppressContentEditableWarning
 					onBlur={e =>{
 						onChange(e.currentTarget.textContent ?? "")
-						sendData(tableDataGlobal[rowIndex]);
+						sendData(tableDataGlobal[rowIndex+1]);
 
 					}}
 					className={cell.correct === false ? 'incorrect-cell' : ''}
@@ -161,11 +161,12 @@ export default function Admin() {
 			const data: TimeData = {
 				id: table[2].id,
 				competitor_id: table[1].id,
-				timestamp: table[2].value,
+				timestamp: timeData?.find((time) => table[2].id === time.id)?.timestamp ?? '-',
 				station_id: table[0].id,
 			};
 
-			editTimeData(data.id, data);
+			console.log(data);
+			editTimeData(data);
 		}
 	}
 	

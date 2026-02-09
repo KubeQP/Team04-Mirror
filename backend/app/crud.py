@@ -83,8 +83,8 @@ def update_competitor(db: Session, competitor_id: int, data):
     db.refresh(competitor)
     return competitor
 
-def update_time_entry(db: Session, time_id: int, data):
-	entry = db.query(TimeEntry).filter(TimeEntry.id == time_id).first()
+def update_time_entry(db: Session, data: TimeEntry):
+	entry = db.query(TimeEntry).filter(TimeEntry.id == data.id).first()
 
 	if entry is None:
 		return None
