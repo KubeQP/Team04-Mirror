@@ -214,7 +214,7 @@ export default function Admin() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex} style={{ backgroundColor: cell.correct === false ? 'red' : undefined }}>
+								<td key={cellIndex} className={cell.correct === false ? 'incorrect-cell' : ''}>
 									{cell.value}{' '}
 								</td>
 							))}
@@ -240,8 +240,8 @@ export default function Admin() {
 					<p>Fel vid hämtning av station data: {stationError}</p>
 				) : (
 					<div style={{ display: 'flex', gap: '20px' }}>
-						{createTable(Array1)}
-						{createTable(Array2)}
+						<div className="Admin-wrapper">{createTable(Array1)}</div>
+						<div className="Admin-wrapper">{createTable(Array2)}</div>
 					</div>
 				)}
 			</div>

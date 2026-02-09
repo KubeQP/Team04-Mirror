@@ -23,13 +23,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # produktion eller release builds.
     db = SessionLocal()
     if db.query(Competitor).count() == 0:
-        comp1 = Competitor(start_number="123", name="Alice")
-        comp2 = Competitor(start_number="456", name="Bob")
-        db.add_all([comp1, comp2])
+        competitors = []
+        competitors.append(Competitor(start_number="123", name="Alice"))
+        competitors.append(Competitor(start_number="458", name="Bob"))
+        competitors.append(Competitor(start_number="459", name="Bob"))
+        competitors.append(Competitor(start_number="452", name="Bob"))
+        competitors.append(Competitor(start_number="453", name="Bob"))
+        competitors.append(Competitor(start_number="426", name="Bob"))
+        competitors.append(Competitor(start_number="436", name="Bob"))
+        competitors.append(Competitor(start_number="446", name="Bob"))
+        competitors.append(Competitor(start_number="486", name="Bob"))
+
+        db.add_all(competitors)
         db.commit()
 
-        db.refresh(comp1)
-        db.refresh(comp2)
+        for i in competitors:
+            db.refresh(i)
 
         station1 = Station(station_name="start", order="0")
         station2 = Station(station_name="mål", order="1")
@@ -42,22 +51,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         db.add_all(
             [
                 TimeEntry(
-                    competitor_id=comp1.id,
+                    competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 31, 39),
                     station_id=station1.id,
                 ),
                 TimeEntry(
-                    competitor_id=comp2.id,
+                    competitor_id=competitors[1].id,
                     timestamp=datetime(2025, 6, 27, 12, 32, 15),
                     station_id=station1.id,
                 ),
                 TimeEntry(
-                    competitor_id=comp2.id,
+                    competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 47, 38),
                     station_id=station2.id,
                 ),
                 TimeEntry(
-                    competitor_id=comp1.id,
+                    competitor_id=competitors[1].id,
                     timestamp=datetime(2025, 6, 27, 12, 52, 5),
                     station_id=station2.id,
                 ),
