@@ -301,7 +301,6 @@ tr:nth-child(odd) {
 	background-color: red;
 }
 
-
 .back-icon-path {
-    fill: var(--color-header-text);
+	fill: var(--color-header-text);
 }
