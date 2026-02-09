@@ -6,6 +6,7 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
+
 // src/pages/Admin.tsx
 export default function Resultatvisare() {
 	//declaring constants for the imports
@@ -21,6 +22,15 @@ export default function Resultatvisare() {
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
+
+	const [minTimeSaved, setMinTimeSaved] = useState<number | null>(null);
+
+	useEffect(() => {
+		const saved = localStorage.getItem('minTime');
+		if (saved !== null) {
+			setMinTimeSaved(Number(saved));
+		}
+	}, []);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -84,8 +94,13 @@ export default function Resultatvisare() {
 			return { value: -1, correct: false };
 		}
 
+		if (minTimeSaved!=null&&((stop.getTime()-start.getTime())/60000 >= minTimeSaved)) {
+			return { value: -1, correct: false };
+		}
+
 		const diffMs = stop.getTime() - start.getTime();
 		const totalSeconds = Math.floor(diffMs / 1000);
+		
 
 		return { value: totalSeconds, correct: true };
 	}
@@ -97,6 +112,7 @@ export default function Resultatvisare() {
 
 		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
+		
 		return formatted;
 	}
 
