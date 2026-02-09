@@ -165,22 +165,6 @@ export default function Registrering() {
 					))}
 				</TableBody>
 			</Table>
-			{/* <table> */}
-			{/* 	<thead> */}
-			{/* 		<tr> */}
-			{/* 			<th>Startnummer</th> */}
-			{/* 			<th>Namn</th> */}
-			{/* 		</tr> */}
-			{/* 	</thead> */}
-			{/* 	<tbody> */}
-			{/* 		{competitors.map((c) => ( */}
-			{/* 			<tr key={c.start_number}> */}
-			{/* 				<td>{c.start_number}</td> */}
-			{/* 				<td>{c.name}</td> */}
-			{/* 			</tr> */}
-			{/* 		))} */}
-			{/* 	</tbody> */}
-			{/* </table> */}
 		</div>
 	);
 }
