@@ -183,7 +183,7 @@ export default function RegistreringStoppTid() {
 			<h2>Registrering Stopptid</h2>
 
 			<div style={{ display: 'flex' }}>
-				<label style= {selectedStationId === '' ? {} : {width: '50%'}}>Välj station:&nbsp;</label>
+				<label style= {selectedStationId === '' ? {} : {width: '50%', color: '#808080'}}> {selectedStationId === '' ? "Välj station:" : "Vald station: " + stations.find(s => s.id === selectedStationId)?.station_name}&nbsp;</label>
 				{selectedStationId === '' ? (
 					<select
 						value={selectedStationId}
