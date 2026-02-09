@@ -21,6 +21,8 @@ export default function Admin() {
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
+	const [resultView] = useState<'startnummer' | 'resultat'>('resultat');
+
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -78,6 +80,52 @@ export default function Admin() {
 		return new Date(timestamp).toLocaleTimeString('sv-SE', { hour12: false });
 	}
 
+	const competitorsByStartNumber = competitorData
+		? [...competitorData].sort(
+				(a, b) => Number(a.start_number) - Number(b.start_number),
+		  )
+		: [];
+
+	const competitorsByResult = competitorData
+		? [...competitorData].sort((a, b) => {
+				const aStart = timeData?.find(
+					(t) =>
+						t.competitor_id === a.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '0',
+				);
+				const aStop = timeData?.find(
+					(t) =>
+						t.competitor_id === a.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '1',
+				);
+
+				const bStart = timeData?.find(
+					(t) =>
+						t.competitor_id === b.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '0',
+				);
+				const bStop = timeData?.find(
+					(t) =>
+						t.competitor_id === b.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '1',
+				);
+
+				const aTotal =
+					aStart && aStop
+						? new Date(aStop.timestamp).getTime() -
+						  new Date(aStart.timestamp).getTime()
+						: Infinity;
+
+				const bTotal =
+					bStart && bStop
+						? new Date(bStop.timestamp).getTime() -
+						  new Date(bStart.timestamp).getTime()
+						: Infinity;
+
+				return aTotal - bTotal;
+		  })
+		: [];
+
 	// Hjälp-funktion räknar antal tider i en sträng
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
@@ -122,14 +170,19 @@ export default function Admin() {
 	];
 	Array1.push(headerRow1);
 	timeData?.forEach((timeSlot) => {
+		//lägga in värde för station
 		const stationValue: Cell = {
 			value: stationData?.find((station) => station.id === timeSlot.station_id)?.station_name ?? '-',
 			correct: true,
 		}; //måste lägga till station //timeSlot.station_id
+
+		//lägga in värde för startnummer
 		const startNumber: Cell = {
 			value: competitorData?.find((competitor) => competitor.id === timeSlot.competitor_id)?.start_number ?? '-',
 			correct: true,
 		};
+
+		//lägga in värde för tidstämpel
 		const timeStamp: Cell = { value: formatTime(timeSlot.timestamp), correct: true };
 
 		const duplicates = timeData.filter(
@@ -149,9 +202,16 @@ export default function Admin() {
 		Array1.push(competitorRow);
 	});
 
+	const competitorsToRender =
+	resultView === 'startnummer'
+		? competitorsByStartNumber
+		: competitorsByResult;
+
 	//Table - Competitors //flera tider för en station, ingen tid.
+	//sorterad efter startnummer/tid
 	const Array2: Cell[][] = [];
 	const headerRow2: Cell[] = [
+		{ value: 'Placering', correct: true},
 		{ value: 'Nr.', correct: true },
 		{ value: 'Namn', correct: true },
 		{ value: 'Start', correct: true },
@@ -159,9 +219,19 @@ export default function Admin() {
 		{ value: 'Totalt', correct: true },
 	];
 	Array2.push(headerRow2);
-	competitorData?.forEach((competitor) => {
+	let placementCounter = 1;
+	
+	competitorsToRender?.forEach((competitor) => {
+
+		//Placering
+
+		//lägga in värde för startnummer
 		const startNumber = { value: competitor.start_number, correct: true };
+
+		//lägga in värde för namn
 		const name = { value: competitor.name, correct: true };
+
+		//lägga in värde för tid:
 		const matchingStartTimes =
 			timeData?.filter(
 				(time) =>
@@ -186,12 +256,17 @@ export default function Admin() {
 		};
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
+		const Placering: Cell = totalTime.correct
+			? { value: String(placementCounter++), correct: true }
+			: { value: '', correct: true };
+
+
 		if (startTime.value === '-') startTime.correct = false;
 		if (stopTime.value === '-') stopTime.correct = false;
 		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
 		if (countTimesInString(stopTime.value) > 1) stopTime.correct = false;
 
-		const competitorRow: Cell[] = [startNumber, name, startTime, stopTime, totalTime];
+		const competitorRow: Cell[] = [Placering, startNumber, name, startTime, stopTime, totalTime];
 		Array2.push(competitorRow);
 	});
 
