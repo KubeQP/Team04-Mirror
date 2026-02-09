@@ -22,6 +22,8 @@ export default function Admin() {
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
+	let tableDataGlobal : Cell[][] = [];
+
 	useEffect(() => {
 		const fetchData = async () => {
 			// Competitor data
@@ -74,7 +76,7 @@ export default function Admin() {
 	}
 
 	type EditableCellProps = {
-		value: Cell;
+		cell: Cell;
 		onChange: (value: string) => void;
 	};
 
@@ -119,30 +121,36 @@ export default function Admin() {
 		return { value: formatted, correct: true, mutable: false };
 	}
 
-	function EditableCell({ value, onChange }: EditableCellProps) {
-		if (value.mutable == true){
+	function EditableCell({ cell, onChange }: EditableCellProps) {
+		if (cell.mutable == true){
 			return (
 				<td 
 					contentEditable
 					suppressContentEditableWarning
-					onBlur={e =>
+					onBlur={e =>{
 						onChange(e.currentTarget.textContent ?? "")
-					}
-					className={value.correct === false ? 'incorrect-cell' : ''}
+						sendData(tableDataGlobal);
+					}}
+					className={cell.correct === false ? 'incorrect-cell' : ''}
 					>
-					{value.value}
+					{cell.value}
 				</td>
+				
 			);
 		}
 		else {
 			return (
 				<td
-					className={value.correct === false ? 'incorrect-cell' : ''}
+					className={cell.correct === false ? 'incorrect-cell' : ''}
 				>
-					{value.value}
+					{cell.value}
 				</td>
 			)
 		}
+	}
+
+	function sendData (table : Cell[][]){
+
 	}
 	
 	//Table - Stations //fel: två tider för samma person i samma station
@@ -234,7 +242,6 @@ export default function Admin() {
 	//dynamic table creation
 	function createTable(tableData: Cell[][]) {
 		if (tableData.length === 0) return null;
-
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
@@ -251,7 +258,7 @@ export default function Admin() {
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
 								<EditableCell
-									value = {cell}
+									cell = {cell}
 									onChange={(newValue) =>{
 										const newData = [...tableData];
 										newData[rowIndex + 1][cellIndex] = {
@@ -260,6 +267,7 @@ export default function Admin() {
 										mutable: cell.mutable
 										};
 										tableData = newData;
+										tableDataGlobal = tableData;
 									}}
 								/>
 
