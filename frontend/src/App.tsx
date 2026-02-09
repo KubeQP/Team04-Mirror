@@ -1,8 +1,31 @@
 import { useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
-import ThemeToggle from './components/ThemeToggle';
+import Navbar from './components/Navbar';
+import { ThemeProvider } from './components/ThemeProvider';
 
+const navigationData = [
+	{
+		title: 'Startsida',
+		href: '/',
+	},
+	{
+		title: 'Stationshantering',
+		href: '/register/station',
+	},
+	{
+		title: 'Registrera tävlande',
+		href: '/register/participant',
+	},
+	{
+		title: 'Stoppid',
+		href: '/register/time',
+	},
+	{
+		title: 'Admin',
+		href: '/admin',
+	},
+];
 export default function App() {
 	const [competitorsVersion, setCompetitorsVersion] = useState(0);
 
@@ -11,25 +34,12 @@ export default function App() {
 	};
 
 	return (
-		<div id="app-container">
-			<header>
-				<div className="theme-button">
-					<ThemeToggle />
-				</div>
-				<h1>Tidtagning</h1>
-				<nav id="main-nav">
-					<Link to="/">Startsida</Link>
-					<Link to="/register/station">Stationshantering</Link>
-					<Link to="/register/participant">Registrera tävlande</Link>
-					<Link to="/register/time">Stopptid</Link>
-					<Link to="/admin">Admin</Link>
-				</nav>
-				<hr />
-			</header>
+		<ThemeProvider>
+			<Navbar navigationData={navigationData} />
 
-			<main>
+			<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
 			</main>
-		</div>
+		</ThemeProvider>
 	);
 }

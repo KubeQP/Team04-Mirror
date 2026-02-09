@@ -103,7 +103,7 @@ export default function StationRegistrering() {
 				</div>
 			</form>
 			<h2 className="mt-6 text-lg font-semibold">Stationer</h2>
-			<Table className="size-1/2">
+			<Table>
 				<TableHeader>
 					<TableRow>
 						<TableHead>Namn</TableHead>
@@ -133,7 +133,7 @@ export default function StationRegistrering() {
 									<Button
 										variant="ghost"
 										size="icon"
-										className="size-8 hover:bg-destructive hover:text-destructive-foreground"
+										className="size-8 hover:bg-destructive hover:text-destructive-foreground dark:hover:bg-destructive dark:hover:text-destructive-foreground"
 									>
 										<Trash2Icon />
 										<span className="sr-only">Radera</span>

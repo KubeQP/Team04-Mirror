@@ -1,4 +1,5 @@
 // frontend/src/pages/Admin.tsx
+import { CrownIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -161,7 +162,7 @@ export default function Resultatvisare() {
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
-			<Table className="size-1/2">
+			<Table>
 				<TableHeader>
 					<TableRow>
 						{headerRow.map((header, index) => (
@@ -173,8 +174,15 @@ export default function Resultatvisare() {
 					{bodyRows.map((row, rowIndex) => (
 						<TableRow key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<TableCell className={cellIndex === 0 ? 'font-medium' : ''} key={cellIndex}>
-									{cell}
+								<TableCell className={cellIndex === 0 ? 'font-medium text-base' : ''} key={cellIndex}>
+									{cellIndex === 0 && cell === '1' ? (
+										<div className="flex items-center gap-2">
+											{cell}
+											<CrownIcon className="size-6 text-yellow-500" />
+										</div>
+									) : (
+										cell
+									)}
 								</TableCell>
 							))}
 						</TableRow>

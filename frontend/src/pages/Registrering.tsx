@@ -133,7 +133,7 @@ export default function Registrering() {
 				</div>
 			</form>
 			<h2 className="text-lg mt-6 font-semibold">Registrerade tävlande</h2>
-			<Table className="size-1/2">
+			<Table>
 				<TableHeader>
 					<TableRow>
 						<TableHead>Startnummer</TableHead>
