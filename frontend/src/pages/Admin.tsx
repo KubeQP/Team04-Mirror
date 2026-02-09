@@ -240,12 +240,8 @@ export default function Admin() {
 					<p>Fel vid hämtning av station data: {stationError}</p>
 				) : (
 					<div style={{ display: 'flex', gap: '20px' }}>
-						<div className="Admin-wrapper">
-						{createTable(Array1)}
-						</div>
-						<div className="Admin-wrapper">
-						{createTable(Array2)}
-						</div>
+						<div className="Admin-wrapper">{createTable(Array1)}</div>
+						<div className="Admin-wrapper">{createTable(Array2)}</div>
 					</div>
 				)}
 			</div>

@@ -112,7 +112,7 @@ describe('Dubbelregistrering med samma startnummer och station', () => {
 
 	it('markerar celler med samma startnummer och station som röd', async () => {
 		await waitFor(() => {
-			const redCells = screen.getAllByText('123').filter((el) => (el as HTMLElement).style.backgroundColor === 'red');
+			const redCells = screen.getAllByText('123').filter((el) => (el as HTMLElement).className === 'incorrect-cell');
 			expect(redCells.length).toBeGreaterThan(0);
 		});
 	});
