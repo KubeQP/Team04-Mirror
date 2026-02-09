@@ -1,5 +1,18 @@
+import { MoreHorizontalIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
+import { Button } from '@/components/ui/button';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type Competitor = {
 	start_number: string;
@@ -84,40 +97,90 @@ export default function Registrering() {
 
 	return (
 		<div>
-			<h2>Registrering:</h2>
-			<input
-				id="startNbrInput"
-				value={reg}
-				onChange={(e) => setReg(e.target.value)}
-				type="text"
-				placeholder="Skriv startnummer här"
-			/>
-			<input
-				id="nameInput"
-				value={name}
-				onChange={(e) => setName(e.target.value)}
-				type="text"
-				placeholder="Skriv namn här"
-			/>
-			<button onClick={addReg} disabled={!reg.trim() || !name.trim()}>
-				Registrera
-			</button>
-			<table>
-				<thead>
-					<tr>
-						<th>Startnummer</th>
-						<th>Namn</th>
-					</tr>
-				</thead>
-				<tbody>
-					{competitors.map((c) => (
-						<tr key={c.start_number}>
-							<td>{c.start_number}</td>
-							<td>{c.name}</td>
-						</tr>
+			<h1 className="text-xl font-bold pb-2">Registrering:</h1>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					addReg();
+				}}
+			>
+				<div className="flex items-end gap-4">
+					<FieldGroup className="grid max-w-sm grid-cols-2">
+						<Field>
+							<FieldLabel>Startnummer</FieldLabel>
+							<Input
+								id="startNbrInput"
+								placeholder="123"
+								type="text"
+								value={reg}
+								onChange={(e) => setReg(e.target.value)}
+							/>
+						</Field>
+						<Field>
+							<FieldLabel>Namn</FieldLabel>
+							<Input
+								id="nameInput"
+								placeholder="Aaron"
+								type="text"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
+						</Field>
+					</FieldGroup>
+					<Button type="submit" variant="default" onClick={addReg} disabled={!reg.trim() || !name.trim()}>
+						Registrera
+					</Button>
+				</div>
+			</form>
+			<Table className="mt-6 size-1/2">
+				<TableHeader>
+					<h2 className="text-lg font-semibold">Registrerade tävlande</h2>
+					<TableRow>
+						<TableHead>Startnummer</TableHead>
+						<TableHead>Namn</TableHead>
+						<TableHead className="text-right">Ändra</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{competitors.map((competitor) => (
+						<TableRow>
+							<TableCell className="font-medium">{competitor.start_number}</TableCell>
+							<TableCell>{competitor.name}</TableCell>
+							<TableCell className="text-right">
+								<DropdownMenu>
+									<DropdownMenuTrigger>
+										<Button variant="ghost" size="icon" className="size-8">
+											<MoreHorizontalIcon />
+											<span className="sr-only">Öppna meny</span>
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="end">
+										<DropdownMenuItem>Redigera</DropdownMenuItem>
+										<DropdownMenuSeparator />
+										<DropdownMenuItem variant="destructive">Radera</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</TableCell>
+						</TableRow>
 					))}
-				</tbody>
-			</table>
+				</TableBody>
+			</Table>
+			{/* <table> */}
+			{/* 	<thead> */}
+			{/* 		<tr> */}
+			{/* 			<th>Startnummer</th> */}
+			{/* 			<th>Namn</th> */}
+			{/* 		</tr> */}
+			{/* 	</thead> */}
+			{/* 	<tbody> */}
+			{/* 		{competitors.map((c) => ( */}
+			{/* 			<tr key={c.start_number}> */}
+			{/* 				<td>{c.start_number}</td> */}
+			{/* 				<td>{c.name}</td> */}
+			{/* 			</tr> */}
+			{/* 		))} */}
+			{/* 	</tbody> */}
+			{/* </table> */}
 		</div>
 	);
 }
