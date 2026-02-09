@@ -40,6 +40,10 @@ export default function RegistreringStoppTid() {
 	const [selectedStationId, setSelectedStationId] = useState<number | ''>('');
 	const [stations, setStations] = useState<Station[]>([]);
 
+	//Used in the search for competitors when regestering stop times. As well as the associated drop down menu.
+	const [search, setSearch] = useState('');
+	const filteredComp = competitors.filter((e) => e.start_number.toLowerCase().includes(search.toLowerCase()));
+
 	const fetchData = async () => {
 		try {
 			const result = await getCompetitorData();
@@ -104,6 +108,17 @@ export default function RegistreringStoppTid() {
 	useEffect(() => {
 		fetchData();
 	}, [competitorsVersion]);
+
+	useEffect(() => {
+		// Only auto-select if the currently selectedStartNumber is not in the filtered list
+		if (!filteredComp.some((c) => c.start_number === selectedStartNumber)) {
+			if (filteredComp.length > 0) {
+				setSelectedStartNumber(filteredComp[0].start_number);
+			} else {
+				setSelectedStartNumber(''); // no match
+			}
+		}
+	}, [filteredComp, selectedStartNumber]);
 
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
@@ -228,16 +243,18 @@ export default function RegistreringStoppTid() {
 			<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
 				<label>
 					Välj tävlande:&nbsp;
-					<select
-						value={selectedStartNumber}
-						onChange={(e) => setSelectedStartNumber(e.target.value)}
-						disabled={competitors.length === 0}
-					>
-						<option value="" disabled selected>
-							...
+					<input
+						type="text"
+						placeholder="searchComp"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+					></input>
+					<select value={selectedStartNumber} onChange={(e) => setSelectedStartNumber(e.target.value)}>
+						<option value="" disabled>
+							Välj...
 						</option>
-						{competitors.map((c) => (
-							<option key={c.start_number} value={c.start_number}>
+						{filteredComp.map((c) => (
+							<option key={c.start_number} value={c.start_number.toString()}>
 								{c.start_number} — {c.name}
 							</option>
 						))}
