@@ -14,11 +14,11 @@ const navigationData = [
 		href: '/register/station',
 	},
 	{
-		title: 'Registrera tävlande',
+		title: 'Registrera',
 		href: '/register/participant',
 	},
 	{
-		title: 'Stoppid',
+		title: 'Stopptid',
 		href: '/register/time',
 	},
 	{
