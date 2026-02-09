@@ -10,7 +10,7 @@
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --check .",
 		"format:fix": "prettier --write .",
-		"check": "tsc --noEmit",
+		"check": "tsc --noEmit .",
 		"preview": "vite preview",
 		"test": "vitest",
 		"ci-check": "concurrently 'npm:lint' 'npm:format' 'npm:check' --prefix-colors 'auto' --group"
