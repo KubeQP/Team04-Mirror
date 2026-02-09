@@ -127,14 +127,14 @@ export default function Registrering() {
 							/>
 						</Field>
 					</FieldGroup>
-					<Button type="submit" variant="default" onClick={addReg} disabled={!reg.trim() || !name.trim()}>
+					<Button type="submit" variant="default" disabled={!reg.trim() || !name.trim()}>
 						Registrera
 					</Button>
 				</div>
 			</form>
-			<Table className="mt-6 size-1/2">
+			<h2 className="text-lg mt-6 font-semibold">Registrerade tävlande</h2>
+			<Table className="size-1/2">
 				<TableHeader>
-					<h2 className="text-lg font-semibold">Registrerade tävlande</h2>
 					<TableRow>
 						<TableHead>Startnummer</TableHead>
 						<TableHead>Namn</TableHead>
@@ -143,12 +143,12 @@ export default function Registrering() {
 				</TableHeader>
 				<TableBody>
 					{competitors.map((competitor) => (
-						<TableRow>
+						<TableRow key={competitor.start_number}>
 							<TableCell className="font-medium">{competitor.start_number}</TableCell>
 							<TableCell>{competitor.name}</TableCell>
 							<TableCell className="text-right">
 								<DropdownMenu>
-									<DropdownMenuTrigger>
+									<DropdownMenuTrigger asChild>
 										<Button variant="ghost" size="icon" className="size-8">
 											<MoreHorizontalIcon />
 											<span className="sr-only">Öppna meny</span>
