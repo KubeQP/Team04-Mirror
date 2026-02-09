@@ -1,7 +1,8 @@
+import { API_BASE_URL } from '../config/api';
 import type { CompetitorData } from '../types';
 
 export async function getCompetitorData(): Promise<Array<CompetitorData>> {
-	const response = await fetch('http://127.0.0.1:8000/api/competitors/', {
+	const response = await fetch(`${API_BASE_URL}/api/competitors/`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
+import { API_BASE_URL } from '../config/api';
+
 type Competitor = {
 	start_number: string;
 	name: string;
@@ -19,7 +21,7 @@ export default function Registrering() {
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
 	const fetchCompetitors = async () => {
-		const res = await fetch('http://localhost:8000/api/competitors/');
+		const res = await fetch(`${API_BASE_URL}/api/competitors/`);
 		if (!res.ok) return;
 		const data = await res.json();
 		setCompetitors(data);
@@ -50,7 +52,7 @@ export default function Registrering() {
 		//const formattedTime = now.toLocaleTimeString('sv-SE');
 
 		try {
-			const res = await fetch('http://localhost:8000/api/competitors/register', {
+			const res = await fetch(`${API_BASE_URL}/api/competitors/register`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
