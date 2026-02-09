@@ -19,10 +19,9 @@ export default function App() {
 				<h1>Tidtagning</h1>
 				<nav id="main-nav">
 					<Link to="/">Startsida</Link>
-					<Link to="/stationregistrering">StationRegistrering</Link>
-					<Link to="/registrering">Registrering</Link>
-					<Link to="/registreringstopptid">RegistreringStoppTid</Link>
-					<Link to="/resultatvisare">Resultatvisare</Link>
+					<Link to="/register/station">Stationshantering</Link>
+					<Link to="/register/participant">Registrera tävlande</Link>
+					<Link to="/register/time">Stopptid</Link>
 					<Link to="/admin">Admin</Link>
 				</nav>
 				<hr />

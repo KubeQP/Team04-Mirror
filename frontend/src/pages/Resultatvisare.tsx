@@ -65,11 +65,7 @@ export default function Resultatvisare() {
 
 	return (
 		<div>
-			<h2>Innehåll på Resultatvisare</h2>
-			<p>
-				Nedan innehåll laddas dynamiskt!{' '}
-				<span className="text-muted text-semibold">*Oooh... Such wow! Much awesome!*</span>
-			</p>
+			<h2>Resultat</h2>
 
 			<div className="card">
 				{(competitorLoading || timeLoading) && <p>Laddar innehåll...</p>}
