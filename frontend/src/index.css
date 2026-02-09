@@ -269,9 +269,9 @@ div.Admin-tables {
 }
 
 div.Admin-wrapper {
-	overflow-y: scroll;
+	overflow-y: auto;
 	overflow-x: auto;
-	max-height: 300px;
+	max-height: 200px;
 	min-height: fit-content;
 }
 
