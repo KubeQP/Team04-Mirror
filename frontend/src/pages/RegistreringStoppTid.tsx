@@ -40,9 +40,9 @@ export default function RegistreringStoppTid() {
 	const [selectedStationId, setSelectedStationId] = useState<number | ''>('');
 	const [stations, setStations] = useState<Station[]>([]);
 
-	//Used in the search for competitors when regestering stop times. As well as the associated drop down menu. 
-	const [search, setSearch] = useState("");
-	const filteredComp = competitors.filter(e => e.start_number.toLowerCase().includes(search.toLowerCase()));
+	//Used in the search for competitors when regestering stop times. As well as the associated drop down menu.
+	const [search, setSearch] = useState('');
+	const filteredComp = competitors.filter((e) => e.start_number.toLowerCase().includes(search.toLowerCase()));
 
 	const fetchData = async () => {
 		try {
@@ -111,15 +111,14 @@ export default function RegistreringStoppTid() {
 
 	useEffect(() => {
 		// Only auto-select if the currently selectedStartNumber is not in the filtered list
-		if (!filteredComp.some(c => c.start_number === selectedStartNumber)) {
-		  if (filteredComp.length > 0) {
-			setSelectedStartNumber(filteredComp[0].start_number);
-		  } else {
-			setSelectedStartNumber(''); // no match
-		  }
+		if (!filteredComp.some((c) => c.start_number === selectedStartNumber)) {
+			if (filteredComp.length > 0) {
+				setSelectedStartNumber(filteredComp[0].start_number);
+			} else {
+				setSelectedStartNumber(''); // no match
+			}
 		}
-	  }, [filteredComp, selectedStartNumber]);
-	  
+	}, [filteredComp, selectedStartNumber]);
 
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
@@ -248,22 +247,18 @@ export default function RegistreringStoppTid() {
 						type="text"
 						placeholder="searchComp"
 						value={search}
-						onChange={(e)=>setSearch(e.target.value)}
-
+						onChange={(e) => setSearch(e.target.value)}
 					></input>
-				<select
-					value={selectedStartNumber}
-					onChange={(e) => setSelectedStartNumber(e.target.value)}
-					>
-					<option value="" disabled>Välj...</option>
-					{filteredComp.map((c) => (
-						<option key={c.start_number} value={c.start_number.toString()}>
-						{c.start_number} — {c.name}
+					<select value={selectedStartNumber} onChange={(e) => setSelectedStartNumber(e.target.value)}>
+						<option value="" disabled>
+							Välj...
 						</option>
-					))}
-				</select>
-
-
+						{filteredComp.map((c) => (
+							<option key={c.start_number} value={c.start_number.toString()}>
+								{c.start_number} — {c.name}
+							</option>
+						))}
+					</select>
 				</label>
 
 				<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber || !selectedStationId}>
