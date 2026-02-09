@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent,render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import RegistreringStoppTid from './RegistreringStoppTid';
+
 
 // ---------- Typer ----------
 type OutletCtx = {
@@ -36,12 +37,15 @@ let competitorsDb: Competitor[] = [];
 let stationsDb: Station[] = [];
 
 // ---------- Typad fetch-mock ----------
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let fetchSpy: MockInstance;
 
 beforeEach(() => {
 	competitorsDb = [
 		{ start_number: '007', name: 'Anna' },
 		{ start_number: '123', name: 'Bob' },
+		{ start_number: '124', name: 'Benim' },
+
 	];
 
 	stationsDb = [
@@ -81,21 +85,33 @@ beforeEach(() => {
 	});
 });
 
-describe('RegistreringStoppTid', () => {
-	it('hämtar och visar tävlande i dropdown och tabell', async () => {
+
+	describe('RegistreringStoppTid', () => {
+	it('hämtar tävlande, visar dem i tabell och filtrerar dropdown via sökfält', async () => {
 		render(<RegistreringStoppTid />);
 
+		// Wait for competitors to load (table)
 		await waitFor(() => {
-			expect(screen.getByText('007 — Anna')).toBeInTheDocument();
-			expect(screen.getByText('123 — Bob')).toBeInTheDocument();
-		});
-
 		expect(screen.getByText('007')).toBeInTheDocument();
 		expect(screen.getByText('Anna')).toBeInTheDocument();
+		expect(screen.getByText('123')).toBeInTheDocument();
+		expect(screen.getByText('Bob')).toBeInTheDocument();
+		});
 
-		// Bonus: bekräfta att GET faktiskt körts
-		expect(fetchSpy).toHaveBeenCalled();
+		// Type in search input
+		const searchInput = screen.getByPlaceholderText('searchComp');
+		fireEvent.change(searchInput, { target: { value: '007' } });
+
+		// Dropdown should now be filtered
+		await waitFor(() => {
+		expect(
+			screen.getByRole('option', { name: '007 - Anna' })
+		).toBeInTheDocument();
+		});
 	});
+	});
+
+  
 
 	it('disablar stopptidsknappen om inga tävlande finns', async () => {
 		competitorsDb = [];
@@ -107,4 +123,4 @@ describe('RegistreringStoppTid', () => {
 
 		expect(screen.getByText('Registrera stopptid nu')).toBeDisabled();
 	});
-});
+

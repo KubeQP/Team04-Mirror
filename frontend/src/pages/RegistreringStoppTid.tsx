@@ -33,12 +33,16 @@ export default function RegistreringStoppTid() {
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-	const [selectedStartNumber, setSelectedStartNumber] = useState<string>('');
+	const [selectedStartNumber] = useState<string>('');
 
 	const [msg, setMsg] = useState<string>('');
 
 	const [selectedStationId, setSelectedStationId] = useState<number | ''>('');
 	const [stations, setStations] = useState<Station[]>([]);
+
+	//Used in the search for competitors when regestering stop times. As well as the associated drop down menu. 
+	const [search, setSearch] = useState("");
+	const filteredComp = competitors.filter(e => e.start_number.toLowerCase().includes(search.toLowerCase()));
 
 	const fetchData = async () => {
 		try {
@@ -185,20 +189,21 @@ export default function RegistreringStoppTid() {
 			<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
 				<label>
 					Välj tävlande:&nbsp;
-					<select
-						value={selectedStartNumber}
-						onChange={(e) => setSelectedStartNumber(e.target.value)}
-						disabled={competitors.length === 0}
-					>
-						<option value="" disabled selected>
-							...
+					<input
+						type="text"
+						placeholder="searchComp"
+						value={search}
+						onChange={(e)=>setSearch(e.target.value)}
+
+					></input>
+				<select>
+					{filteredComp.map((e)=>(
+						<option key = {e.start_number} value={e.start_number}>
+							{e.start_number} - {e.name}
 						</option>
-						{competitors.map((c) => (
-							<option key={c.start_number} value={c.start_number}>
-								{c.start_number} — {c.name}
-							</option>
-						))}
-					</select>
+					))}
+				</select>
+
 				</label>
 				<label>
 					Välj station:&nbsp;
