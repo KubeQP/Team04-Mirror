@@ -33,7 +33,7 @@ export default function RegistreringStoppTid() {
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-	const [selectedStartNumber] = useState<string>('');
+	const [selectedStartNumber, setSelectedStartNumber] = useState<string>('');
 
 	const [msg, setMsg] = useState<string>('');
 
@@ -239,13 +239,18 @@ export default function RegistreringStoppTid() {
 						onChange={(e)=>setSearch(e.target.value)}
 
 					></input>
-				<select>
-					{filteredComp.map((e)=>(
-						<option key = {e.start_number} value={e.start_number}>
-							{e.start_number} - {e.name}
+				<select
+					value={selectedStartNumber}
+					onChange={(e) => setSelectedStartNumber(e.target.value)}
+					>
+					<option value="" disabled>Välj...</option>
+					{filteredComp.map((c) => (
+						<option key={c.start_number} value={c.start_number.toString()}>
+						{c.start_number} — {c.name}
 						</option>
 					))}
 				</select>
+
 
 				</label>
 
