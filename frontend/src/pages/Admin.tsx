@@ -70,7 +70,13 @@ export default function Admin() {
 	interface Cell {
 		value: string;
 		correct: boolean;
+		//mutable: boolean;
 	}
+
+	type EditableCellProps = {
+		value: Cell;
+		onChange: (value: string) => void;
+	};
 
 	//Hjälp-funktion för att skriva tagen tid som HH:MM:SS
 	function formatTime(timestamp?: string): string {
@@ -113,6 +119,21 @@ export default function Admin() {
 		return { value: formatted, correct: true };
 	}
 
+	function EditableCell({ value, onChange }: EditableCellProps) {
+		return (
+			<td 
+				contentEditable
+				suppressContentEditableWarning
+				onBlur={e =>
+					onChange(e.currentTarget.textContent ?? "")
+				}
+				className= {value.correct === false ? 'incorrect-cell' : ''}
+				>
+				{value.value}
+    		</td>
+		);
+	}
+	
 	//Table - Stations //fel: två tider för samma person i samma station
 	const Array1: Cell[][] = [];
 	const headerRow1: Cell[] = [
@@ -214,11 +235,22 @@ export default function Admin() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex} className={cell.correct === false ? 'incorrect-cell' : ''}>
-									{cell.value}{' '}
-								</td>
+								
+								<EditableCell
+									value = {cell}
+									onChange={(newValue) =>{
+										const newData = [...tableData];
+										newData[rowIndex + 1][cellIndex] = {
+										value: newValue,
+										correct: cell.correct,
+										};
+										tableData = newData;
+									}}
+								/>
+
 							))}
 						</tr>
+						
 					))}
 				</tbody>
 			</table>
