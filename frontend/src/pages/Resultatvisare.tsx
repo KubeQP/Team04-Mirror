@@ -1,6 +1,8 @@
 // frontend/src/pages/Admin.tsx
 import { useEffect, useState } from 'react';
 
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
@@ -159,30 +161,32 @@ export default function Resultatvisare() {
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
-			<table>
-				<thead>
-					<tr>
+			<Table className="size-1/2">
+				<TableHeader>
+					<TableRow>
 						{headerRow.map((header, index) => (
-							<th key={index}>{header}</th>
+							<TableHead key={index}>{header}</TableHead>
 						))}
-					</tr>
-				</thead>
-				<tbody>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
 					{bodyRows.map((row, rowIndex) => (
-						<tr key={rowIndex}>
+						<TableRow key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex}>{cell} </td>
+								<TableCell className={cellIndex === 0 ? 'font-medium' : ''} key={cellIndex}>
+									{cell}
+								</TableCell>
 							))}
-						</tr>
+						</TableRow>
 					))}
-				</tbody>
-			</table>
+				</TableBody>
+			</Table>
 		);
 	}
 
 	return (
 		<div>
-			<h2>Resultatvisare</h2>
+			<h1 className="text-xl font-bold pb-2">Resultatvisare:</h1>
 			<div className="Admin-tables">
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
@@ -193,9 +197,7 @@ export default function Resultatvisare() {
 				) : stationError ? (
 					<p>Fel vid hämtning av station data: {stationError}</p>
 				) : (
-					<div style={{ display: 'flex', gap: '20px' }}>
-						<div className="Admin-wrapper">{createTable(tableArray)}</div>
-					</div>
+					<div className="Admin-wrapper">{createTable(tableArray)}</div>
 				)}
 			</div>
 		</div>
