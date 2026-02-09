@@ -40,7 +40,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         for i in competitors:
             db.refresh(i)
 
-
         station1 = Station(station_name="start", order="0")
         station2 = Station(station_name="mål", order="1")
         db.add_all([station1, station2])
