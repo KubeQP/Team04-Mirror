@@ -302,5 +302,5 @@ tr:nth-child(odd) {
 }
 
 .back-icon-path {
-	fill: var(--color-header-text);
+	fill: var(--color-text);
 }
