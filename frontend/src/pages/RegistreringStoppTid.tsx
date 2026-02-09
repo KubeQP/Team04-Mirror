@@ -109,6 +109,18 @@ export default function RegistreringStoppTid() {
 		fetchData();
 	}, [competitorsVersion]);
 
+	useEffect(() => {
+		// Only auto-select if the currently selectedStartNumber is not in the filtered list
+		if (!filteredComp.some(c => c.start_number === selectedStartNumber)) {
+		  if (filteredComp.length > 0) {
+			setSelectedStartNumber(filteredComp[0].start_number);
+		  } else {
+			setSelectedStartNumber(''); // no match
+		  }
+		}
+	  }, [filteredComp, selectedStartNumber]);
+	  
+
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
 		[competitors, selectedStartNumber],

@@ -99,13 +99,15 @@ beforeEach(() => {
 		});
 
 		// Type in search input
+// Type in search input
 		const searchInput = screen.getByPlaceholderText('searchComp');
 		fireEvent.change(searchInput, { target: { value: '007' } });
+
 
 		// Dropdown should now be filtered
 		await waitFor(() => {
 		expect(
-			screen.getByRole('option', { name: '007 - Anna' })
+			screen.getByRole('option', { name: '007 — Anna' })
 		).toBeInTheDocument();
 		});
 	});
