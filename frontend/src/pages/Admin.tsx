@@ -24,10 +24,9 @@ export default function Admin() {
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
-	let tableDataGlobal : Cell[][] = [];
 
-	useEffect(() => {
-		const fetchData = async () => {
+	let tableDataGlobal : Cell[][] = [];
+	const fetchData = async () => {
 			// Competitor data
 			try {
 				const result = await getCompetitorData();
@@ -68,8 +67,10 @@ export default function Admin() {
 			}
 		};
 
+	useEffect(() => {
 		fetchData();
 	}, []);
+
 
 	interface Cell {
 		value: string;
@@ -132,7 +133,7 @@ export default function Admin() {
 					suppressContentEditableWarning
 					onBlur={e =>{
 						onChange(e.currentTarget.textContent ?? "")
-						sendData(tableDataGlobal[rowIndex+1]);
+						cell = sendData(tableDataGlobal[rowIndex+1]);
 
 					}}
 					className={cell.correct === false ? 'incorrect-cell' : ''}
@@ -153,21 +154,38 @@ export default function Admin() {
 		}
 	}
 
-	function sendData (table : Cell[]){
+	function sendData (table : Cell[]) : Cell {
 		console.log("send data");
 		console.log(table);
 
 		if (table.length == 3){
-			const data: TimeData = {
-				id: table[2].id,
-				competitor_id: table[1].id,
-				timestamp: timeData?.find((time) => table[2].id === time.id)?.timestamp ?? '-',
-				station_id: table[0].id,
-			};
+			if (competitorData?.find((competitor) => table[1].value === competitor.start_number)){
+					const data: TimeData = {
+					id: table[2].id,
+					competitor_id: competitorData?.find((competitor) => table[1].value === competitor.start_number)?.id ?? -1,
+					timestamp: timeData?.find((time) => table[2].id === time.id)?.timestamp ?? '-',
+					station_id: table[0].id,
+				};
 
-			console.log(data);
-			editTimeData(data);
+				console.log(data);
+				editTimeData(data);
+				return table[1];
+
+			}
+			else{
+				const incorrect: Cell = {
+					value: table[1].value,
+					correct: false,
+					mutable: table[1].mutable,
+					id: table[1].id
+				}
+				return incorrect;
+			}
 		}
+		else {
+			return table[0]
+		}
+		
 	}
 	
 	//Table - Stations //fel: två tider för samma person i samma station
