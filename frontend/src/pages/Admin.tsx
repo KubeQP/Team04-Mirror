@@ -22,6 +22,9 @@ export default function Admin() {
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
+	const [minTime, setMinTime] = useState<string>('');
+	const [minTimeSaved, setMinTimeSaved] = useState<number | null>(null);
+
 	useEffect(() => {
 		const fetchData = async () => {
 			// Competitor data
@@ -67,6 +70,15 @@ export default function Admin() {
 		fetchData();
 	}, []);
 
+	useEffect(() => {
+  		const saved = localStorage.getItem('minTime');
+  		if (saved !== null) {
+    		setMinTimeSaved(Number(saved));
+    		setMinTime(saved); // fyll input-fältet också
+  		}
+	}, []);
+
+
 	interface Cell {
 		value: string;
 		correct: boolean;
@@ -82,6 +94,12 @@ export default function Admin() {
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
 		return matches ? matches.length : 0;
+	}
+
+	// hjälpfunktion räknar ut minuter i en sträng
+	function getMinutesFromTimeString(time: string): number {
+  		const [h, m] = time.split(':').map(Number);
+  		return h * 60 + m;
 	}
 
 	function calculateTotalTime(
@@ -186,6 +204,15 @@ export default function Admin() {
 		};
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
+		if (totalTime.correct && minTimeSaved !== null) {
+  			const totalMinutes = getMinutesFromTimeString(totalTime.value);
+  			const minMinutes = minTimeSaved;
+
+  			if (totalMinutes < minMinutes) {
+    			totalTime.correct = false;
+  			}
+		}
+		
 		if (startTime.value === '-') startTime.correct = false;
 		if (stopTime.value === '-') stopTime.correct = false;
 		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
@@ -229,6 +256,27 @@ export default function Admin() {
 		<div>
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
+				<input
+					type="number"
+					placeholder="Minimitid (min)"
+					value={minTime}
+					onChange={(e) => setMinTime(e.target.value)}
+			/>
+			<button
+				type="button"
+				onClick={() => {
+  					const value = Number(minTime);
+  					setMinTimeSaved(value);
+  					localStorage.setItem('minTime', value.toString());
+				}}
+			>
+			Spara
+			</button>
+
+			{minTimeSaved !== null && (
+			<p>Aktuell minimitid: {minTimeSaved} min</p>
+			)}
+			
 			<div className="Admin-tables">
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
