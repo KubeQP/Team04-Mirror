@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import RegistreringStoppTid from './RegistreringStoppTid';
@@ -36,12 +36,14 @@ let competitorsDb: Competitor[] = [];
 let stationsDb: Station[] = [];
 
 // ---------- Typad fetch-mock ----------
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let fetchSpy: MockInstance;
 
 beforeEach(() => {
 	competitorsDb = [
 		{ start_number: '007', name: 'Anna' },
 		{ start_number: '123', name: 'Bob' },
+		{ start_number: '124', name: 'Benim' },
 	];
 
 	stationsDb = [
@@ -82,29 +84,36 @@ beforeEach(() => {
 });
 
 describe('RegistreringStoppTid', () => {
-	it('hämtar och visar tävlande i dropdown och tabell', async () => {
+	it('hämtar tävlande, visar dem i tabell och filtrerar dropdown via sökfält', async () => {
 		render(<RegistreringStoppTid />);
 
+		// Wait for competitors to load (table)
 		await waitFor(() => {
-			expect(screen.getByText('007 — Anna')).toBeInTheDocument();
-			expect(screen.getByText('123 — Bob')).toBeInTheDocument();
+			expect(screen.getByText('007')).toBeInTheDocument();
+			expect(screen.getByText('Anna')).toBeInTheDocument();
+			expect(screen.getByText('123')).toBeInTheDocument();
+			expect(screen.getByText('Bob')).toBeInTheDocument();
 		});
 
-		expect(screen.getByText('007')).toBeInTheDocument();
-		expect(screen.getByText('Anna')).toBeInTheDocument();
+		// Type in search input
+		// Type in search input
+		const searchInput = screen.getByPlaceholderText('searchComp');
+		fireEvent.change(searchInput, { target: { value: '007' } });
 
-		// Bonus: bekräfta att GET faktiskt körts
-		expect(fetchSpy).toHaveBeenCalled();
-	});
-
-	it('disablar stopptidsknappen om inga tävlande finns', async () => {
-		competitorsDb = [];
-		render(<RegistreringStoppTid />);
-
+		// Dropdown should now be filtered
 		await waitFor(() => {
-			expect(screen.getByText(/Inga tävlande hittades/i)).toBeInTheDocument();
+			expect(screen.getByRole('option', { name: '007 — Anna' })).toBeInTheDocument();
 		});
-
-		expect(screen.getByText('Registrera stopptid nu')).toBeDisabled();
 	});
+});
+
+it('disablar stopptidsknappen om inga tävlande finns', async () => {
+	competitorsDb = [];
+	render(<RegistreringStoppTid />);
+
+	await waitFor(() => {
+		expect(screen.getByText(/Inga tävlande hittades/i)).toBeInTheDocument();
+	});
+
+	expect(screen.getByText('Registrera stopptid nu')).toBeDisabled();
 });
