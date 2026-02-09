@@ -90,7 +90,7 @@ export default function Resultatvisare() {
 		return { value: totalSeconds, correct: true };
 	}
 
-	function formatTotalTime (totalSeconds : number) {
+	function formatTotalTime(totalSeconds: number) {
 		const hours = Math.floor(totalSeconds / 3600);
 		const minutes = Math.floor((totalSeconds % 3600) / 60);
 		const seconds = totalSeconds % 60;
@@ -101,20 +101,15 @@ export default function Resultatvisare() {
 	}
 
 	interface ResultObject {
-		Rang : number;
-		Nr : string;
-		Name : string;
-		Total : number;
+		Rang: number;
+		Nr: string;
+		Name: string;
+		Total: number;
 	}
 	//tableArray - Competitors //flera tider för en station, ingen tid.
 	const Results: ResultObject[] = [];
-	const headerRow: string[] = [
-		'Rang',
-		'Nr.' ,
-		'Namn' ,
-		'Totalt',
-	];
-	
+	const headerRow: string[] = ['Rang', 'Nr.', 'Namn', 'Totalt'];
+
 	competitorData?.forEach((competitor) => {
 		const startNumber = { value: competitor.start_number, correct: true };
 		const name = { value: competitor.name, correct: true };
@@ -124,39 +119,39 @@ export default function Resultatvisare() {
 					time.competitor_id === competitor.id &&
 					stationData?.find((station) => station.id === time.station_id)?.order === '0',
 			) || [];
-		
+
 		const matchingStopTimes =
 			timeData?.filter(
 				(time) =>
 					time.competitor_id === competitor.id &&
 					stationData?.find((station) => station.id === time.station_id)?.order === '1',
 			) || [];
-		
+
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
-		if (totalTime.value != -1){
-			const competitorRow: ResultObject = {Rang: 0, Nr: startNumber.value, Name: name.value, Total: totalTime.value};
+		if (totalTime.value != -1) {
+			const competitorRow: ResultObject = { Rang: 0, Nr: startNumber.value, Name: name.value, Total: totalTime.value };
 			Results.push(competitorRow);
-		}		
+		}
 	});
 
-	Results.sort((a, b) => a.Total - b.Total)
+	Results.sort((a, b) => a.Total - b.Total);
 
-	for (let i : number = 0; i < Results.length ; i++){
-		Results[i].Rang = i+1;
+	for (let i: number = 0; i < Results.length; i++) {
+		Results[i].Rang = i + 1;
 	}
 
 	const tableArray: string[][] = [];
 	tableArray.push(headerRow);
 
 	Results?.forEach((ResultObject) => {
-		const tempArray :  string[] = [];
+		const tempArray: string[] = [];
 		tempArray.push(ResultObject.Rang.toString());
 		tempArray.push(ResultObject.Nr);
 		tempArray.push(ResultObject.Name);
 		tempArray.push(formatTotalTime(ResultObject.Total));
 		tableArray.push(tempArray);
-	})
+	});
 	//dynamic table creation
 	function createTable(tableData: string[][]) {
 		if (tableData.length === 0) return null;
@@ -176,9 +171,7 @@ export default function Resultatvisare() {
 					{bodyRows.map((row, rowIndex) => (
 						<tr key={rowIndex}>
 							{row.map((cell, cellIndex) => (
-								<td key={cellIndex}>
-									{cell}{' '}
-								</td>
+								<td key={cellIndex}>{cell} </td>
 							))}
 						</tr>
 					))}
