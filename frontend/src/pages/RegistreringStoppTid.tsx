@@ -183,7 +183,13 @@ export default function RegistreringStoppTid() {
 			<h2>Registrering Stopptid</h2>
 
 			<div style={{ display: 'flex' }}>
-				<label style= {selectedStationId === '' ? {} : {width: '50%', color: '#808080'}}> {selectedStationId === '' ? "Välj station:" : "Vald station: " + stations.find(s => s.id === selectedStationId)?.station_name}&nbsp;</label>
+				<label style={selectedStationId === '' ? {} : { width: '50%', color: '#808080' }}>
+					{' '}
+					{selectedStationId === ''
+						? 'Välj station:'
+						: 'Vald station: ' + stations.find((s) => s.id === selectedStationId)?.station_name}
+					&nbsp;
+				</label>
 				{selectedStationId === '' ? (
 					<select
 						value={selectedStationId}
@@ -200,7 +206,9 @@ export default function RegistreringStoppTid() {
 						))}
 					</select>
 				) : (
-					<div style={{ display: 'flex', width: '50%', alignItems: 'right', justifyContent: 'end', padding: '4px 0px' }}>
+					<div
+						style={{ display: 'flex', width: '50%', alignItems: 'right', justifyContent: 'end', padding: '4px 0px' }}
+					>
 						<button onClick={() => setSelectedStationId('')} style={{ padding: '0px 2px' }}>
 							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
 								<title>back_2_fill</title>
