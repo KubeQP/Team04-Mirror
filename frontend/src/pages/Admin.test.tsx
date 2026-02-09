@@ -71,7 +71,7 @@ describe('Person utan start eller stopptid', () => {
 
 	it('markerar start- eller stopptid som röd', async () => {
 		await waitFor(() => {
-			const redCells = screen.getAllByText('-').filter((el) => (el as HTMLElement).style.backgroundColor === 'red');
+			const redCells = screen.getAllByText('-').filter((el) => (el as HTMLElement).className === 'incorrect-cell');
 			expect(redCells.length).toBeGreaterThan(0);
 		});
 	});
