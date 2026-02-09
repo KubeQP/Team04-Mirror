@@ -300,3 +300,8 @@ tr:nth-child(odd) {
 .incorrect-cell {
 	background-color: red;
 }
+
+
+.back-icon-path {
+    fill: var(--color-header-text);
+}
