@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { API_BASE_URL } from '../config/api';
+
 type Station = {
 	station_name: string;
 	order: string;
@@ -11,7 +13,7 @@ export default function StationRegistrering() {
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const fetchStations = async () => {
-		const res = await fetch('http://localhost:8000/api/stations/getstations');
+		const res = await fetch(`${API_BASE_URL}/api/stations/getstations`);
 		if (!res.ok) return;
 		const data = await res.json();
 		setStations(data);
@@ -28,7 +30,7 @@ export default function StationRegistrering() {
 		if (!order.trim()) return;
 
 		try {
-			const res = await fetch('http://localhost:8000/api/stations/registerstation', {
+			const res = await fetch(`${API_BASE_URL}/api/stations/registerstation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

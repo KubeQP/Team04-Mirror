@@ -4,6 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
+import { API_BASE_URL } from '../config/api';
 
 type Competitor = {
 	start_number: string;
@@ -63,7 +64,7 @@ export default function RegistreringStoppTid() {
 	};
 	/*
   const fetchStations = async () => {
-    const res = await fetch("http://localhost:8000/stations/getstations");
+    const res = await fetch(`${API_BASE_URL}/stations/getstations`);
     if (!res.ok) return;
     const data: Station[] = await res.json();
     setStations(data);
@@ -75,7 +76,7 @@ export default function RegistreringStoppTid() {
 
 	const fetchCompetitors = async () => {
 		try {
-			const res = await fetch('http://localhost:8000/competitors/');
+			const res = await fetch(`${API_BASE_URL}/competitors/`);
 			if (!res.ok) {
 				setMsg(`Kunde inte hämta tävlande (status ${res.status})`);
 				return;
@@ -138,7 +139,7 @@ export default function RegistreringStoppTid() {
 		setMsg('Registrerar stopptid...');
 
 		try {
-			const res = await fetch('http://localhost:8000/api/times/record', {
+			const res = await fetch(`${API_BASE_URL}/api/times/record`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
