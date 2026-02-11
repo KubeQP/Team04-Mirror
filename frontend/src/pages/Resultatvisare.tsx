@@ -2,6 +2,7 @@
 import { CrownIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { getCompetitorData } from '../api/getCompetitorData';
@@ -162,40 +163,42 @@ export default function Resultatvisare() {
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
-			<Table>
-				<TableHeader>
-					<TableRow>
-						{headerRow.map((header, index) => (
-							<TableHead key={index}>{header}</TableHead>
-						))}
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{bodyRows.map((row, rowIndex) => (
-						<TableRow key={rowIndex}>
-							{row.map((cell, cellIndex) => (
-								<TableCell className={cellIndex === 0 ? 'font-medium text-base' : ''} key={cellIndex}>
-									{cellIndex === 0 && cell === '1' ? (
-										<div className="flex items-center gap-2">
-											{cell}
-											<CrownIcon className="size-6 text-yellow-500" />
-										</div>
-									) : (
-										cell
-									)}
-								</TableCell>
+			<ScrollArea className="rounded-md border px-4 h-[80vh]">
+				<Table>
+					<TableHeader>
+						<TableRow>
+							{headerRow.map((header, index) => (
+								<TableHead key={index}>{header}</TableHead>
 							))}
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+					<TableBody>
+						{bodyRows.map((row, rowIndex) => (
+							<TableRow key={rowIndex}>
+								{row.map((cell, cellIndex) => (
+									<TableCell className={cellIndex === 0 ? 'font-medium text-base' : ''} key={cellIndex}>
+										{cellIndex === 0 && cell === '1' ? (
+											<div className="flex items-center gap-2">
+												{cell}
+												<CrownIcon className="size-6 text-yellow-500" />
+											</div>
+										) : (
+											cell
+										)}
+									</TableCell>
+								))}
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		);
 	}
 
 	return (
 		<div>
 			<h1 className="text-xl font-bold pb-2">Resultatvisare:</h1>
-			<div className="Admin-tables">
+			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
 				) : competitorError ? (
@@ -205,7 +208,7 @@ export default function Resultatvisare() {
 				) : stationError ? (
 					<p>Fel vid hämtning av station data: {stationError}</p>
 				) : (
-					<div className="Admin-wrapper">{createTable(tableArray)}</div>
+					<div>{createTable(tableArray)}</div>
 				)}
 			</div>
 		</div>

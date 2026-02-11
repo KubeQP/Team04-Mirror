@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -67,7 +68,7 @@ export default function StationRegistrering() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold pb-2">Hantera stationer:</h1>
+			<h1 className="text-xl font-bold pb-4">Hantera stationer:</h1>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
@@ -102,48 +103,50 @@ export default function StationRegistrering() {
 					</Button>
 				</div>
 			</form>
-			<h2 className="mt-6 text-lg font-semibold">Stationer</h2>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Namn</TableHead>
-						<TableHead>Ordning</TableHead>
-						<TableHead className="text-right">Ändra</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{stations.map((station) => (
-						<TableRow key={station.order}>
-							<TableCell className="font-medium">{station.station_name}</TableCell>
-							<TableCell>{station.order}</TableCell>
-							<TableCell className="text-right">
-								<div className="flex items-center justify-end gap-2">
-									<Button variant="ghost" size="icon" className="size-8">
-										<ChevronDownIcon />
-										<span className="sr-only">Flytta ned</span>
-									</Button>
-									<Button variant="ghost" size="icon" className="size-8">
-										<ChevronUpIcon />
-										<span className="sr-only">Flytta upp</span>
-									</Button>
-									<div className="h-6 flex items-center">
-										<Separator orientation="vertical" />
-									</div>
-
-									<Button
-										variant="ghost"
-										size="icon"
-										className="size-8 hover:bg-destructive hover:text-destructive-foreground dark:hover:bg-destructive dark:hover:text-destructive-foreground"
-									>
-										<Trash2Icon />
-										<span className="sr-only">Radera</span>
-									</Button>
-								</div>
-							</TableCell>
+			<h2 className="mt-6 text-lg font-semibold pb-2">Stationer</h2>
+			<ScrollArea className="rounded-md border px-4 h-[60vh]">
+				<Table>
+					<TableHeader className="h-14">
+						<TableRow>
+							<TableHead>Namn</TableHead>
+							<TableHead>Ordning</TableHead>
+							<TableHead className="text-right">Ändra</TableHead>
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+					<TableBody>
+						{stations.map((station) => (
+							<TableRow key={station.order}>
+								<TableCell className="font-medium">{station.station_name}</TableCell>
+								<TableCell>{station.order}</TableCell>
+								<TableCell className="text-right">
+									<div className="flex items-center justify-end gap-2">
+										<Button variant="ghost" size="icon" className="size-8">
+											<ChevronDownIcon />
+											<span className="sr-only">Flytta ned</span>
+										</Button>
+										<Button variant="ghost" size="icon" className="size-8">
+											<ChevronUpIcon />
+											<span className="sr-only">Flytta upp</span>
+										</Button>
+										<div className="h-6 flex items-center">
+											<Separator orientation="vertical" />
+										</div>
+
+										<Button
+											variant="ghost"
+											size="icon"
+											className="size-8 hover:bg-destructive hover:text-destructive-foreground dark:hover:bg-destructive dark:hover:text-destructive-foreground"
+										>
+											<Trash2Icon />
+											<span className="sr-only">Radera</span>
+										</Button>
+									</div>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		</div>
 	);
 }

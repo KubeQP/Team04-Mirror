@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type Competitor = {
@@ -97,7 +98,7 @@ export default function Registrering() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold pb-2">Registrering:</h1>
+			<h1 className="text-xl font-bold pb-4">Registrering:</h1>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
@@ -132,39 +133,41 @@ export default function Registrering() {
 					</Button>
 				</div>
 			</form>
-			<h2 className="text-lg mt-6 font-semibold">Registrerade tävlande</h2>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Startnummer</TableHead>
-						<TableHead>Namn</TableHead>
-						<TableHead className="text-right">Ändra</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{competitors.map((competitor) => (
-						<TableRow key={competitor.start_number}>
-							<TableCell className="font-medium">{competitor.start_number}</TableCell>
-							<TableCell>{competitor.name}</TableCell>
-							<TableCell className="text-right">
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button variant="ghost" size="icon" className="size-8">
-											<MoreHorizontalIcon />
-											<span className="sr-only">Öppna meny</span>
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem>Redigera</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem variant="destructive">Radera</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</TableCell>
+			<h2 className="text-lg mt-6 font-semibold mb-2">Registrerade tävlande</h2>
+			<ScrollArea className="h-[60vh] rounded-md border px-4">
+				<Table>
+					<TableHeader>
+						<TableRow className="h-14">
+							<TableHead>Startnummer</TableHead>
+							<TableHead>Namn</TableHead>
+							<TableHead className="text-right">Ändra</TableHead>
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+					<TableBody>
+						{competitors.map((competitor) => (
+							<TableRow key={competitor.start_number}>
+								<TableCell className="font-medium">{competitor.start_number}</TableCell>
+								<TableCell>{competitor.name}</TableCell>
+								<TableCell className="text-right">
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button variant="ghost" size="icon" className="size-8">
+												<MoreHorizontalIcon />
+												<span className="sr-only">Öppna meny</span>
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem>Redigera</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem variant="destructive">Radera</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		</div>
 	);
 }
