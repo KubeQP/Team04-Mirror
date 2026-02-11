@@ -165,7 +165,7 @@ export default function Resultatvisare() {
 		return (
 			<ScrollArea className="rounded-md border px-4 h-[80vh]">
 				<Table>
-					<TableHeader>
+					<TableHeader className="h-12">
 						<TableRow>
 							{headerRow.map((header, index) => (
 								<TableHead key={index}>{header}</TableHead>

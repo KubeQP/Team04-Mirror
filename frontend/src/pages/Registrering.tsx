@@ -121,7 +121,7 @@ export default function Registrering() {
 							<FieldLabel>Namn</FieldLabel>
 							<Input
 								id="nameInput"
-								placeholder="Aaron"
+								placeholder="John Doe"
 								type="text"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
