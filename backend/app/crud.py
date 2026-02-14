@@ -68,6 +68,7 @@ def get_stations(db: Session) -> list[Station]:
     """Hämta alla stationer från databasen."""
     return db.query(Station).all()
 
+
 def update_competitor(db: Session, data: Competitor):
     competitor = db.query(Competitor).filter(Competitor.id == data.id).first()
 
@@ -83,19 +84,20 @@ def update_competitor(db: Session, data: Competitor):
     db.refresh(competitor)
     return competitor
 
+
 def update_time_entry(db: Session, data: TimeEntry):
-	entry = db.query(TimeEntry).filter(TimeEntry.id == data.id).first()
+    entry = db.query(TimeEntry).filter(TimeEntry.id == data.id).first()
 
-	if entry is None:
-		return None
+    if entry is None:
+        return None
 
-	if data.competitor_id is not None:
-		entry.competitor_id = data.competitor_id
-	if data.timestamp is not None:
-		entry.timestamp = data.timestamp
-	if data.station_id is not None:
-		entry.station_id = data.station_id
+    if data.competitor_id is not None:
+        entry.competitor_id = data.competitor_id
+    if data.timestamp is not None:
+        entry.timestamp = data.timestamp
+    if data.station_id is not None:
+        entry.station_id = data.station_id
 
-	db.commit()
-	db.refresh(entry)
-	return entry
+    db.commit()
+    db.refresh(entry)
+    return entry
