@@ -48,6 +48,7 @@ class StationOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class CompetitorUpdate(BaseModel):
+    id: Optional[int] = None
     start_number: Optional[str] = None
     name: Optional[str] = None
 

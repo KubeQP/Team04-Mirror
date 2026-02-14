@@ -68,8 +68,8 @@ def get_stations(db: Session) -> list[Station]:
     """Hämta alla stationer från databasen."""
     return db.query(Station).all()
 
-def update_competitor(db: Session, competitor_id: int, data):
-    competitor = db.query(Competitor).filter(Competitor.id == competitor_id).first()
+def update_competitor(db: Session, data: Competitor):
+    competitor = db.query(Competitor).filter(Competitor.id == data.id).first()
 
     if competitor is None:
         return None

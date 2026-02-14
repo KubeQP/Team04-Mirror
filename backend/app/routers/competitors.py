@@ -1,5 +1,5 @@
 # backend/app/routers/competitors.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import Column
 from sqlalchemy.orm import Session
 
@@ -23,3 +23,16 @@ def reg_competitor(
 ) -> dict[str, Column[str]]:
     competitor = crud.record_new_reg(db, data.start_number, data.name)
     return {"start_number": competitor.start_number, "name": competitor.name}
+
+
+@router.put("/{competitor_id}/", response_model=schemas.CompetitorOut)
+def update_competitor(
+    data: schemas.CompetitorUpdate,
+    db: Session = Depends(get_db),
+):
+    competitor = crud.update_competitor(db, data)
+
+    if competitor is None:
+        raise HTTPException(status_code=404, detail="Competitor not found")
+
+    return competitor
