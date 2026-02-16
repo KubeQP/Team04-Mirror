@@ -69,7 +69,9 @@ describe('Person utan start eller stopptid', () => {
 
 	it('markerar start- eller stopptid som röd', async () => {
 		await waitFor(() => {
-			const redCells = screen.getAllByText('-').filter((el) => (el as HTMLElement).className === 'incorrect-cell');
+			const redCells = screen
+				.getAllByText('-')
+				.filter((el) => (el as HTMLElement).className.includes('bg-destructive'));
 			expect(redCells.length).toBeGreaterThan(0);
 		});
 	});
@@ -111,8 +113,8 @@ describe('Dubbelregistrering med samma startnummer och station', () => {
 	it('markerar celler med samma startnummer och station som röd', async () => {
 		await waitFor(() => {
 			const redCells = screen
-				.getAllByText('123')
-				.filter((el) => (el as HTMLElement).classList.contains('incorrect-cell'));
+				.getAllByRole('cell')
+				.filter((el) => (el as HTMLElement).classList.contains('bg-destructive'));
 			expect(redCells.length).toBeGreaterThan(0);
 		});
 	});

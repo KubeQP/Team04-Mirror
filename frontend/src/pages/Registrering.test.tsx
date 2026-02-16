@@ -53,12 +53,12 @@ beforeEach(() => {
 describe('RegisteringStartTid', () => {
 	it('registrerar ett korrekt startnummer', async () => {
 		// fyll startnummer
-		fireEvent.change(screen.getByPlaceholderText('Skriv startnummer här'), {
+		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: '001' },
 		});
 
 		// fyll namn (viktigt!)
-		fireEvent.change(screen.getByPlaceholderText('Skriv namn här'), {
+		fireEvent.change(screen.getByPlaceholderText('John Doe'), {
 			target: { value: 'Alice' },
 		});
 
@@ -71,10 +71,10 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar felaktig registrering med bokstäver', async () => {
-		fireEvent.change(screen.getByPlaceholderText('Skriv startnummer här'), {
+		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: 'abc' },
 		});
-		fireEvent.change(screen.getByPlaceholderText('Skriv namn här'), {
+		fireEvent.change(screen.getByPlaceholderText('John Doe'), {
 			target: { value: 'Alice' },
 		});
 
@@ -87,10 +87,10 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar registrering med extra nollor framför', async () => {
-		fireEvent.change(screen.getByPlaceholderText('Skriv startnummer här'), {
+		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: '000210' },
 		});
-		fireEvent.change(screen.getByPlaceholderText('Skriv namn här'), {
+		fireEvent.change(screen.getByPlaceholderText('John Doe'), {
 			target: { value: 'Team' },
 		});
 
@@ -102,10 +102,10 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar registrering med färre än tre siffror', async () => {
-		fireEvent.change(screen.getByPlaceholderText('Skriv startnummer här'), {
+		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: '13' },
 		});
-		fireEvent.change(screen.getByPlaceholderText('Skriv namn här'), {
+		fireEvent.change(screen.getByPlaceholderText('John Doe'), {
 			target: { value: 'Team' },
 		});
 
@@ -118,10 +118,10 @@ describe('RegisteringStartTid', () => {
 
 	it('testar registrering med dubletter', async () => {
 		for (let i = 0; i < 2; i++) {
-			fireEvent.change(screen.getByPlaceholderText('Skriv startnummer här'), {
+			fireEvent.change(screen.getByPlaceholderText('123'), {
 				target: { value: '011' },
 			});
-			fireEvent.change(screen.getByPlaceholderText('Skriv namn här'), {
+			fireEvent.change(screen.getByPlaceholderText('John Doe'), {
 				target: { value: 'Team' },
 			});
 
