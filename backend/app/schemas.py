@@ -45,3 +45,16 @@ class StationOut(BaseModel):
     order: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CompetitorUpdate(BaseModel):
+    id: int | None = None
+    start_number: str | None = None
+    name: str | None = None
+
+
+class TimeEntryUpdate(BaseModel):
+    id: int | None = None
+    competitor_id: int | None = None
+    timestamp: datetime | None = None
+    station_id: int | None = None

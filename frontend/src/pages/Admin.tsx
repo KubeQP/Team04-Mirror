@@ -1,90 +1,89 @@
 // frontend/src/pages/Admin.tsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
+import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-// src/pages/Admin.tsx
-export default function Admin() {
-	//declaring constants for the imports
 
+export default function Admin() {
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
-
+	
 	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
-
+	
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
+	
+	const [stationTable, setStationTable] = useState<Cell[][]>([]);
+	//// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [resultView] = useState<'startnummer' | 'resultat'>('startnummer');
 
 
+	// Fetch data
+	const fetchData = async () => {
+		try {
+			const competitors = await getCompetitorData();
+			setCompetitorData(competitors);
+			console.log('Fetched competitor data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setCompetitorError(err.message);
+			else if (typeof err === 'string') setCompetitorError(err);
+			else setCompetitorError('Ett okänt fel inträffade');
+		} finally {
+			setCompetitorLoading(false);
+		}
+		
+		try {
+			const times = await getTimeData();
+			setTimeData(times);
+			console.log('Fetched time data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setTimeError(err.message);
+			else if (typeof err === 'string') setTimeError(err);
+			else setTimeError('Ett okänt fel inträffade');
+		} finally {
+			setTimeLoading(false);
+		}
+		
+		try {
+			const stations = await getStationData();
+			setStationData(stations);
+			console.log('Fetched station data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setStationError(err.message);
+			else if (typeof err === 'string') setStationError(err);
+			else setStationError('Ett okänt fel inträffade');
+		} finally {
+			setStationLoading(false);
+		}
+	};
+	
 	useEffect(() => {
-		const fetchData = async () => {
-			// Competitor data
-			try {
-				const result = await getCompetitorData();
-				setCompetitorData(result);
-				console.log('Fetched competitor data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setCompetitorError(err.message);
-				else if (typeof err === 'string') setCompetitorError(err);
-				else setCompetitorError('Ett okänt fel inträffade');
-			} finally {
-				setCompetitorLoading(false);
-			}
-
-			// Time data
-			try {
-				const result = await getTimeData();
-				setTimeData(result);
-				console.log('Fetched time data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setTimeError(err.message);
-				else if (typeof err === 'string') setTimeError(err);
-				else setTimeError('Ett okänt fel inträffade');
-			} finally {
-				setTimeLoading(false);
-			}
-
-			// Station data
-			try {
-				const result = await getStationData();
-				setStationData(result);
-				console.log('Fetched station data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setStationError(err.message);
-				else if (typeof err === 'string') setStationError(err);
-				else setStationError('Ett okänt fel inträffade');
-			} finally {
-				setStationLoading(false);
-			}
-		};
-
 		fetchData();
 	}, []);
-
+	
 	interface Cell {
 		value: string;
 		correct: boolean;
+		mutable: boolean;
+		id: number;
 	}
-
-	//Hjälp-funktion för att skriva tagen tid som HH:MM:SS
+	// Hjälpfunktioner
 	function formatTime(timestamp?: string): string {
 		if (!timestamp) return '-';
 		return new Date(timestamp).toLocaleTimeString('sv-SE', { hour12: false });
 	}
-
-	const competitorsByStartNumber = competitorData
-		? [...competitorData].sort(
-				(a, b) => Number(a.start_number) - Number(b.start_number),
-		  )
-		: [];
 
 	const competitorsByResult = competitorData
 		? [...competitorData].sort((a, b) => {
@@ -126,7 +125,7 @@ export default function Admin() {
 		  })
 		: [];
 
-	// Hjälp-funktion räknar antal tider i en sträng
+
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
 		return matches ? matches.length : 0;
@@ -161,150 +160,234 @@ export default function Admin() {
 		return { value: formatted, correct: true };
 	}
 
-	//Table - Stations //fel: två tider för samma person i samma station
-	const Array1: Cell[][] = [];
-	const headerRow1: Cell[] = [
-		{ value: 'Station', correct: true },
-		{ value: 'Nr.', correct: true },
-		{ value: 'Tid', correct: true },
-	];
-	Array1.push(headerRow1);
-	timeData?.forEach((timeSlot) => {
-		//lägga in värde för station
-		const stationValue: Cell = {
-			value: stationData?.find((station) => station.id === timeSlot.station_id)?.station_name ?? '-',
-			correct: true,
-		}; //måste lägga till station //timeSlot.station_id
 
-		//lägga in värde för startnummer
-		const startNumber: Cell = {
-			value: competitorData?.find((competitor) => competitor.id === timeSlot.competitor_id)?.start_number ?? '-',
-			correct: true,
-		};
+	// Redigerbar cell
+	function EditableCell({ cell, rowIndex, cellIndex }: { cell: Cell; rowIndex: number; cellIndex: number }) {
+		const [value, setValue] = useState(cell.value);
 
-		//lägga in värde för tidstämpel
-		const timeStamp: Cell = { value: formatTime(timeSlot.timestamp), correct: true };
+		useEffect(() => setValue(cell.value), [cell.value]);
 
-		const duplicates = timeData.filter(
-			(t) =>
-				t.id !== timeSlot.id &&
-				(competitorData?.find((competitor) => competitor.id === t.competitor_id)?.start_number ?? '-') ===
-					startNumber.value &&
-				(t.station_id !== undefined ? t.station_id : '-') === timeSlot.station_id,
+		if (!cell.mutable)
+			return <TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>{cell.value}</TableCell>;
+
+		return (
+			<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
+				<Input
+					value={value}
+					onChange={(e) => setValue(e.target.value)}
+					onBlur={() => handleCellUpdate(rowIndex, cellIndex, value)}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') e.currentTarget.blur();
+					}}
+					className="h-8"
+				/>
+			</TableCell>
 		);
+	}
 
-		if (duplicates.length > 0) {
-			stationValue.correct = false;
-			startNumber.correct = false;
+	// Uppdatera cell
+	async function handleCellUpdate(rowIndex: number, cellIndex: number, newValue: string) {
+		setStationTable((prev) => {
+			const updated = [...prev];
+			updated[rowIndex + 1][cellIndex] = { ...updated[rowIndex + 1][cellIndex], value: newValue };
+			const validated = validateStationDuplicates(updated);
+
+			return validated;
+
+		});
+
+		const row = stationTable[rowIndex + 1];
+		const timeId = row[2].id;
+		const competitor = competitorData?.find((c) => c.start_number === newValue);
+
+		if (!competitor) {
+			setStationTable((prev) => {
+				const updated = [...prev];
+				updated[rowIndex + 1][1] = {
+					...updated[rowIndex + 1][1],
+					correct: false,
+				};
+				const validated = validateStationDuplicates(updated);
+
+				return validated;
+			});
+
+			return;
 		}
 
-		const competitorRow: Cell[] = [stationValue, startNumber, timeStamp];
-		Array1.push(competitorRow);
-	});
+		setTimeData((prev) => prev?.map((t) => (t.id === timeId ? { ...t, competitor_id: competitor.id } : t)) ?? null);
 
-	const competitorsToRender =
-	resultView === 'startnummer'
-		? competitorsByStartNumber
-		: competitorsByResult;
+		await editTimeData({
+			id: timeId,
+			competitor_id: competitor.id,
+			timestamp: timeData?.find((t) => t.id === timeId)?.timestamp ?? '-',
+			station_id: row[0].id,
+		});
 
-	//Table - Competitors //flera tider för en station, ingen tid.
-	//sorterad efter startnummer/tid
-	const Array2: Cell[][] = [];
+	}
+
+	const validateStationDuplicates = useCallback((table: Cell[][]): Cell[][] => {
+		const updated = table.map((row) => [...row]);
+
+		const seen = new Map<string, number[]>();
+
+		for (let i = 1; i < updated.length; i++) {
+			const row = updated[i];
+
+			const stationId = row[0].id;
+			const startNumber = row[1].value;
+
+			const key = `${stationId}-${startNumber}`;
+
+			if (!seen.has(key)) {
+				seen.set(key, [i]);
+			} else {
+				seen.get(key)?.push(i);
+			}
+		}
+
+		seen.forEach((indexes) => {
+			if (indexes.length > 1) {
+				indexes.forEach((i) => {
+					updated[i][0] = { ...updated[i][0], correct: false };
+					updated[i][1] = { ...updated[i][1], correct: false };
+				});
+			}
+		});
+
+		return updated;
+	}, []);
+
+
+	// Bygg stationstabell
+	useEffect(() => {
+		if (!timeData || !stationData || !competitorData) return;
+
+		const table: Cell[][] = [];
+		table.push([
+			{ value: 'Station', correct: true, mutable: false, id: 0 },
+			{ value: 'Nr.', correct: true, mutable: false, id: 0 },
+			{ value: 'Tid', correct: true, mutable: false, id: 0 },
+		]);
+
+		timeData.forEach((timeSlot) => {
+			const station = stationData.find((s) => s.id === timeSlot.station_id);
+			const competitor = competitorData.find((c) => c.id === timeSlot.competitor_id);
+
+			table.push([
+				{ value: station?.station_name ?? '-', correct: true, mutable: false, id: station?.id ?? 0 },
+				{ value: competitor?.start_number ?? '-', correct: true, mutable: true, id: timeSlot.id },
+				{ value: formatTime(timeSlot.timestamp), correct: true, mutable: false, id: timeSlot.id },
+			]);
+		});
+
+		setStationTable(validateStationDuplicates(table));
+	}, [timeData, stationData, competitorData, validateStationDuplicates]);
+
+	// Bygg tävlandetable
+	const competitorsToRender: CompetitorData[] = competitorData
+  		? resultView === 'startnummer'
+    		? [...competitorData].sort((a, b) => Number(a.start_number) - Number(b.start_number))
+    		: competitorsByResult.sort((a, b) => {
+				const getTotal = (c: CompetitorData) => {
+					const start = timeData?.find(
+						(t) =>
+						t.competitor_id === c.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '0'
+					);
+					const stop = timeData?.find(
+						(t) =>
+						t.competitor_id === c.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '1'
+					);
+					return start && stop
+						? new Date(stop.timestamp).getTime() - new Date(start.timestamp).getTime()
+						: Infinity;
+					};
+				return getTotal(a) - getTotal(b);
+      })
+  : [];
+
+
+	const competitorTable: Cell[][] = [];
 	const headerRow2: Cell[] = [
-		//{ value: 'Placering', correct: true},
-		{ value: 'Nr.', correct: true },
-		{ value: 'Namn', correct: true },
-		{ value: 'Start', correct: true },
-		{ value: 'Mål', correct: true },
-		{ value: 'Totalt', correct: true },
+		{ value: 'Nr.', correct: true, mutable: false, id: 0 },
+		{ value: 'Namn', correct: true, mutable: false, id: 0 },
+		{ value: 'Start', correct: true, mutable: false, id: 0 },
+		{ value: 'Mål', correct: true, mutable: false, id: 0 },
+		{ value: 'Totalt', correct: true, mutable: false, id: 0 },
 	];
-	Array2.push(headerRow2);
-	//let placementCounter = 1;
-	
-	competitorsToRender?.forEach((competitor) => {
+	competitorTable.push(headerRow2);
 
-		//Placering
+	competitorsToRender.forEach((competitor) => {
+		const startTimes = timeData?.filter(
+			(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
+		) || [];
+		const stopTimes = timeData?.filter(
+			(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
+		) || [];
 
-		//lägga in värde för startnummer
-		const startNumber = { value: competitor.start_number, correct: true };
+		const startTime = { value: startTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-', correct: true, mutable: false, id: competitor.id };
+		const stopTime = { value: stopTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-', correct: true, mutable: false, id: competitor.id };
+		const totalTimeRaw = calculateTotalTime(startTimes, stopTimes);
 
-		//lägga in värde för namn
-		const name = { value: competitor.name, correct: true };
-
-		//lägga in värde för tid:
-		const matchingStartTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '0',
-			) || [];
-		const startTime = {
-			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
-			value: matchingStartTimes.length > 0 ? matchingStartTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
-			correct: true,
+		const totalTime: Cell = {
+			value: totalTimeRaw.value,
+			correct: totalTimeRaw.correct,
+			mutable: false,
+			id: competitor.id,
 		};
-		const matchingStopTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '1',
-			) || [];
-		const stopTime = {
-			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
-			value: matchingStopTimes.length > 0 ? matchingStopTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
-			correct: true,
-		};
-		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
-
-		//const Placering: Cell = totalTime.correct
-			//? { value: String(placementCounter++), correct: true }
-			//: { value: '', correct: true };
 
 
-		if (startTime.value === '-') startTime.correct = false;
-		if (stopTime.value === '-') stopTime.correct = false;
+		if (startTime.value === '-' || countTimesInString(startTime.value) > 1) startTime.correct = false;
+		if (stopTime.value === '-' || countTimesInString(stopTime.value) > 1) stopTime.correct = false;
+
 		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
 		if (countTimesInString(stopTime.value) > 1) stopTime.correct = false;
 
-		const competitorRow: Cell[] = [startNumber, name, startTime, stopTime, totalTime];
-		Array2.push(competitorRow);
+		const competitorRow: Cell[] = [
+			{ value: competitor.start_number, correct: true, mutable: false, id: competitor.id },
+			{ value: competitor.name, correct: true, mutable: false, id: competitor.id },
+			startTime,
+			stopTime, 
+			totalTime,
+		];
+		competitorTable.push(competitorRow);
+
 	});
 
-	//dynamic table creation
 	function createTable(tableData: Cell[][]) {
 		if (tableData.length === 0) return null;
-
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
-			<table>
-				<thead>
-					<tr>
-						{headerRow.map((header, index) => (
-							<th key={index}>{header.value}</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{bodyRows.map((row, rowIndex) => (
-						<tr key={rowIndex}>
-							{row.map((cell, cellIndex) => (
-								<td key={cellIndex} className={cell.correct === false ? 'incorrect-cell' : ''}>
-									{cell.value}{' '}
-								</td>
+			<ScrollArea className="h-[70vh] rounded-md border px-4">
+				<Table>
+					<TableHeader>
+						<TableRow className="h-14">
+							{headerRow.map((header, index) => (
+								<TableHead key={index}>{header.value}</TableHead>
 							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{bodyRows.map((row, rowIndex) => (
+							<TableRow key={rowIndex}>
+								{row.map((cell, cellIndex) => (
+									<EditableCell key={cellIndex} cell={cell} rowIndex={rowIndex} cellIndex={cellIndex} />
+								))}
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		);
 	}
 
 	return (
 		<div>
-			<h2>Admin Sida</h2>
-			<p>Välkommen till administrationssidan.</p>
-			<div className="Admin-tables">
+			<h1 className="text-xl font-bold pb-4">Adminsida:</h1>
+			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
 				) : competitorError ? (
@@ -312,11 +395,17 @@ export default function Admin() {
 				) : timeError ? (
 					<p>Fel vid hämtning av tiddata: {timeError}</p>
 				) : stationError ? (
-					<p>Fel vid hämtning av station data: {stationError}</p>
+					<p>Fel vid hämtning av stationsdata: {stationError}</p>
 				) : (
-					<div style={{ display: 'flex', gap: '20px' }}>
-						<div className="Admin-wrapper">{createTable(Array1)}</div>
-						<div className="Admin-wrapper">{createTable(Array2)}</div>
+					<div className="flex gap-6">
+						<div className="w-1/3">
+							<h2 className="text-lg font-semibold mb-2">Stationer</h2>
+							{createTable(stationTable)}
+						</div>
+						<div className="w-2/3">
+							<h2 className="text-lg font-semibold mb-2">Tävlande</h2>
+							{createTable(competitorTable)}
+						</div>
 					</div>
 				)}
 			</div>

@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { API_BASE_URL } from '../config/api';
 import { getTimeData } from './getTimeData';
 
 const fixedDate = new Date('2025-01-01T12:00:00.000Z');
@@ -25,7 +26,7 @@ describe('getTimeData', () => {
 		const result = await getTimeData();
 
 		// Kontrollera att fetch anropades med rätt URL.
-		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/api/times/', {
+		expect(globalThis.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/times/`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

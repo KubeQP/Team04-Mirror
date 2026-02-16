@@ -1,9 +1,36 @@
 // src/pages/RegistreringStoppTid.tsx
+import { EraserIcon, Undo2Icon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import {
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+} from '@/components/ui/combobox';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
+import { API_BASE_URL } from '../config/api';
 
 type Competitor = {
 	start_number: string;
@@ -16,10 +43,12 @@ type Station = {
 	order: string;
 };
 
-type TimeEntryOut = {
-	id?: number;
-	competitor_id?: number;
-	station_id?: number;
+type LocalTimeEntry = {
+	id: string;
+	start_number: string | null;
+	name?: string;
+	station_id: number;
+	station_name?: string;
 	timestamp: string;
 };
 
@@ -33,71 +62,27 @@ export default function RegistreringStoppTid() {
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-	const [selectedStartNumber, setSelectedStartNumber] = useState<string>('');
-
-	const [msg, setMsg] = useState<string>('');
+	const [selectedStartNumber, setSelectedStartNumber] = useState<string | null>(null);
 
 	const [selectedStationId, setSelectedStationId] = useState<number | ''>('');
 	const [stations, setStations] = useState<Station[]>([]);
 
-	//Used in the search for competitors when regestering stop times. As well as the associated drop down menu.
-	const [search, setSearch] = useState('');
-	const filteredComp = competitors.filter((e) => e.start_number.toLowerCase().includes(search.toLowerCase()));
+	const [latestRegistrations, setLatestRegistrations] = useState<LocalTimeEntry[]>([]);
+
+	useEffect(() => {
+		const stored = localStorage.getItem('latestStopTimes');
+		if (stored) {
+			setLatestRegistrations(JSON.parse(stored));
+		}
+	}, []);
 
 	const fetchData = async () => {
-		try {
-			const result = await getCompetitorData();
-			setCompetitors(result);
-			console.log('fetched comps');
-		} catch (err: unknown) {
-			console.log(err);
-		}
+		const result = await getCompetitorData();
+		setCompetitors(result);
 
-		try {
-			const res = await getStationData();
-			setStations(res);
-			console.log('fetched stations');
-		} catch (err: unknown) {
-			console.log(err);
-		}
+		const res = await getStationData();
+		setStations(res);
 	};
-	/*
-  const fetchStations = async () => {
-    const res = await fetch("http://localhost:8000/stations/getstations");
-    if (!res.ok) return;
-    const data: Station[] = await res.json();
-    setStations(data);
-
-    if (selectedStationId === "" && data.length > 0) {
-      setSelectedStationId(data[0].id);
-    }
-  };
-
-	const fetchCompetitors = async () => {
-		try {
-			const res = await fetch('http://localhost:8000/competitors/');
-			if (!res.ok) {
-				setMsg(`Kunde inte hämta tävlande (status ${res.status})`);
-				return;
-			}
-			const data: Competitor[] = await res.json();
-			setCompetitors(data);
-
-			// Om inget valt än, välj första i listan
-			if (!selectedStartNumber && data.length > 0) {
-				setSelectedStartNumber(data[0].start_number);
-			}
-
-      // Om det valda startnumret inte längre finns (t.ex. reset av DB), välj första
-      if (selectedStartNumber && !data.some(c => c.start_number === selectedStartNumber)) {
-        setSelectedStartNumber(data[0]?.start_number ?? "");
-      }
-    } catch (err) {
-      console.error(err);
-      setMsg("Kunde inte kontakta servern för att hämta tävlande.");
-    }
-  };
-  */
 
 	// Hämta vid första mount
 	useEffect(() => {
@@ -109,190 +94,212 @@ export default function RegistreringStoppTid() {
 		fetchData();
 	}, [competitorsVersion]);
 
-	useEffect(() => {
-		// Only auto-select if the currently selectedStartNumber is not in the filtered list
-		if (!filteredComp.some((c) => c.start_number === selectedStartNumber)) {
-			if (filteredComp.length > 0) {
-				setSelectedStartNumber(filteredComp[0].start_number);
-			} else {
-				setSelectedStartNumber(''); // no match
-			}
-		}
-	}, [filteredComp, selectedStartNumber]);
-
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
 		[competitors, selectedStartNumber],
 	);
 
 	const recordStopTimeNow = async () => {
-		if (!selectedStartNumber) {
-			setMsg('Välj en tävlande först.');
-			return;
+		const response = await fetch(`${API_BASE_URL}/api/times/record`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				start_number: selectedStartNumber,
+				station_id: selectedStationId,
+				timestamp: new Date().toISOString(),
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to register time');
 		}
-		if (selectedStationId === '') {
-			setMsg('Välj en station först.');
-			return;
-		}
 
-		setMsg('Registrerar stopptid...');
+		// Create local entry
+		const newEntry: LocalTimeEntry = {
+			id: crypto.randomUUID(),
+			start_number: selectedStartNumber || null,
+			name: selectedCompetitor?.name,
+			station_id: selectedStationId as number,
+			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
+			timestamp: new Date().toISOString(),
+		};
 
-		try {
-			const res = await fetch('http://localhost:8000/api/times/record', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					start_number: selectedStartNumber,
-					station_id: selectedStationId,
-					timestamp: new Date().toISOString(),
-				}),
-			});
+		const updated = [newEntry, ...latestRegistrations].slice(0, 20); // keep last 20
+		setLatestRegistrations(updated);
+		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
 
-			// Läs text först så du alltid kan se fel även om backend inte skickar JSON
-			const text = await res.text();
-
-			if (!res.ok) {
-				// backend kan skicka {"detail": "..."} men ibland bara text
-				try {
-					const maybeJson = JSON.parse(text);
-					setMsg(maybeJson?.detail ?? `Fel vid registrering (status ${res.status})`);
-				} catch {
-					setMsg(text || `Fel vid registrering (status ${res.status})`);
-				}
-				return;
-			}
-			if (!res.ok) {
-				// backend kan skicka {"detail": "..."} men ibland bara text
-				try {
-					const maybeJson = JSON.parse(text);
-					setMsg(maybeJson?.detail ?? `Fel vid registrering (status ${res.status})`);
-				} catch {
-					setMsg(text || `Fel vid registrering (status ${res.status})`);
-				}
-				return;
-			}
-
-			// Om du vill använda svaret:
-			let saved: TimeEntryOut | null = null;
-			try {
-				saved = JSON.parse(text);
-			} catch {
-				saved = null;
-			}
-
-			const who = selectedCompetitor ? `${selectedCompetitor.name} (${selectedStartNumber})` : selectedStartNumber;
-			const when = saved?.timestamp
-				? new Date(saved.timestamp).toLocaleTimeString('sv-SE')
-				: new Date().toLocaleTimeString('sv-SE');
-
-			setMsg(`Stopptid registrerad för ${who} kl ${when}`);
-			console.log('Saved time entry:', saved);
-		} catch (err) {
-			console.error(err);
-			setMsg('Kunde inte kontakta servern för att registrera tid.');
-		}
+		return response;
 	};
 
 	return (
 		<div>
-			<h2>Registrering Stopptid</h2>
+			<h1 className="text-xl font-bold pb-2">Registrera stopptid:</h1>
 
-			<div style={{ display: 'flex' }}>
-				<label style={selectedStationId === '' ? {} : { width: '50%', color: '#808080' }}>
-					{' '}
-					{selectedStationId === ''
-						? 'Välj station:'
-						: 'Vald station: ' + stations.find((s) => s.id === selectedStationId)?.station_name}
-					&nbsp;
-				</label>
-				{selectedStationId === '' ? (
-					<select
-						value={selectedStationId}
-						onChange={(e) => setSelectedStationId(Number(e.target.value))}
-						disabled={stations.length === 0}
+			<Field className="my-2">
+				<FieldLabel>Station</FieldLabel>
+				<div className="flex items-center gap-0.5">
+					<Select
+						disabled={selectedStationId !== '' || stations.length === 0}
+						value={selectedStationId.toString()}
+						onValueChange={(value) => setSelectedStationId(Number(value))}
 					>
-						<option value="" disabled selected>
-							...
-						</option>
-						{stations.map((c) => (
-							<option key={c.id} value={c.id}>
-								{c.station_name}
-							</option>
-						))}
-					</select>
-				) : (
-					<div
-						style={{ display: 'flex', width: '50%', alignItems: 'right', justifyContent: 'end', padding: '4px 0px' }}
+						<SelectTrigger className="w-full max-w-48">
+							<SelectValue placeholder="Välj station" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Stationer</SelectLabel>
+								{stations.map((station) => (
+									<SelectItem
+										key={station.id}
+										value={station.id.toString()}
+										onSelect={() => setSelectedStationId(station.id)}
+									>
+										{station.station_name}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								hidden={selectedStationId === ''}
+								onClick={() => setSelectedStationId('')}
+								size="icon"
+							>
+								<Undo2Icon />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Ångra val av station</p>
+						</TooltipContent>
+					</Tooltip>
+				</div>
+			</Field>
+			<Field className="my-4">
+				<FieldLabel>Välj tävlande</FieldLabel>
+				<Field orientation="horizontal" className="gap-2">
+					<Combobox
+						items={competitors}
+						value={selectedStartNumber ?? ''}
+						onInputValueChange={(value) => setSelectedStartNumber(value === '' ? null : value)}
 					>
-						<button onClick={() => setSelectedStationId('')} style={{ padding: '0px 2px' }}>
-							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" className="back-icon">
-								<title>back_2_fill</title>
-								<g id="back_2_fill" fill="none" fill-rule="nonzero">
-									<path d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002-.071.035-.02.004-.014-.004-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01-.017.428.005.02.01.013.104.074.015.004.012-.004.104-.074.012-.016.004-.017-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113-.013.002-.185.093-.01.01-.003.011.018.43.005.012.008.007.201.093c.012.004.023 0 .029-.008l.004-.014-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014-.034.614c0 .012.007.02.017.024l.015-.002.201-.093.01-.008.004-.011.017-.43-.003-.012-.01-.01-.184-.092Z" />
-									<path
-										className="back-icon-path"
-										d="M7.16 10.972A7 7 0 0 1 19.5 15.5a1.5 1.5 0 1 0 3 0c0-5.523-4.477-10-10-10a9.973 9.973 0 0 0-7.418 3.295L4.735 6.83a1.5 1.5 0 1 0-2.954.52l1.042 5.91c.069.391.29.74.617.968.403.282.934.345 1.385.202l5.644-.996a1.5 1.5 0 1 0-.52-2.954l-2.788.491Z"
-									/>
-								</g>
-							</svg>
-						</button>
+						<ComboboxInput placeholder="Sök tävlande..." className="w-1/4" maxLength={3} />
+						<ComboboxContent>
+							<ComboboxEmpty>Kunde inte hitta några tävlande.</ComboboxEmpty>
+							<ComboboxList>
+								{(competitor: Competitor) => (
+									<ComboboxItem key={competitor.start_number} value={competitor.start_number}>
+										<Item size="sm" className="p-0">
+											<ItemContent>
+												<ItemTitle className="whitespace-nowrap">{competitor.start_number}</ItemTitle>
+												<ItemDescription>{competitor.name}</ItemDescription>
+											</ItemContent>
+										</Item>
+									</ComboboxItem>
+								)}
+							</ComboboxList>
+						</ComboboxContent>
+					</Combobox>
+					<Button
+						type="button"
+						disabled={!selectedStationId}
+						onClick={async () => {
+							toast.promise(recordStopTimeNow(), {
+								loading: 'Registrerar stopptid...',
+								success: () =>
+									selectedStartNumber
+										? `Stopptid registrerad för: ${selectedCompetitor?.name ?? ''} (${selectedStartNumber})`
+										: 'Stopptid registrerad utan kopplad tävlande',
+								error: 'Kunde inte registrera stopptid',
+							});
+						}}
+					>
+						Registrera stopptid nu
+					</Button>
+					<Button
+						type="button"
+						variant="secondary"
+						onClick={async () => {
+							toast.promise(fetchData(), {
+								loading: 'Uppdaterar lista...',
+								success: 'Lista uppdaterad',
+								error: 'Kunde inte uppdatera lista',
+							});
+						}}
+					>
+						Uppdatera lista
+					</Button>
+				</Field>
+			</Field>
+			<div className="flex gap-6 mt-8">
+				<div className="w-full">
+					<h2 className="text-lg font-semibold mb-2">Alla tävlande</h2>
+					<ScrollArea className="h-[50vh] rounded-md border px-2">
+						<Table>
+							<TableHeader className="h-12">
+								<TableRow>
+									<TableHead>Startnummer</TableHead>
+									<TableHead>Namn</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{competitors.map((competitor) => (
+									<TableRow key={competitor.start_number}>
+										<TableCell className="font-medium">{competitor.start_number}</TableCell>
+										<TableCell>{competitor.name}</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</ScrollArea>
+				</div>
+				<div className="w-full">
+					<div className="flex">
+						<h2 className="text-lg flex-1 font-semibold mb-2">Senaste registreringar</h2>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setLatestRegistrations([]);
+										localStorage.removeItem('latestStopTimes');
+									}}
+								>
+									<EraserIcon />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Rensa senaste registreringar (lokalt, påverkar inte backend)</p>
+							</TooltipContent>
+						</Tooltip>
 					</div>
-				)}
+					<ScrollArea className="h-[50vh] rounded-md border px-2">
+						<Table>
+							<TableHeader className="h-12">
+								<TableRow>
+									<TableHead>Tid</TableHead>
+									<TableHead>Startnummer</TableHead>
+									<TableHead>Namn</TableHead>
+									<TableHead>Station</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{latestRegistrations.map((entry) => (
+									<TableRow key={entry.id}>
+										<TableCell>{new Date(entry.timestamp).toLocaleTimeString('sv-SE')}</TableCell>
+										<TableCell className="font-medium">{entry.start_number}</TableCell>
+										<TableCell>{entry.name}</TableCell>
+										<TableCell>{entry.station_name}</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+					</ScrollArea>
+				</div>
 			</div>
-
-			<div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-				<label>
-					Välj tävlande:&nbsp;
-					<input
-						type="text"
-						placeholder="searchComp"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-					></input>
-					<select value={selectedStartNumber} onChange={(e) => setSelectedStartNumber(e.target.value)}>
-						<option value="" disabled>
-							Välj...
-						</option>
-						{filteredComp.map((c) => (
-							<option key={c.start_number} value={c.start_number.toString()}>
-								{c.start_number} — {c.name}
-							</option>
-						))}
-					</select>
-				</label>
-
-				<button type="button" onClick={recordStopTimeNow} disabled={!selectedStartNumber || !selectedStationId}>
-					Registrera stopptid nu
-				</button>
-
-				<button type="button" onClick={fetchData}>
-					Uppdatera lista
-				</button>
-			</div>
-
-			{msg && <p style={{ marginTop: 12 }}>{msg}</p>}
-
-			<hr />
-
-			<h3>Alla tävlande</h3>
-			<table>
-				<thead>
-					<tr>
-						<th>Startnummer</th>
-						<th>Namn</th>
-					</tr>
-				</thead>
-				<tbody>
-					{competitors.map((c) => (
-						<tr key={c.start_number}>
-							<td>{c.start_number}</td>
-							<td>{c.name}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-
-			{competitors.length === 0 && <p>Inga tävlande hittades. Registrera någon först.</p>}
 		</div>
 	);
 }

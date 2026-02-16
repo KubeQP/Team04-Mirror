@@ -1,5 +1,21 @@
+import { MoreHorizontalIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
+import { Button } from '@/components/ui/button';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+import { API_BASE_URL } from '../config/api';
 
 type Competitor = {
 	start_number: string;
@@ -19,7 +35,7 @@ export default function Registrering() {
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
 	const fetchCompetitors = async () => {
-		const res = await fetch('http://localhost:8000/api/competitors/');
+		const res = await fetch(`${API_BASE_URL}/api/competitors/`);
 		if (!res.ok) return;
 		const data = await res.json();
 		setCompetitors(data);
@@ -50,7 +66,7 @@ export default function Registrering() {
 		//const formattedTime = now.toLocaleTimeString('sv-SE');
 
 		try {
-			const res = await fetch('http://localhost:8000/api/competitors/register', {
+			const res = await fetch(`${API_BASE_URL}/api/competitors/register`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -84,40 +100,76 @@ export default function Registrering() {
 
 	return (
 		<div>
-			<h2>Registrering:</h2>
-			<input
-				id="startNbrInput"
-				value={reg}
-				onChange={(e) => setReg(e.target.value)}
-				type="text"
-				placeholder="Skriv startnummer här"
-			/>
-			<input
-				id="nameInput"
-				value={name}
-				onChange={(e) => setName(e.target.value)}
-				type="text"
-				placeholder="Skriv namn här"
-			/>
-			<button onClick={addReg} disabled={!reg.trim() || !name.trim()}>
-				Registrera
-			</button>
-			<table>
-				<thead>
-					<tr>
-						<th>Startnummer</th>
-						<th>Namn</th>
-					</tr>
-				</thead>
-				<tbody>
-					{competitors.map((c) => (
-						<tr key={c.start_number}>
-							<td>{c.start_number}</td>
-							<td>{c.name}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+			<h1 className="text-xl font-bold pb-4">Registrering:</h1>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					addReg();
+				}}
+			>
+				<div className="flex items-end gap-4">
+					<FieldGroup className="grid max-w-sm grid-cols-2">
+						<Field>
+							<FieldLabel>Startnummer</FieldLabel>
+							<Input
+								id="startNbrInput"
+								placeholder="123"
+								type="text"
+								value={reg}
+								onChange={(e) => setReg(e.target.value)}
+							/>
+						</Field>
+						<Field>
+							<FieldLabel>Namn</FieldLabel>
+							<Input
+								id="nameInput"
+								placeholder="John Doe"
+								type="text"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
+						</Field>
+					</FieldGroup>
+					<Button type="submit" variant="default" disabled={!reg.trim() || !name.trim()}>
+						Registrera
+					</Button>
+				</div>
+			</form>
+			<h2 className="text-lg mt-6 font-semibold mb-2">Registrerade tävlande</h2>
+			<ScrollArea className="h-[60vh] rounded-md border px-4">
+				<Table>
+					<TableHeader>
+						<TableRow className="h-14">
+							<TableHead>Startnummer</TableHead>
+							<TableHead>Namn</TableHead>
+							<TableHead className="text-right">Ändra</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{competitors.map((competitor) => (
+							<TableRow key={competitor.start_number}>
+								<TableCell className="font-medium">{competitor.start_number}</TableCell>
+								<TableCell>{competitor.name}</TableCell>
+								<TableCell className="text-right">
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button variant="ghost" size="icon" className="size-8">
+												<MoreHorizontalIcon />
+												<span className="sr-only">Öppna meny</span>
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem>Redigera</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem variant="destructive">Radera</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		</div>
 	);
 }

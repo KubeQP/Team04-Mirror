@@ -1,7 +1,8 @@
+import { API_BASE_URL } from '../config/api';
 import type { TimeData } from '../types';
 
 export async function getTimeData(): Promise<Array<TimeData>> {
-	const response = await fetch('http://127.0.0.1:8000/api/times/', {
+	const response = await fetch(`${API_BASE_URL}/api/times/`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',

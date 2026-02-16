@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { API_BASE_URL } from '../config/api';
 import { getStationData } from './getStationData';
 
 describe('getStationData', () => {
@@ -28,7 +29,7 @@ describe('getStationData', () => {
 		const result = await getStationData();
 
 		// Kontrollera att fetch anropas med rätt URL
-		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/api/stations/getstations', {
+		expect(globalThis.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/stations/getstations`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
