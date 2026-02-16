@@ -461,7 +461,7 @@ Frontend är uppbyggd enligt en komponentbaserad arkitektur.
 \subsection{Ansvarsfördelning}
 
 \begin{itemize}
-    \item \textbf{Pages}: Representerar applikationens olika vyer.
+    \item \textbf{Pages}: Representerar applikationens olika vyer. Dessa är kopplade till router och ansvarar för att hämta data och rendera UI
         \begin{itemize}
             \item Admin sida
             \item Registreringssida
@@ -471,6 +471,9 @@ Frontend är uppbyggd enligt en komponentbaserad arkitektur.
         \end{itemize}
     \item \textbf{Components}: Återanvändbara UI-komponenter.
     \item \textbf{API}: Abstraktion för kommunikation med backend.
+        \begin{itemize}
+            \item Både FETCH och PUT anrop används för att hämta och skicka data till backend.
+        \end{itemize}
     \
 \end{itemize}
 
