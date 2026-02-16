@@ -91,7 +91,7 @@ def test_record_time_for_existing_competitor(
     db_session.commit()
     db_session.refresh(c1)
 
-    payload = {"start_number": "1001"}
+    payload = {"start_number": "1001", "timeStamp": "2026-02-16T14:30:00Z" }
 
     # Act
     response = client.post("/api/times/record", json=payload)
