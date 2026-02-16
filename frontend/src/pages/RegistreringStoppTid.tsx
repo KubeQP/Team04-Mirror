@@ -3,6 +3,7 @@ import { EraserIcon, Undo2Icon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
+import vineBoom from '@/assets/audio/vine-boom.mp3';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -76,13 +77,16 @@ export default function RegistreringStoppTid() {
 		}
 	}, []);
 
-	const fetchData = async () => {
-		const result = await getCompetitorData();
-		setCompetitors(result);
+	// fetchData: hämtar konkurrenter och stationer, utan autoplay
+    const fetchData = async () => {
+        const result = await getCompetitorData();
+        setCompetitors(result);
 
-		const res = await getStationData();
-		setStations(res);
-	};
+        const res = await getStationData();
+        setStations(res);
+    };
+
+
 
 	// Hämta vid första mount
 	useEffect(() => {
@@ -220,18 +224,27 @@ export default function RegistreringStoppTid() {
 						Registrera stopptid nu
 					</Button>
 					<Button
-						type="button"
-						variant="secondary"
-						onClick={async () => {
-							toast.promise(fetchData(), {
-								loading: 'Uppdaterar lista...',
-								success: 'Lista uppdaterad',
-								error: 'Kunde inte uppdatera lista',
-							});
-						}}
-					>
-						Uppdatera lista
-					</Button>
+                        type="button"
+                        variant="secondary"
+                        onClick={async () => {
+                            await toast.promise(
+                                (async () => {
+                                    await fetchData();
+
+                                    // Spela ljud NU – webbläsaren tillåter detta eftersom det sker efter klick
+                                    const audio = new Audio(vineBoom); // public/assets
+                                    audio.play().catch(() => console.warn('Kunde inte spela ljud'));
+                                })(),
+                                {
+                                    loading: 'Uppdaterar lista...',
+                                    success: 'Lista uppdaterad',
+                                    error: 'Kunde inte uppdatera lista',
+                                },
+                            );
+                        }}
+                    >
+                        Uppdatera lista
+                    </Button>
 				</Field>
 			</Field>
 			<div className="flex gap-6 mt-8">
