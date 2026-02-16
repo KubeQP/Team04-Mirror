@@ -222,7 +222,7 @@ export default function RegistreringStoppTid() {
 			<div className="flex gap-6 mt-8">
 				<div className="w-full">
 					<h2 className="text-lg font-semibold mb-2">Alla tävlande</h2>
-					<ScrollArea className="h-2/3 rounded-md border px-2">
+					<ScrollArea className="h-[50vh] rounded-md border px-2">
 						<Table>
 							<TableHeader className="h-12">
 								<TableRow>
@@ -243,7 +243,7 @@ export default function RegistreringStoppTid() {
 				</div>
 				<div className="w-full">
 					<h2 className="text-lg font-semibold mb-2">Senaste registreringar</h2>
-					<ScrollArea className="h-2/3 rounded-md border px-2">
+					<ScrollArea className="h-[50vh] rounded-md border px-2">
 						<Table>
 							<TableHeader className="h-12">
 								<TableRow>
