@@ -304,3 +304,6 @@ tr:nth-child(odd) {
 .back-icon-path {
 	fill: var(--color-text);
 }
+.editable-cell {
+	border: 1px dashed #999; /* or any style/color you prefer */
+}
