@@ -21,7 +21,7 @@ export default function Admin() {
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
-	const [resultView] = useState<'startnummer' | 'resultat'>('resultat');
+	const [resultView] = useState<'startnummer' | 'resultat'>('startnummer');
 
 
 	useEffect(() => {
@@ -211,7 +211,7 @@ export default function Admin() {
 	//sorterad efter startnummer/tid
 	const Array2: Cell[][] = [];
 	const headerRow2: Cell[] = [
-		{ value: 'Placering', correct: true},
+		//{ value: 'Placering', correct: true},
 		{ value: 'Nr.', correct: true },
 		{ value: 'Namn', correct: true },
 		{ value: 'Start', correct: true },
@@ -219,7 +219,7 @@ export default function Admin() {
 		{ value: 'Totalt', correct: true },
 	];
 	Array2.push(headerRow2);
-	let placementCounter = 1;
+	//let placementCounter = 1;
 	
 	competitorsToRender?.forEach((competitor) => {
 
@@ -256,9 +256,9 @@ export default function Admin() {
 		};
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
-		const Placering: Cell = totalTime.correct
-			? { value: String(placementCounter++), correct: true }
-			: { value: '', correct: true };
+		//const Placering: Cell = totalTime.correct
+			//? { value: String(placementCounter++), correct: true }
+			//: { value: '', correct: true };
 
 
 		if (startTime.value === '-') startTime.correct = false;
@@ -266,7 +266,7 @@ export default function Admin() {
 		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
 		if (countTimesInString(stopTime.value) > 1) stopTime.correct = false;
 
-		const competitorRow: Cell[] = [Placering, startNumber, name, startTime, stopTime, totalTime];
+		const competitorRow: Cell[] = [startNumber, name, startTime, stopTime, totalTime];
 		Array2.push(competitorRow);
 	});
 
