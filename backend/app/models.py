@@ -1,8 +1,8 @@
 # backend/app/models.py
 from datetime import UTC, datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
 
@@ -11,24 +11,28 @@ from .database import Base
 
 class Competitor(Base):
     __tablename__ = "competitors"
-    id = Column(Integer, primary_key=True, index=True)
-    start_number = Column(String, unique=True, index=True)
-    name = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    start_number: Mapped[str] = mapped_column(String, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String)
 
 
 class Station(Base):
     __tablename__ = "stations"
-    id = Column(Integer, primary_key=True, index=True)
-    station_name = Column(String)
-    order = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    station_name: Mapped[str] = mapped_column(String)
+    order: Mapped[str] = mapped_column(String)
 
 
 class TimeEntry(Base):
     __tablename__ = "times"
-    id = Column(Integer, primary_key=True, index=True)
-    competitor_id = Column(Integer, ForeignKey("competitors.id"), index=True)
-    station_id = Column(Integer, ForeignKey("stations.id"), index=True)
-    timestamp = Column(
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    competitor_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("competitors.id"), index=True
+    )
+    station_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("stations.id"), index=True
+    )
+    timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(UTC),
