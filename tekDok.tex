@@ -426,7 +426,7 @@ Under en tävling distribueras systemet enligt följande:
 \section{Vidareutveckling}
 För att lägga till ny funktionalitet eller uppdatera denna dokumentationen kan följande sektioner hjälpleda utvecklingen. 
 
-Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Detta medför även att refaktorisering ska göras \textbf{CONTINUE HERE}
+Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Även refaktorering av kod och uppdatering av dokumentation är en del av vidareutvecklingen, se då till att testerna fortfarande är gröna och att dokumentationen är uppdaterad.
 
 \subsection{Backend}
 
@@ -447,11 +447,15 @@ Vänligen notera att det praktiseras \textbf{Test Driven Development} och förut
 \end{enumerate}
 
 \subsection{Teknisk Dokumentation}
-\begin{enumerate}
-    \item Uppdatera arkitekturdiagram vid större förändringar.
+Vid större förrändringar av systemet, se till att uppdatera denna tekniska dokumentation. Detta så att den alltid är aktuell och användbar för framtida utvecklingsteam. Detta inkluderar:
+\begin{itemize}
+    \item Uppdatera fildiagram och UML vid större förändringar.
+        \begin{itemize}
+            \item Vi rekommenderar att använda verktyget \href{https://mermaid.js.org/}{Mermaid} för att skapa och uppdatera UML-diagramet, men välj fritt själv. Det finns inga krav för specifika verktyg.
+        \end{itemize}
     \item Lägg till beskrivningar av nya moduler och filer.
     \item Dokumentera API-kontrakt i \texttt{schemas.py}.
-\end{enumerate}
+\end{itemize}
 
 
 \noindent
