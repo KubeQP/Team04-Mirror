@@ -2,7 +2,9 @@ import '@testing-library/jest-dom';
 
 import { describe, expect, it, vi } from 'vitest';
 
+import { API_BASE_URL } from '../config/api';
 import { getCompetitorData } from './getCompetitorData';
+
 
 describe('getCompetitorData', () => {
 	it('hämtar och formaterar data korrekt', async () => {
@@ -23,7 +25,7 @@ describe('getCompetitorData', () => {
 		const result = await getCompetitorData();
 
 		// Kontrollera att fetch anropades med rätt URL.
-		expect(globalThis.fetch).toHaveBeenCalledWith('http://127.0.0.1:8000/api/competitors/', {
+		expect(globalThis.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/api/competitors/`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

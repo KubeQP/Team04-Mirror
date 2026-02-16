@@ -8,6 +8,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+import { API_BASE_URL } from '../config/api';
+
 type Station = {
 	station_name: string;
 	order: string;
@@ -19,7 +21,7 @@ export default function StationRegistrering() {
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const fetchStations = async () => {
-		const res = await fetch('http://localhost:8000/api/stations/getstations');
+		const res = await fetch(`${API_BASE_URL}/api/stations/getstations`);
 		if (!res.ok) return;
 		const data = await res.json();
 		setStations((data as Array<Station>).sort((a, b) => Number(a.order) - Number(b.order)));
@@ -36,7 +38,7 @@ export default function StationRegistrering() {
 		if (!order.trim()) return;
 
 		try {
-			const res = await fetch('http://localhost:8000/api/stations/registerstation', {
+			const res = await fetch(`${API_BASE_URL}/api/stations/registerstation`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

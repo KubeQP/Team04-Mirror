@@ -29,6 +29,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
+import { API_BASE_URL } from '../config/api';
 
 type Competitor = {
 	start_number: string;
@@ -81,6 +82,43 @@ export default function RegistreringStoppTid() {
 		const res = await getStationData();
 		setStations(res);
 	};
+	/*
+  const fetchStations = async () => {
+    const res = await fetch(`${API_BASE_URL}/stations/getstations`);
+    if (!res.ok) return;
+    const data: Station[] = await res.json();
+    setStations(data);
+
+    if (selectedStationId === "" && data.length > 0) {
+      setSelectedStationId(data[0].id);
+    }
+  };
+
+	const fetchCompetitors = async () => {
+		try {
+			const res = await fetch(`${API_BASE_URL}/competitors/`);
+			if (!res.ok) {
+				setMsg(`Kunde inte hämta tävlande (status ${res.status})`);
+				return;
+			}
+			const data: Competitor[] = await res.json();
+			setCompetitors(data);
+
+			// Om inget valt än, välj första i listan
+			if (!selectedStartNumber && data.length > 0) {
+				setSelectedStartNumber(data[0].start_number);
+			}
+
+      // Om det valda startnumret inte längre finns (t.ex. reset av DB), välj första
+      if (selectedStartNumber && !data.some(c => c.start_number === selectedStartNumber)) {
+        setSelectedStartNumber(data[0]?.start_number ?? "");
+      }
+    } catch (err) {
+      console.error(err);
+      setMsg("Kunde inte kontakta servern för att hämta tävlande.");
+    }
+  };
+  */
 
 	// Hämta vid första mount
 	useEffect(() => {
@@ -98,7 +136,7 @@ export default function RegistreringStoppTid() {
 	);
 
 	const recordStopTimeNow = async () => {
-		const response = await fetch('http://localhost:8000/api/times/record', {
+		const response = await fetch(`${API_BASE_URL}/api/times/record`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

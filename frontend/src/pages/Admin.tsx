@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
+import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
 // src/pages/Admin.tsx
@@ -25,55 +26,63 @@ export default function Admin() {
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
+	const tableDataGlobal: Cell[][] = [];
+	const fetchData = async () => {
+		// Competitor data
+		try {
+			const result = await getCompetitorData();
+			setCompetitorData(result);
+			console.log('Fetched competitor data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setCompetitorError(err.message);
+			else if (typeof err === 'string') setCompetitorError(err);
+			else setCompetitorError('Ett okänt fel inträffade');
+		} finally {
+			setCompetitorLoading(false);
+		}
+
+		// Time data
+		try {
+			const result = await getTimeData();
+			setTimeData(result);
+			console.log('Fetched time data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setTimeError(err.message);
+			else if (typeof err === 'string') setTimeError(err);
+			else setTimeError('Ett okänt fel inträffade');
+		} finally {
+			setTimeLoading(false);
+		}
+
+		// Station data
+		try {
+			const result = await getStationData();
+			setStationData(result);
+			console.log('Fetched station data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setStationError(err.message);
+			else if (typeof err === 'string') setStationError(err);
+			else setStationError('Ett okänt fel inträffade');
+		} finally {
+			setStationLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		const fetchData = async () => {
-			// Competitor data
-			try {
-				const result = await getCompetitorData();
-				setCompetitorData(result);
-				console.log('Fetched competitor data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setCompetitorError(err.message);
-				else if (typeof err === 'string') setCompetitorError(err);
-				else setCompetitorError('Ett okänt fel inträffade');
-			} finally {
-				setCompetitorLoading(false);
-			}
-
-			// Time data
-			try {
-				const result = await getTimeData();
-				setTimeData(result);
-				console.log('Fetched time data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setTimeError(err.message);
-				else if (typeof err === 'string') setTimeError(err);
-				else setTimeError('Ett okänt fel inträffade');
-			} finally {
-				setTimeLoading(false);
-			}
-
-			// Station data
-			try {
-				const result = await getStationData();
-				setStationData(result);
-				console.log('Fetched station data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setStationError(err.message);
-				else if (typeof err === 'string') setStationError(err);
-				else setStationError('Ett okänt fel inträffade');
-			} finally {
-				setStationLoading(false);
-			}
-		};
-
 		fetchData();
 	}, []);
 
 	interface Cell {
 		value: string;
 		correct: boolean;
+		mutable: boolean;
+		id: number;
 	}
+
+	type EditableCellProps = {
+		cell: Cell;
+		onChange: (value: string) => void;
+	};
 
 	//Hjälp-funktion för att skriva tagen tid som HH:MM:SS
 	function formatTime(timestamp?: string): string {
@@ -90,10 +99,10 @@ export default function Admin() {
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],
 		stopTimes: { timestamp: string | number | Date }[],
-	): { value: string; correct: boolean } {
+	): { value: string; correct: boolean; mutable: false; id: 0 } {
 		// Kräver exakt en starttid och exakt en stoptid
 		if (startTimes.length !== 1 || stopTimes.length !== 1) {
-			return { value: '-', correct: false };
+			return { value: '-', correct: false, mutable: false, id: 0 };
 		}
 
 		const start = new Date(startTimes[0].timestamp);
@@ -101,7 +110,7 @@ export default function Admin() {
 
 		// Ogiltiga datum eller stop före start → "-"
 		if (isNaN(start.getTime()) || isNaN(stop.getTime()) || stop <= start) {
-			return { value: '-', correct: false };
+			return { value: '-', correct: false, mutable: false, id: 0 };
 		}
 
 		const diffMs = stop.getTime() - start.getTime();
@@ -113,27 +122,76 @@ export default function Admin() {
 
 		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-		return { value: formatted, correct: true };
+		return { value: formatted, correct: true, mutable: false, id: 0 };
+	}
+
+	function EditableCell({ cell, onChange, rowIndex }: EditableCellProps & { rowIndex: number }) {
+		if (cell.mutable == true) {
+			return (
+				<td
+					contentEditable
+					suppressContentEditableWarning
+					onBlur={(e) => {
+						onChange(e.currentTarget.textContent ?? '');
+						cell = sendData(tableDataGlobal[rowIndex + 1]);
+					}}
+					className={`${cell.correct === false ? 'incorrect-cell' : ''} ${cell.mutable ? 'editable-cell' : ''}`}
+				>
+					{cell.value}
+				</td>
+			);
+		} else {
+			return <td className={cell.correct === false ? 'incorrect-cell' : ''}>{cell.value}</td>;
+		}
+	}
+
+	function sendData(table: Cell[]): Cell {
+		console.log('send data');
+		console.log(table);
+		if (competitorData?.find((competitor) => table[1].value === competitor.start_number)) {
+			const data: TimeData = {
+				id: table[2].id,
+				competitor_id: competitorData?.find((competitor) => table[1].value === competitor.start_number)?.id ?? -1,
+				timestamp: timeData?.find((time) => table[2].id === time.id)?.timestamp ?? '-',
+				station_id: table[0].id,
+			};
+
+			console.log(data);
+			editTimeData(data);
+			return table[1];
+		} else {
+			const incorrect: Cell = {
+				value: table[1].value,
+				correct: false,
+				mutable: table[1].mutable,
+				id: table[1].id,
+			};
+			return incorrect;
+		}
 	}
 
 	//Table - Stations //fel: två tider för samma person i samma station
 	const Array1: Cell[][] = [];
 	const headerRow1: Cell[] = [
-		{ value: 'Station', correct: true },
-		{ value: 'Nr.', correct: true },
-		{ value: 'Tid', correct: true },
+		{ value: 'Station', correct: true, mutable: false, id: 0 },
+		{ value: 'Nr.', correct: true, mutable: false, id: 0 },
+		{ value: 'Tid', correct: true, mutable: false, id: 0 },
 	];
 	Array1.push(headerRow1);
 	timeData?.forEach((timeSlot) => {
 		const stationValue: Cell = {
 			value: stationData?.find((station) => station.id === timeSlot.station_id)?.station_name ?? '-',
 			correct: true,
+			mutable: false,
+			id: stationData?.find((station) => station.id === timeSlot.station_id)?.id ?? 0,
 		}; //måste lägga till station //timeSlot.station_id
 		const startNumber: Cell = {
 			value: competitorData?.find((competitor) => competitor.id === timeSlot.competitor_id)?.start_number ?? '-',
 			correct: true,
+			mutable: true,
+			id: competitorData?.find((competitor) => competitor.id === timeSlot.competitor_id)?.id ?? 0,
 		};
-		const timeStamp: Cell = { value: formatTime(timeSlot.timestamp), correct: true };
+		const timeStamp: Cell = { value: formatTime(timeSlot.timestamp), correct: true, mutable: false, id: timeSlot.id };
 
 		const duplicates = timeData.filter(
 			(t) =>
@@ -155,16 +213,17 @@ export default function Admin() {
 	//Table - Competitors //flera tider för en station, ingen tid.
 	const Array2: Cell[][] = [];
 	const headerRow2: Cell[] = [
-		{ value: 'Nr.', correct: true },
-		{ value: 'Namn', correct: true },
-		{ value: 'Start', correct: true },
-		{ value: 'Mål', correct: true },
-		{ value: 'Totalt', correct: true },
+		{ value: 'Nr.', correct: true, mutable: false, id: 0 },
+		{ value: 'Namn', correct: true, mutable: false, id: 0 },
+		{ value: 'Start', correct: true, mutable: false, id: 0 },
+		{ value: 'Mål', correct: true, mutable: false, id: 0 },
+		{ value: 'Totalt', correct: true, mutable: false, id: 0 },
 	];
+
 	Array2.push(headerRow2);
 	competitorData?.forEach((competitor) => {
-		const startNumber = { value: competitor.start_number, correct: true };
-		const name = { value: competitor.name, correct: true };
+		const startNumber = { value: competitor.start_number, correct: true, mutable: false, id: competitor.id };
+		const name = { value: competitor.name, correct: true, mutable: false, id: competitor.id };
 		const matchingStartTimes =
 			timeData?.filter(
 				(time) =>
@@ -175,6 +234,8 @@ export default function Admin() {
 			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
 			value: matchingStartTimes.length > 0 ? matchingStartTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
 			correct: true,
+			mutable: false,
+			id: competitor.id,
 		};
 		const matchingStopTimes =
 			timeData?.filter(
@@ -186,6 +247,8 @@ export default function Admin() {
 			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
 			value: matchingStopTimes.length > 0 ? matchingStopTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
 			correct: true,
+			mutable: false,
+			id: competitor.id,
 		};
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
@@ -201,7 +264,6 @@ export default function Admin() {
 	//dynamic table creation
 	function createTable(tableData: Cell[][]) {
 		if (tableData.length === 0) return null;
-
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
