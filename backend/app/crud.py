@@ -77,9 +77,15 @@ def get_stations(db: Session) -> list[Station]:
 
 
 def update_competitor(
-    db: Session, id: int | None, start_number: str | None, name: str | None
+    db: Session,
+    identifier: str,
+    start_number: str | None,
+    name: str | None,
 ) -> Competitor | None:
-    competitor = db.query(Competitor).filter(Competitor.id == id).first()
+    competitor = db.query(Competitor).filter(Competitor.id == identifier).first()
+
+    if competitor is None and start_number is not None:
+        competitor = db.query(Competitor).filter_by(start_number=identifier).first()
 
     if competitor is None:
         return None
@@ -91,6 +97,7 @@ def update_competitor(
 
     db.commit()
     db.refresh(competitor)
+
     return competitor
 
 
