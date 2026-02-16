@@ -28,7 +28,7 @@ def reg_station(
 def update_station_order(
     stations: list[schemas.StationReg],
     db: Session = Depends(get_db),
-):
+) -> list[schemas.StationReg]:
     for station in stations:
         db.query(models.Station).filter(
             models.Station.station_name == station.station_name
