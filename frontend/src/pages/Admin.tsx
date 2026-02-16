@@ -30,9 +30,6 @@ export default function Admin() {
 	const [minTime, setMinTime] = useState<string>('');
 	const [minTimeSaved, setMinTimeSaved] = useState<number | null>(null);
 
-	const [minTime, setMinTime] = useState<string>('');
-	const [minTimeSaved, setMinTimeSaved] = useState<number | null>(null);
-
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
 
 	const fetchData = async () => {
@@ -424,5 +421,6 @@ export default function Admin() {
 				)}
 			</div>
 		</div>
+	</div>
 	);
 }
