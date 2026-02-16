@@ -107,7 +107,7 @@ export default function RegistreringStoppTid() {
 				start_number: selectedStartNumber,
 				station_id: selectedStationId,
 				timestamp: new Date().toISOString(),
-					competition_id: competition
+				competition_id: competition
 			}),
 		});
 

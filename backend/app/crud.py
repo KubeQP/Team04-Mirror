@@ -42,7 +42,7 @@ def record_time_for_start_number(
     if competitor is None:
         return None  # hanteras i router
     entry = TimeEntry(
-        competitor_id=competitor.id, timestamp=timestamp, station_id=station_id
+        competitor_id=competitor.id, timestamp=timestamp, station_id=station_id, competition_id=competition_id
     )
     db.add(entry)
     db.commit()
@@ -54,7 +54,7 @@ def record_new_reg(
     db: Session, start_number: str, name: str, competition_id: int
 ) -> Competitor:
     """Registrerar en ny competitor med starttid"""
-    entry = Competitor(start_number=start_number, name=name)
+    entry = Competitor(start_number=start_number, name=name, competition_id=competition_id)
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -65,7 +65,7 @@ def record_new_station(
     db: Session, station_name: str, order: str, competition_id: int
 ) -> Station:
     """Registrera en ny station"""
-    entry = Station(station_name=station_name, order=order)
+    entry = Station(station_name=station_name, order=order, competition_id=competition_id)
     db.add(entry)
     db.commit()
     db.refresh(entry)

@@ -21,6 +21,7 @@ import { competition } from '../App';
 type Competitor = {
 	start_number: string;
 	name: string;
+	competition_id: number;
 };
 
 type OutletCtx = {
@@ -39,7 +40,7 @@ export default function Registrering() {
 		const res = await fetch(`${API_BASE_URL}/api/competitors/`);
 		if (!res.ok) return;
 		const data = await res.json();
-		setCompetitors(data);
+		setCompetitors((data as Array<Competitor>).filter(c => c.competition_id === competition));
 	};
 
 	useEffect(() => {
