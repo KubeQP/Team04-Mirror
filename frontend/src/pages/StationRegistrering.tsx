@@ -1,4 +1,12 @@
+import { ChevronDownIcon, ChevronUpIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { API_BASE_URL } from '../config/api';
 import { competition } from '../App';
@@ -17,7 +25,7 @@ export default function StationRegistrering() {
 		const res = await fetch(`${API_BASE_URL}/api/stations/getstations`);
 		if (!res.ok) return;
 		const data = await res.json();
-		setStations(data);
+		setStations((data as Array<Station>).sort((a, b) => Number(a.order) - Number(b.order)));
 	};
 
 	useEffect(() => {
@@ -64,40 +72,85 @@ export default function StationRegistrering() {
 
 	return (
 		<div>
-			<h2>StationRegistrering:</h2>
-			<input
-				id="stationNamnInput"
-				value={stationName}
-				onChange={(e) => setStationName(e.target.value)}
-				type="text"
-				placeholder="Skriv stationsnamn här"
-			/>
-			<input
-				id="orderInput"
-				value={order}
-				onChange={(e) => setOrder(e.target.value)}
-				type="text"
-				placeholder="Skriv ordning här"
-			/>
-			<button onClick={addStation} disabled={!order.trim() || !stationName.trim()}>
-				Registrera Station
-			</button>
-			<table>
-				<thead>
-					<tr>
-						<th>Station</th>
-						<th>ordning</th>
-					</tr>
-				</thead>
-				<tbody>
-					{stations.map((c) => (
-						<tr key={c.station_name}>
-							<td>{c.station_name}</td>
-							<td>{c.order}</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+			<h1 className="text-xl font-bold pb-4">Hantera stationer:</h1>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					addStation();
+				}}
+			>
+				<div className="flex items-end gap-4">
+					<FieldGroup className="grid max-w-sm grid-cols-2">
+						<Field>
+							<FieldLabel>Namn</FieldLabel>
+							<Input
+								id="stationNamnInput"
+								placeholder="Start"
+								type="text"
+								value={stationName}
+								onChange={(e) => setStationName(e.target.value)}
+							/>
+						</Field>
+						<Field>
+							<FieldLabel>Ordning</FieldLabel>
+							<Input
+								id="orderInput"
+								placeholder="0"
+								type="text"
+								value={order}
+								onChange={(e) => setOrder(e.target.value)}
+							/>
+						</Field>
+					</FieldGroup>
+					<Button type="submit" variant="default" disabled={!order.trim() || !stationName.trim()}>
+						Registrera
+					</Button>
+				</div>
+			</form>
+			<h2 className="mt-6 text-lg font-semibold pb-2">Stationer</h2>
+			<ScrollArea className="rounded-md border px-4 h-[60vh]">
+				<Table>
+					<TableHeader className="h-14">
+						<TableRow>
+							<TableHead>Namn</TableHead>
+							<TableHead>Ordning</TableHead>
+							<TableHead className="text-right">Ändra</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{stations.map((station) => (
+							<TableRow key={station.order}>
+								<TableCell className="font-medium">{station.station_name}</TableCell>
+								<TableCell>{station.order}</TableCell>
+								<TableCell className="text-right">
+									<div className="flex items-center justify-end gap-2">
+										<Button variant="ghost" size="icon" className="size-8">
+											<ChevronDownIcon />
+											<span className="sr-only">Flytta ned</span>
+										</Button>
+										<Button variant="ghost" size="icon" className="size-8">
+											<ChevronUpIcon />
+											<span className="sr-only">Flytta upp</span>
+										</Button>
+										<div className="h-6 flex items-center">
+											<Separator orientation="vertical" />
+										</div>
+
+										<Button
+											variant="ghost"
+											size="icon"
+											className="size-8 hover:bg-destructive hover:text-destructive-foreground dark:hover:bg-destructive dark:hover:text-destructive-foreground"
+										>
+											<Trash2Icon />
+											<span className="sr-only">Radera</span>
+										</Button>
+									</div>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		</div>
 	);
 }

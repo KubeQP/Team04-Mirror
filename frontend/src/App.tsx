@@ -1,8 +1,32 @@
 import { useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
-import ThemeToggle from './components/ThemeToggle';
-export const competition : number = 0;
+import Navbar from './components/Navbar';
+import { ThemeProvider } from './components/ThemeProvider';
+
+const navigationData = [
+	{
+		title: 'Startsida',
+		href: '/',
+	},
+	{
+		title: 'Stationshantering',
+		href: '/register/station',
+	},
+	{
+		title: 'Registrera',
+		href: '/register/participant',
+	},
+	{
+		title: 'Stopptid',
+		href: '/register/time',
+	},
+	{
+		title: 'Admin',
+		href: '/admin',
+	},
+];export const competition : number = 0;
 export default function App() {
 	const [competitorsVersion, setCompetitorsVersion] = useState(0);
 
@@ -12,26 +36,15 @@ export default function App() {
 	
 
 	return (
-		<div id="app-container">
-			<header>
-				<div className="theme-button">
-					<ThemeToggle />
-				</div>
-				<h1>Tidtagning</h1>
-				<nav id="main-nav">
-					<Link to="/">Startsida</Link>
-					<Link to="/stationregistrering">StationRegistrering</Link>
-					<Link to="/registrering">Registrering</Link>
-					<Link to="/registreringstopptid">RegistreringStoppTid</Link>
-					<Link to="/resultatvisare">Resultatvisare</Link>
-					<Link to="/admin">Admin</Link>
-				</nav>
-				<hr />
-			</header>
+		<ThemeProvider>
+			<div className="max-h-screen overflow-hidden">
+				<Navbar navigationData={navigationData} />
 
-			<main>
-				<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
-			</main>
-		</div>
+				<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+					<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
+				</main>
+				<Toaster />
+			</div>
+		</ThemeProvider>
 	);
 }
