@@ -122,11 +122,15 @@ export default function StationRegistrering() {
 								<TableCell>{station.order}</TableCell>
 								<TableCell className="text-right">
 									<div className="flex items-center justify-end gap-2">
-										<Button variant="ghost" size="icon" className="size-8">
+										<Button variant="ghost" size="icon" className="size-8" onClick={() => {
+                      swapStationOrder(station, -1);
+                    }} >
 											<ChevronDownIcon />
 											<span className="sr-only">Flytta ned</span>
 										</Button>
-										<Button variant="ghost" size="icon" className="size-8">
+										<Button variant="ghost" size="icon" className="size-8" onClick={() => {
+                      swapStationOrder(station, 1);
+                    }}>
 											<ChevronUpIcon />
 											<span className="sr-only">Flytta upp</span>
 										</Button>
