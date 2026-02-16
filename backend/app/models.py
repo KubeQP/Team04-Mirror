@@ -2,7 +2,7 @@
 from datetime import UTC, datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import relationship
 
 from .database import Base
 
@@ -14,7 +14,7 @@ class Competitor(Base):
     id = Column(Integer, primary_key=True, index=True)
     start_number = Column(String, unique=True, index=True)
     name = Column(String)
-    competition_id =Column(Integer)
+    competition_id = Column(Integer)
 
 
 class Station(Base):
@@ -22,7 +22,7 @@ class Station(Base):
     id = Column(Integer, primary_key=True, index=True)
     station_name = Column(String)
     order = Column(String)
-    competition_id =Column(Integer)
+    competition_id = Column(Integer)
 
 
 class TimeEntry(Base):
@@ -35,7 +35,7 @@ class TimeEntry(Base):
         nullable=False,
         default=lambda: datetime.now(UTC),
     )
-    competition_id =Column(Integer)
+    competition_id = Column(Integer)
 
     competitor = relationship("Competitor")
     station = relationship("Station")

@@ -5,6 +5,7 @@ import { useOutletContext } from 'react-router-dom';
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { API_BASE_URL } from '../config/api';
+import { competition } from '../App';
 
 type Competitor = {
 	start_number: string;
@@ -146,6 +147,7 @@ export default function RegistreringStoppTid() {
 					start_number: selectedStartNumber,
 					station_id: selectedStationId,
 					timestamp: new Date().toISOString(),
+					competition_id: competition
 				}),
 			});
 

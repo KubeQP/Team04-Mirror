@@ -37,16 +37,16 @@ let stations: StationData[] = [];
 
 beforeEach(() => {
 	competitors = [
-		{ id: 0, start_number: '007', name: 'Anna' },
-		{ id: 1, start_number: '123', name: 'Bob' },
+		{ id: 0, start_number: '007', name: 'Anna', competition_id: 0 },
+		{ id: 1, start_number: '123', name: 'Bob', competition_id: 0 },
 	];
 	times = [
-		{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:31:39', station_id: 0 },
-		{ id: 1, competitor_id: 1, timestamp: '2025-06-27T12:32:15', station_id: 0 },
+		{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:31:39', station_id: 0, competition_id: 0 },
+		{ id: 1, competitor_id: 1, timestamp: '2025-06-27T12:32:15', station_id: 0, competition_id: 0 },
 	];
 	stations = [
-		{ id: 0, station_name: 'start', order: '0' },
-		{ id: 1, station_name: 'stop', order: '1' },
+		{ id: 0, station_name: 'start', order: '0', competition_id: 0 },
+		{ id: 1, station_name: 'stop', order: '1', competition_id: 0 },
 	];
 
 	vi.mocked(getCompetitorData).mockResolvedValue(competitors);
@@ -61,7 +61,7 @@ beforeEach(() => {
 describe('Person utan start eller stopptid', () => {
 	beforeEach(() => {
 		times = [
-			{ id: 0, competitor_id: 0, timestamp: '-', station_id: 0 }, // ingen starttid
+			{ id: 0, competitor_id: 0, timestamp: '-', station_id: 0, competition_id: 0 }, // ingen starttid
 		];
 		vi.mocked(getTimeData).mockResolvedValue(times);
 		render(<Admin />);
@@ -80,8 +80,8 @@ describe('Person utan start eller stopptid', () => {
 describe('Totaltid beräkning', () => {
 	beforeEach(() => {
 		times = [
-			{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:00:00', station_id: 0 },
-			{ id: 1, competitor_id: 0, timestamp: '2025-06-27T12:30:00', station_id: 1 },
+			{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:00:00', station_id: 0, competition_id: 0 },
+			{ id: 1, competitor_id: 0, timestamp: '2025-06-27T12:30:00', station_id: 1, competition_id: 0 },
 		];
 		vi.mocked(getTimeData).mockResolvedValue(times);
 		render(<Admin />);
@@ -100,9 +100,9 @@ describe('Totaltid beräkning', () => {
 describe('Dubbelregistrering med samma startnummer och station', () => {
 	beforeEach(() => {
 		times = [
-			{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:31:39', station_id: 0 },
-			{ id: 1, competitor_id: 1, timestamp: '2025-06-27T12:32:39', station_id: 0 },
-			{ id: 2, competitor_id: 1, timestamp: '2025-06-27T12:33:00', station_id: 0 }, // samma station + start_number
+			{ id: 0, competitor_id: 0, timestamp: '2025-06-27T12:31:39', station_id: 0, competition_id: 0 },
+			{ id: 1, competitor_id: 1, timestamp: '2025-06-27T12:32:39', station_id: 0, competition_id: 0 },
+			{ id: 2, competitor_id: 1, timestamp: '2025-06-27T12:33:00', station_id: 0, competition_id: 0 }, // samma station + start_number
 		];
 		vi.mocked(getTimeData).mockResolvedValue(times);
 		render(<Admin />);

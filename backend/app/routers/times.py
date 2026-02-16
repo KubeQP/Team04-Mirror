@@ -47,7 +47,12 @@ def update_time_entry(
     db: Session = Depends(get_db),
 ) -> TimeEntry:
     entry = crud.update_time_entry(
-        db, data.id, data.competitor_id, data.timestamp, data.station_id
+        db,
+        data.id,
+        data.competitor_id,
+        data.timestamp,
+        data.station_id,
+        data.competition_id,
     )
 
     if entry is None:

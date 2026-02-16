@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 import { API_BASE_URL } from '../config/api';
+import { competition } from '../App';
 
 type Competitor = {
 	start_number: string;
@@ -60,6 +61,7 @@ export default function Registrering() {
 				body: JSON.stringify({
 					start_number: formattedReg,
 					name: name,
+					competition_id: competition
 				}),
 			});
 

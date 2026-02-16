@@ -6,7 +6,7 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
-
+import { competition } from '../App';
 // src/pages/Admin.tsx
 export default function Admin() {
 	//declaring constants for the imports
@@ -151,6 +151,7 @@ export default function Admin() {
 				competitor_id: competitorData?.find((competitor) => table[1].value === competitor.start_number)?.id ?? -1,
 				timestamp: timeData?.find((time) => table[2].id === time.id)?.timestamp ?? '-',
 				station_id: table[0].id,
+				competition_id: competition
 			};
 
 			console.log(data);

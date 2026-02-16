@@ -9,8 +9,6 @@ from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
 
-from typing import cast
-
 
 def get_competitors(db: Session) -> list[Competitor]:
     """Hämta alla tävlande från databasen."""
@@ -33,7 +31,11 @@ def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]
 
 
 def record_time_for_start_number(
-    db: Session, start_number: str, timestamp: datetime | None, station_id: int | None, competition_id: int | None
+    db: Session,
+    start_number: str,
+    timestamp: datetime | None,
+    station_id: int | None,
+    competition_id: int | None,
 ) -> TimeEntry | None:
     """Registrera en ny tid för en tävlande med angivet startnummer."""
     competitor = db.query(Competitor).filter_by(start_number=start_number).first()
@@ -48,7 +50,9 @@ def record_time_for_start_number(
     return entry
 
 
-def record_new_reg(db: Session, start_number: str, name: str, competition_id: int) -> Competitor:
+def record_new_reg(
+    db: Session, start_number: str, name: str, competition_id: int
+) -> Competitor:
     """Registrerar en ny competitor med starttid"""
     entry = Competitor(start_number=start_number, name=name)
     db.add(entry)
@@ -57,7 +61,9 @@ def record_new_reg(db: Session, start_number: str, name: str, competition_id: in
     return entry
 
 
-def record_new_station(db: Session, station_name: str, order: str, competition_id: int) -> Station:
+def record_new_station(
+    db: Session, station_name: str, order: str, competition_id: int
+) -> Station:
     """Registrera en ny station"""
     entry = Station(station_name=station_name, order=order)
     db.add(entry)
@@ -72,7 +78,11 @@ def get_stations(db: Session) -> list[Station]:
 
 
 def update_competitor(
-    db: Session, id: int | None, start_number: str | None, name: str | None
+    db: Session,
+    id: int | None,
+    start_number: str | None,
+    name: str | None,
+    competition_id: int | None,
 ) -> Competitor | None:
     competitor = db.query(Competitor).filter(Competitor.id == id).first()
 
@@ -83,6 +93,8 @@ def update_competitor(
         competitor.start_number = start_number
     if name is not None:
         competitor.name = name
+    if competition_id is not None:
+        competitor.competition_id = competition_id
 
     db.commit()
     db.refresh(competitor)
@@ -95,6 +107,7 @@ def update_time_entry(
     competitor_id: int | None,
     timestamp: datetime | None,
     station_id: int | None,
+    competition_id: int | None,
 ) -> TimeEntry | None:
     entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
 
@@ -107,6 +120,8 @@ def update_time_entry(
         entry.timestamp = timestamp
     if station_id is not None:
         entry.station_id = station_id
+    if competition_id is not None:
+        entry.competition_id = competition_id
 
     db.commit()
     db.refresh(entry)

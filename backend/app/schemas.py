@@ -57,6 +57,7 @@ class CompetitorUpdate(BaseModel):
     id: int | None = None
     start_number: str | None = None
     name: str | None = None
+    competition_id: int | None = None
 
 
 class TimeEntryUpdate(BaseModel):
@@ -64,3 +65,4 @@ class TimeEntryUpdate(BaseModel):
     competitor_id: int | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
+    competition_id: int | None = None

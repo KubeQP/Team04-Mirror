@@ -21,7 +21,9 @@ def read_competitors(db: Session = Depends(get_db)) -> list[Competitor]:
 def reg_competitor(
     data: schemas.CompetitorReg, db: Session = Depends(get_db)
 ) -> dict[str, Column[str]]:
-    competitor = crud.record_new_reg(db, data.start_number, data.name)
+    competitor = crud.record_new_reg(
+        db, data.start_number, data.name, data.competition_id
+    )
     return {"start_number": competitor.start_number, "name": competitor.name}
 
 
@@ -30,7 +32,9 @@ def update_competitor(
     data: schemas.CompetitorUpdate,
     db: Session = Depends(get_db),
 ) -> Competitor:
-    competitor = crud.update_competitor(db, data.id, data.start_number, data.name)
+    competitor = crud.update_competitor(
+        db, data.id, data.start_number, data.name, data.competition_id
+    )
 
     if competitor is None:
         raise HTTPException(status_code=404, detail="Competitor not found")

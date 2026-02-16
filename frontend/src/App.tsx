@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
 import ThemeToggle from './components/ThemeToggle';
-
+export const competition : number = 0;
 export default function App() {
 	const [competitorsVersion, setCompetitorsVersion] = useState(0);
 
 	const notifyCompetitorAdded = () => {
 		setCompetitorsVersion((v) => v + 1);
 	};
+	
 
 	return (
 		<div id="app-container">

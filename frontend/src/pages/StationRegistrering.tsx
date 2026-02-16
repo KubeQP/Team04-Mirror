@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { API_BASE_URL } from '../config/api';
+import { competition } from '../App';
 
 type Station = {
 	station_name: string;
@@ -38,6 +39,7 @@ export default function StationRegistrering() {
 				body: JSON.stringify({
 					station_name: stationName,
 					order: order,
+					competition_id: competition
 				}),
 			});
 
