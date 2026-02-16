@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class RecordTimeIn(BaseModel):
-    start_number: str
+    start_number: str | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
 
@@ -22,7 +22,7 @@ class CompetitorOut(BaseModel):
 
 class TimeEntryOut(BaseModel):
     id: int
-    competitor_id: int
+    competitor_id: int | None = None
     station_id: int | None = None
     timestamp: datetime
 
