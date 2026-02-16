@@ -1,6 +1,9 @@
 // frontend/src/pages/Admin.tsx
 import { useEffect, useState } from 'react';
 
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
@@ -202,34 +205,38 @@ export default function Admin() {
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
-			<table>
-				<thead>
-					<tr>
-						{headerRow.map((header, index) => (
-							<th key={index}>{header.value}</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{bodyRows.map((row, rowIndex) => (
-						<tr key={rowIndex}>
-							{row.map((cell, cellIndex) => (
-								<td key={cellIndex} className={cell.correct === false ? 'incorrect-cell' : ''}>
-									{cell.value}{' '}
-								</td>
+			<ScrollArea className="h-[60vh] rounded-md border px-4">
+				<Table>
+					<TableHeader>
+						<TableRow className="h-14">
+							{headerRow.map((header, index) => (
+								<TableHead key={index}>{header.value}</TableHead>
 							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{bodyRows.map((row, rowIndex) => (
+							<TableRow key={rowIndex}>
+								{row.map((cell, cellIndex) => (
+									<TableCell
+										key={cellIndex}
+										className={cell.correct === false ? 'bg-destructive border text-destructive-foreground' : ''}
+									>
+										{cell.value}{' '}
+									</TableCell>
+								))}
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		);
 	}
 
 	return (
 		<div>
-			<h2>Admin Sida</h2>
-			<p>Välkommen till administrationssidan.</p>
-			<div className="Admin-tables">
+			<h1 className="text-xl font-bold pb-4">Adminsida:</h1>
+			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
 				) : competitorError ? (
@@ -237,11 +244,11 @@ export default function Admin() {
 				) : timeError ? (
 					<p>Fel vid hämtning av tiddata: {timeError}</p>
 				) : stationError ? (
-					<p>Fel vid hämtning av station data: {stationError}</p>
+					<p>Fel vid hämtning av stationsdata: {stationError}</p>
 				) : (
-					<div style={{ display: 'flex', gap: '20px' }}>
-						<div className="Admin-wrapper">{createTable(Array1)}</div>
-						<div className="Admin-wrapper">{createTable(Array2)}</div>
+					<div className="flex gap-6">
+						<div className="w-1/3">{createTable(Array1)}</div>
+						<div className="w-2/3">{createTable(Array2)}</div>
 					</div>
 				)}
 			</div>
