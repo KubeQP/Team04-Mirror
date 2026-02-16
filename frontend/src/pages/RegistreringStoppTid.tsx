@@ -45,7 +45,7 @@ type Station = {
 
 type LocalTimeEntry = {
 	id: string;
-	start_number: string;
+	start_number: string | null;
 	name?: string;
 	station_id: number;
 	station_name?: string;
@@ -62,7 +62,7 @@ export default function RegistreringStoppTid() {
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-	const [selectedStartNumber, setSelectedStartNumber] = useState<string>('');
+	const [selectedStartNumber, setSelectedStartNumber] = useState<string | null>(null);
 
 	const [selectedStationId, setSelectedStationId] = useState<number | ''>('');
 	const [stations, setStations] = useState<Station[]>([]);
@@ -117,7 +117,7 @@ export default function RegistreringStoppTid() {
 		// Create local entry
 		const newEntry: LocalTimeEntry = {
 			id: crypto.randomUUID(),
-			start_number: selectedStartNumber,
+			start_number: selectedStartNumber || null,
 			name: selectedCompetitor?.name,
 			station_id: selectedStationId as number,
 			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
@@ -181,7 +181,8 @@ export default function RegistreringStoppTid() {
 			<Field className="my-4">
 				<FieldLabel>Välj tävlande</FieldLabel>
 				<Field orientation="horizontal" className="gap-2">
-					<Combobox items={competitors} value={selectedStartNumber} onInputValueChange={setSelectedStartNumber}>
+					<Combobox items={competitors} value={selectedStartNumber ?? ''} onInputValueChange={(value) =>
+    setSelectedStartNumber(value === '' ? null : value)}>
 						<ComboboxInput placeholder="Sök tävlande..." className="w-1/4" maxLength={3} />
 						<ComboboxContent>
 							<ComboboxEmpty>Kunde inte hitta några tävlande.</ComboboxEmpty>
@@ -201,11 +202,14 @@ export default function RegistreringStoppTid() {
 					</Combobox>
 					<Button
 						type="button"
-						disabled={!selectedStartNumber || !selectedStationId}
+						disabled={!selectedStationId}
 						onClick={async () => {
 							toast.promise(recordStopTimeNow(), {
 								loading: 'Registrerar stopptid...',
-								success: `Stopptid registrerad för: ${selectedCompetitor?.name} (${selectedStartNumber})`,
+								success: () =>
+									selectedStartNumber
+										? `Stopptid registrerad för: ${selectedCompetitor?.name ?? ''} (${selectedStartNumber})`
+										: 'Stopptid registrerad utan kopplad tävlande',
 								error: 'Kunde inte registrera stopptid',
 							});
 						}}

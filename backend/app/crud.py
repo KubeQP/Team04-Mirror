@@ -31,14 +31,23 @@ def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]
 
 
 def record_time_for_start_number(
-    db: Session, start_number: str, timestamp: datetime | None, station_id: int | None
+    db: Session, 
+    start_number: str | None, 
+    timestamp: datetime | None, 
+    station_id: int | None,
 ) -> TimeEntry | None:
-    """Registrera en ny tid för en tävlande med angivet startnummer."""
-    competitor = db.query(Competitor).filter_by(start_number=start_number).first()
-    if competitor is None:
-        return None  # hanteras i router
+    
+    competitor = None
+
+    if start_number:
+        competitor = db.query(Competitor).filter_by(
+            start_number = start_number
+        ).first()
+
     entry = TimeEntry(
-        competitor_id=competitor.id, timestamp=timestamp, station_id=station_id
+        competitor_id=competitor.id if competitor else None,
+        timestamp=timestamp,
+        station_id=station_id
     )
     db.add(entry)
     db.commit()

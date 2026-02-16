@@ -1,13 +1,15 @@
 # backend/app/schemas.py
 from datetime import datetime
 
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 # Definierar hur data skickas och tas emot via API:et
 
 
 class RecordTimeIn(BaseModel):
-    start_number: str
+    start_number: Optional[str] = None
     timestamp: datetime | None = None
     station_id: int | None = None
 
@@ -22,7 +24,7 @@ class CompetitorOut(BaseModel):
 
 class TimeEntryOut(BaseModel):
     id: int
-    competitor_id: int
+    competitor_id:  Optional[int] = None
     station_id: int | None = None
     timestamp: datetime
 

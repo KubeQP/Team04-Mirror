@@ -36,8 +36,7 @@ def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
     entry = crud.record_time_for_start_number(
         db, data.start_number, data.timestamp, data.station_id
     )
-    if entry is None:
-        raise HTTPException(status_code=404, detail="Competitor not found")
+    
     return entry
 
 
@@ -50,7 +49,5 @@ def update_time_entry(
         db, data.id, data.competitor_id, data.timestamp, data.station_id
     )
 
-    if entry is None:
-        raise HTTPException(status_code=404, detail="Time entry not found")
-
+    
     return entry
