@@ -2,7 +2,16 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app import models
+from app.models import Competitor, Station, TimeEntry
+
+
+def create_station(db_session: Session) -> Station:
+    """Skapa en station som kan användas i testerna."""
+    station = Station(station_name="Station 1", order="1")
+    db_session.add(station)
+    db_session.commit()
+    db_session.refresh(station)
+    return station
 
 
 def test_get_times_empty(client: TestClient) -> None:
@@ -14,18 +23,18 @@ def test_get_times_empty(client: TestClient) -> None:
 
 def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
     """GET /api/times ska returnera alla tider i databasen."""
-    # Skapa två tävlande
-    c1 = models.Competitor(start_number="1001", name="Team 1")
-    c2 = models.Competitor(start_number="1002", name="Team 2")
+    station = create_station(db_session)
+
+    c1 = Competitor(start_number="1001", name="Team 1")
+    c2 = Competitor(start_number="1002", name="Team 2")
     db_session.add_all([c1, c2])
     db_session.commit()
     db_session.refresh(c1)
     db_session.refresh(c2)
 
-    # Skapa tre tider (2 för 1001, 1 för 1002)
-    t1 = models.TimeEntry(competitor_id=c1.id)
-    t2 = models.TimeEntry(competitor_id=c1.id)
-    t3 = models.TimeEntry(competitor_id=c2.id)
+    t1 = TimeEntry(competitor_id=c1.id, station_id=station.id)
+    t2 = TimeEntry(competitor_id=c1.id, station_id=station.id)
+    t3 = TimeEntry(competitor_id=c2.id, station_id=station.id)
     db_session.add_all([t1, t2, t3])
     db_session.commit()
 
@@ -42,20 +51,20 @@ def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
 
 def test_get_times_by_start_number(client: TestClient, db_session: Session) -> None:
     """GET /api/times/{start_number} ska bara ge tider för rätt tävlande."""
-    # Skapa tävlande
-    c1 = models.Competitor(start_number="1001", name="Team 1")
-    c2 = models.Competitor(start_number="1002", name="Team 2")
+    station = create_station(db_session)
+
+    c1 = Competitor(start_number="1001", name="Team 1")
+    c2 = Competitor(start_number="1002", name="Team 2")
     db_session.add_all([c1, c2])
     db_session.commit()
     db_session.refresh(c1)
     db_session.refresh(c2)
 
-    # Skapa tider: 2 för 1001, 1 för 1002
     db_session.add_all(
         [
-            models.TimeEntry(competitor_id=c1.id),
-            models.TimeEntry(competitor_id=c1.id),
-            models.TimeEntry(competitor_id=c2.id),
+            TimeEntry(competitor_id=c1.id, station_id=station.id),
+            TimeEntry(competitor_id=c1.id, station_id=station.id),
+            TimeEntry(competitor_id=c2.id, station_id=station.id),
         ]
     )
     db_session.commit()
@@ -72,59 +81,55 @@ def test_get_times_by_start_number_unknown(
     client: TestClient, db_session: Session
 ) -> None:
     """Vad händer om startnumret inte finns? Här förväntar vi oss tom lista."""
-    # Ingen med startnummer 9999
     response = client.get("/api/times/9999")
-    assert response.status_code == 200  # ändra till 404 om du vill that beteende
+    assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
-    # antingen tom lista...
-    # assert data == []
 
 
 def test_record_time_for_existing_competitor(
     client: TestClient, db_session: Session
 ) -> None:
     """POST /api/times/record ska skapa en ny TimeEntry för giltigt startnummer."""
-    # Arrange: skapa en tävlande
-    c1 = models.Competitor(start_number="1001", name="Team 1")
+    station = create_station(db_session)
+
+    c1 = Competitor(start_number="1001", name="Team 1")
     db_session.add(c1)
     db_session.commit()
     db_session.refresh(c1)
 
-    payload = {"start_number": "1001"}
+    payload = {
+        "start_number": "1001",
+        "timeStamp": "2026-02-16T14:30:00Z",
+        "station_id": station.id,
+    }
 
-    # Act
     response = client.post("/api/times/record", json=payload)
-
-    # Assert
     assert response.status_code == 200
 
     data = response.json()
-    # Beroende på vilket response_model du använder
     assert data["competitor_id"] == c1.id
     assert isinstance(data["id"], int)
     assert isinstance(data["timestamp"], str)
 
-    # Och kontrollera att det faktiskt skapats en rad i DB
-    times_in_db = (
-        db_session.query(models.TimeEntry).filter_by(competitor_id=c1.id).all()
-    )
+    times_in_db = db_session.query(TimeEntry).filter_by(competitor_id=c1.id).all()
     assert len(times_in_db) == 1
+    assert times_in_db[0].station_id == station.id
 
 
-def test_record_time_for_unknown_competitor_returns_404(client: TestClient) -> None:
+def test_record_time_for_unknown_competitor_returns_404(
+    client: TestClient, db_session: Session
+) -> None:
     """POST /api/times/record ska ge 404 om startnumret inte finns."""
-    # Arrange: skicka ett startnummer som inte finns i databasen
-    payload = {"start_number": "9999"}
+    station = create_station(db_session)
 
-    # Act
+    payload = {"start_number": "9999", "station_id": station.id}
     response = client.post("/api/times/record", json=payload)
 
-    # Assert
     assert response.status_code == 404
-
     data = response.json()
     assert "detail" in data
     assert (
         "not found" in data["detail"].lower() or "finns inte" in data["detail"].lower()
     )
+
