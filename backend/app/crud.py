@@ -7,7 +7,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from .models import Competitor, Station, TimeEntry
+from .models import Competitor, Station, TimeEntry, Competition
 
 
 def get_competitors(db: Session) -> list[Competitor]:
@@ -126,3 +126,16 @@ def update_time_entry(
     db.commit()
     db.refresh(entry)
     return entry
+
+
+def record_new_competition(
+        db: Session
+):
+    entry = Competition()
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+def get_competitions(db: Session) -> list[Competition]:
+    return db.query(Competition).all()

@@ -66,3 +66,10 @@ class TimeEntryUpdate(BaseModel):
     timestamp: datetime | None = None
     station_id: int | None = None
     competition_id: int | None = None
+
+
+class CompetitionsReg(BaseModel):
+    id: int
+
+class CompetitionsOut(BaseModel):
+    id: int

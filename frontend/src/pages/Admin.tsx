@@ -33,7 +33,8 @@ export default function Admin() {
 		// Competitor data
 		try {
 			const result = await getCompetitorData();
-			setCompetitorData(result);
+			setCompetitorData(result.filter(c =>
+				c.competition_id === competition));
 			console.log('Fetched competitor data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setCompetitorError(err.message);
@@ -46,7 +47,8 @@ export default function Admin() {
 		// Time data
 		try {
 			const result = await getTimeData();
-			setTimeData(result);
+			setTimeData(result.filter(c =>
+				c.competition_id === competition));
 			console.log('Fetched time data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setTimeError(err.message);
@@ -59,7 +61,9 @@ export default function Admin() {
 		// Station data
 		try {
 			const result = await getStationData();
-			setStationData(result);
+			setStationData(result.filter(c =>
+				c.competition_id === competition
+			));
 			console.log('Fetched station data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setStationError(err.message);
@@ -191,6 +195,7 @@ export default function Admin() {
 			competitor_id: competitor.id,
 			timestamp: timeData?.find((t) => t.id === timeId)?.timestamp ?? '-',
 			station_id: row[0].id,
+			competition_id: competition
 		});
 	}
 

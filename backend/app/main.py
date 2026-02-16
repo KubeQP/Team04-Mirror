@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .database import Base, SessionLocal, engine
-from .models import Competitor, Station, TimeEntry
-from .routers import competitors, stations, times
+from .models import Competitor, Station, TimeEntry, Competition
+from .routers import competitors, stations, times, competitions
 
 
 @asynccontextmanager
@@ -72,6 +72,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                 ),
             ]
         )
+        db.commit()
+
+        competition0 = Competition()
+        db.add(competition0)
         db.commit()
     db.close()
 

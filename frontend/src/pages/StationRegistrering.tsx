@@ -14,6 +14,7 @@ import { competition } from '../App';
 type Station = {
 	station_name: string;
 	order: string;
+	competition_id: number;
 };
 
 export default function StationRegistrering() {
@@ -25,7 +26,9 @@ export default function StationRegistrering() {
 		const res = await fetch(`${API_BASE_URL}/api/stations/getstations`);
 		if (!res.ok) return;
 		const data = await res.json();
-		setStations((data as Array<Station>).sort((a, b) => Number(a.order) - Number(b.order)));
+		setStations((data as Array<Station>).filter(c =>
+				c.competition_id === competition
+			).sort((a, b) => Number(a.order) - Number(b.order)));
 	};
 
 	useEffect(() => {

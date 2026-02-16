@@ -14,7 +14,7 @@ class Competitor(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     start_number: Mapped[str] = mapped_column(String, unique=True, index=True)
     name: Mapped[str] = mapped_column(String)
-    competition_id = Column(Integer)
+    competition_id = mapped_column(Integer)
 
 
 class Station(Base):
@@ -22,7 +22,7 @@ class Station(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     station_name: Mapped[str] = mapped_column(String)
     order: Mapped[str] = mapped_column(String)
-    competition_id = Column(Integer)
+    competition_id = mapped_column(Integer)
 
 
 class TimeEntry(Base):
@@ -39,7 +39,12 @@ class TimeEntry(Base):
         nullable=False,
         default=lambda: datetime.now(UTC),
     )
-    competition_id = Column(Integer)
+    competition_id = mapped_column(Integer)
 
     competitor = relationship("Competitor")
     station = relationship("Station")
+
+
+class Competition(Base): 
+    __tablename__ = 'competitions'
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
