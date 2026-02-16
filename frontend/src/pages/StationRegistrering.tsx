@@ -1,5 +1,6 @@
 import { ChevronDownIcon, ChevronUpIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
@@ -52,6 +53,25 @@ export default function StationRegistrering() {
 			await updateStationOrder(reordered);
 		} catch (err) {
 			console.error(err);
+		}
+	};
+
+	const deleteStation = async (order: string) => {
+		try {
+			const res = await fetch(`${API_BASE_URL}/api/stations/delete/${order}`, {
+				method: 'DELETE',
+			});
+			console.log('Delete response:', res);
+
+			if (!res.ok) {
+				const err = await res.json();
+
+				throw new Error(err.detail || 'Unknown error');
+			}
+
+			await fetchStations();
+		} catch (err) {
+			throw new Error(err instanceof Error ? err.message : 'Fetch error');
 		}
 	};
 
@@ -178,6 +198,13 @@ export default function StationRegistrering() {
 											variant="ghost"
 											size="icon"
 											className="size-8 hover:bg-destructive hover:text-destructive-foreground dark:hover:bg-destructive dark:hover:text-destructive-foreground"
+											onClick={async () => {
+												toast.promise(deleteStation(station.order), {
+													loading: 'Raderar station...',
+													success: 'Station raderad',
+													error: (err) => `Kunde inte radera: ${err.message}`,
+												});
+											}}
 										>
 											<Trash2Icon />
 											<span className="sr-only">Radera</span>

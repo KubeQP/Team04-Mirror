@@ -37,3 +37,18 @@ def update_station_order(
     db.commit()
 
     return stations
+
+
+@router.delete("/delete/{station_order}")
+def delete_station(station_order: int, db: Session = Depends(get_db)) -> dict[str, str]:
+    station = (
+        db.query(models.Station).filter(models.Station.order == station_order).first()
+    )
+
+    if station is None:
+        return {"detail": "Station not found"}
+
+    db.delete(station)
+    db.commit()
+
+    return {"detail": "Station deleted"}

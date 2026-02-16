@@ -3,8 +3,8 @@ import { EraserIcon, Undo2Icon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
-import vineBoom from '@/assets/audio/vine-boom.mp3';
 
+import vineBoom from '@/assets/audio/vine-boom.mp3';
 import { Button } from '@/components/ui/button';
 import {
 	Combobox,
