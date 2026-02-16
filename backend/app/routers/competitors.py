@@ -29,8 +29,8 @@ def reg_competitor(
 def update_competitor(
     data: schemas.CompetitorUpdate,
     db: Session = Depends(get_db),
-):
-    competitor = crud.update_competitor(db, data)
+) -> Competitor:
+    competitor = crud.update_competitor(db, data.id, data.start_number, data.name)
 
     if competitor is None:
         raise HTTPException(status_code=404, detail="Competitor not found")

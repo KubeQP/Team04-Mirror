@@ -45,8 +45,10 @@ def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
 def update_time_entry(
     data: TimeEntryUpdate,
     db: Session = Depends(get_db),
-):
-    entry = crud.update_time_entry(db, data)
+) -> TimeEntry:
+    entry = crud.update_time_entry(
+        db, data.id, data.competitor_id, data.timestamp, data.station_id
+    )
 
     if entry is None:
         raise HTTPException(status_code=404, detail="Time entry not found")

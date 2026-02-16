@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
 
+from typing import cast
+
 
 def get_competitors(db: Session) -> list[Competitor]:
     """Hämta alla tävlande från databasen."""
@@ -69,34 +71,42 @@ def get_stations(db: Session) -> list[Station]:
     return db.query(Station).all()
 
 
-def update_competitor(db: Session, data: Competitor):
-    competitor = db.query(Competitor).filter(Competitor.id == data.id).first()
+def update_competitor(
+    db: Session, id: int | None, start_number: str | None, name: str | None
+) -> Competitor | None:
+    competitor = db.query(Competitor).filter(Competitor.id == id).first()
 
     if competitor is None:
         return None
 
-    if data.start_number is not None:
-        competitor.start_number = data.start_number
-    if data.name is not None:
-        competitor.name = data.name
+    if start_number is not None:
+        competitor.start_number = start_number
+    if name is not None:
+        competitor.name = name
 
     db.commit()
     db.refresh(competitor)
     return competitor
 
 
-def update_time_entry(db: Session, data: TimeEntry):
-    entry = db.query(TimeEntry).filter(TimeEntry.id == data.id).first()
+def update_time_entry(
+    db: Session,
+    id: int | None,
+    competitor_id: int | None,
+    timestamp: datetime | None,
+    station_id: int | None,
+) -> TimeEntry | None:
+    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
 
     if entry is None:
         return None
 
-    if data.competitor_id is not None:
-        entry.competitor_id = data.competitor_id
-    if data.timestamp is not None:
-        entry.timestamp = data.timestamp
-    if data.station_id is not None:
-        entry.station_id = data.station_id
+    if competitor_id is not None:
+        entry.competitor_id = competitor_id
+    if timestamp is not None:
+        entry.timestamp = timestamp
+    if station_id is not None:
+        entry.station_id = station_id
 
     db.commit()
     db.refresh(entry)
