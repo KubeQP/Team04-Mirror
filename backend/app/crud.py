@@ -31,7 +31,7 @@ def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]
 
 
 def record_time_for_start_number(
-    db: Session, start_number: str, timestamp: datetime | None, station_id: int | None
+    db: Session, start_number: str, timestamp: datetime | None, station_id: int | None, competition_id: int | None
 ) -> TimeEntry | None:
     """Registrera en ny tid för en tävlande med angivet startnummer."""
     competitor = db.query(Competitor).filter_by(start_number=start_number).first()
@@ -46,7 +46,7 @@ def record_time_for_start_number(
     return entry
 
 
-def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
+def record_new_reg(db: Session, start_number: str, name: str, competition_id: int) -> Competitor:
     """Registrerar en ny competitor med starttid"""
     entry = Competitor(start_number=start_number, name=name)
     db.add(entry)
@@ -55,7 +55,7 @@ def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
     return entry
 
 
-def record_new_station(db: Session, station_name: str, order: str) -> Station:
+def record_new_station(db: Session, station_name: str, order: str, competition_id: int) -> Station:
     """Registrera en ny station"""
     entry = Station(station_name=station_name, order=order)
     db.add(entry)
