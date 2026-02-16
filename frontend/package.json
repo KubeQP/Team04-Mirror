@@ -16,6 +16,7 @@
 		"ci-check": "concurrently 'npm:lint' 'npm:format' 'npm:check' --prefix-colors 'auto' --group"
 	},
 	"dependencies": {
+		"@base-ui/react": "^1.2.0",
 		"@tailwindcss/vite": "^4.1.18",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",

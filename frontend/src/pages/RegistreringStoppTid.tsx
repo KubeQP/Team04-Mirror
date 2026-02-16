@@ -5,8 +5,16 @@ import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import {
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+} from '@/components/ui/combobox';
 import { Field, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Select,
@@ -164,19 +172,24 @@ export default function RegistreringStoppTid() {
 			<Field className="my-4">
 				<FieldLabel>Välj tävlande</FieldLabel>
 				<Field orientation="horizontal" className="gap-2">
-					<Input
-						type="text"
-						placeholder="Sök tävlande..."
-						value={selectedStartNumber}
-						className="w-1/4"
-						maxLength={3}
-						inputMode="numeric"
-						pattern="[0-9]*"
-						onChange={(e) => {
-							const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
-							setSelectedStartNumber(value);
-						}}
-					/>
+					<Combobox items={competitors} value={selectedStartNumber} onInputValueChange={setSelectedStartNumber}>
+						<ComboboxInput placeholder="Sök tävlande..." className="w-1/4" maxLength={3} />
+						<ComboboxContent>
+							<ComboboxEmpty>Kunde inte hitta några tävlande.</ComboboxEmpty>
+							<ComboboxList>
+								{(competitor: Competitor) => (
+									<ComboboxItem key={competitor.start_number} value={competitor.start_number}>
+										<Item size="sm" className="p-0">
+											<ItemContent>
+												<ItemTitle className="whitespace-nowrap">{competitor.start_number}</ItemTitle>
+												<ItemDescription>{competitor.name}</ItemDescription>
+											</ItemContent>
+										</Item>
+									</ComboboxItem>
+								)}
+							</ComboboxList>
+						</ComboboxContent>
+					</Combobox>
 					<Button
 						type="button"
 						disabled={!selectedStartNumber || !selectedStationId}
