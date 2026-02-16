@@ -462,8 +462,16 @@ Frontend är uppbyggd enligt en komponentbaserad arkitektur.
 
 \begin{itemize}
     \item \textbf{Pages}: Representerar applikationens olika vyer.
+        \begin{itemize}
+            \item Admin sida
+            \item Registreringssida
+            \item Tid regristreringssida
+            \item Stationsregistreringssida
+            \item Resultatsida
+        \end{itemize}
     \item \textbf{Components}: Återanvändbara UI-komponenter.
     \item \textbf{API}: Abstraktion för kommunikation med backend.
+    \
 \end{itemize}
 
 \noindent
@@ -578,9 +586,7 @@ Under en tävling distribueras systemet enligt följande:
 \section{Vidareutveckling}
 För att lägga till ny funktionalitet eller uppdatera denna dokumentationen kan följande sektioner hjälpleda utvecklingen. 
 
-Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Detta medför även att refaktorisering ska göras kontinuerligt för att bibehålla kodkvalitet och tydlig struktur.
-All ny funktionalitet ska först specificeras genom tester innan implementation påbörjas.
-Tester placeras i \texttt{tests/}-mappen och ska täcka både lyckade och felaktiga scenarion.
+Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Även refaktorering av kod och uppdatering av dokumentation är en del av vidareutvecklingen, se då till att testerna fortfarande är gröna och att dokumentationen är uppdaterad.
 
 \subsection{Backend}
 
@@ -601,11 +607,15 @@ Tester placeras i \texttt{tests/}-mappen och ska täcka både lyckade och felakt
 \end{enumerate}
 
 \subsection{Teknisk Dokumentation}
-\begin{enumerate}
-    \item Uppdatera arkitekturdiagram vid större förändringar.
+Vid större förrändringar av systemet, se till att uppdatera denna tekniska dokumentation. Detta så att den alltid är aktuell och användbar för framtida utvecklingsteam. Detta inkluderar:
+\begin{itemize}
+    \item Uppdatera fildiagram och UML vid större förändringar.
+        \begin{itemize}
+            \item Vi rekommenderar att använda verktyget \href{https://mermaid.js.org/}{Mermaid} för att skapa och uppdatera UML-diagramet, men välj fritt själv. Det finns inga krav för specifika verktyg.
+        \end{itemize}
     \item Lägg till beskrivningar av nya moduler och filer.
     \item Dokumentera API-kontrakt i \texttt{schemas.py}.
-\end{enumerate}
+\end{itemize}
 
 
 \noindent
