@@ -132,4 +132,3 @@ def test_record_time_for_unknown_competitor_returns_404(
     assert (
         "not found" in data["detail"].lower() or "finns inte" in data["detail"].lower()
     )
-

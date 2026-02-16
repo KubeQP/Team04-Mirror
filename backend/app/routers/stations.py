@@ -2,9 +2,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.models import Station
 from app import models
-
+from app.models import Station
 
 from .. import crud, schemas
 from ..database import get_db
@@ -24,17 +23,17 @@ def reg_station(
     station = crud.record_new_station(db, data.station_name, data.order)
     return {"station_name": station.station_name, "order": station.order}
 
+
 @router.patch("/updateOrder/")
 def update_station_order(
-	stations: list[schemas.StationReg],
-	db: Session = Depends(get_db),
+    stations: list[schemas.StationReg],
+    db: Session = Depends(get_db),
 ):
-	for station in stations:
-		db.query(models.Station).filter(
-			models.Station.station_name == station.station_name
-		).update({ "order": station.order })
+    for station in stations:
+        db.query(models.Station).filter(
+            models.Station.station_name == station.station_name
+        ).update({"order": station.order})
 
-	db.commit()
+    db.commit()
 
-	return stations
-
+    return stations
