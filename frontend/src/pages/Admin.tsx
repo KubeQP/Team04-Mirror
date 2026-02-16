@@ -81,13 +81,12 @@ export default function Admin() {
 	}, []);
 
 	useEffect(() => {
-  		const saved = localStorage.getItem('minTime');
-  		if (saved !== null) {
-    		setMinTimeSaved(Number(saved));
-    		setMinTime(saved); // fyll input-fältet också
-  		}
+		const saved = localStorage.getItem('minTime');
+		if (saved !== null) {
+			setMinTimeSaved(Number(saved));
+			setMinTime(saved); // fyll input-fältet också
+		}
 	}, []);
-
 
 	interface Cell {
 		value: string;
@@ -110,8 +109,8 @@ export default function Admin() {
 
 	// hjälpfunktion räknar ut minuter i en sträng
 	function getMinutesFromTimeString(time: string): number {
-  		const [h, m] = time.split(':').map(Number);
-  		return h * 60 + m;
+		const [h, m] = time.split(':').map(Number);
+		return h * 60 + m;
 	}
 
 	function calculateTotalTime(
@@ -335,14 +334,14 @@ export default function Admin() {
 		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
 		if (totalTime.correct && minTimeSaved !== null) {
-  			const totalMinutes = getMinutesFromTimeString(totalTime.value);
-  			const minMinutes = minTimeSaved;
+			const totalMinutes = getMinutesFromTimeString(totalTime.value);
+			const minMinutes = minTimeSaved;
 
-  			if (totalMinutes < minMinutes) {
-    			totalTime.correct = false;
-  			}
+			if (totalMinutes < minMinutes) {
+				totalTime.correct = false;
+			}
 		}
-		
+
 		if (startTime.value === '-') startTime.correct = false;
 		if (stopTime.value === '-') stopTime.correct = false;
 		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
@@ -386,27 +385,20 @@ export default function Admin() {
 		<div>
 			<h2>Admin Sida</h2>
 			<p>Välkommen till administrationssidan.</p>
-				<input
-					type="number"
-					placeholder="Minimitid (min)"
-					value={minTime}
-					onChange={(e) => setMinTime(e.target.value)}
-			/>
+			<input type="number" placeholder="Minimitid (min)" value={minTime} onChange={(e) => setMinTime(e.target.value)} />
 			<button
 				type="button"
 				onClick={() => {
-  					const value = Number(minTime);
-  					setMinTimeSaved(value);
-  					localStorage.setItem('minTime', value.toString());
+					const value = Number(minTime);
+					setMinTimeSaved(value);
+					localStorage.setItem('minTime', value.toString());
 				}}
 			>
-			Spara
+				Spara
 			</button>
 
-			{minTimeSaved !== null && (
-			<p>Aktuell minimitid: {minTimeSaved} min</p>
-			)}
-			
+			{minTimeSaved !== null && <p>Aktuell minimitid: {minTimeSaved} min</p>}
+
 			<div className="Admin-tables">
 			<h1 className="text-xl font-bold pb-4">Adminsida:</h1>
 			<div>
