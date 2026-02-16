@@ -131,14 +131,14 @@ export default function Admin() {
 
 		if (!cell.mutable) {
 			return (
-				<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground' : ''}>
+				<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
 					{cell.value}
 				</TableCell>
 			);
 		}
 
 		return (
-			<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground' : ''}>
+			<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
 				<Input
 					value={value}
 					onChange={(e) => setValue(e.target.value)}
