@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+import { updateStationOrder } from '../api/PatchStationOrder';
 import { API_BASE_URL } from '../config/api';
 
 type Station = {
@@ -25,6 +26,33 @@ export default function StationRegistrering() {
 		if (!res.ok) return;
 		const data = await res.json();
 		setStations((data as Array<Station>).sort((a, b) => Number(a.order) - Number(b.order)));
+	};
+
+	const moveStation = async (index: number, direction: 'up' | 'down') => {
+		const newStations = [...stations];
+
+		const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+		if (targetIndex < 0 || targetIndex >= newStations.length) return;
+
+		// 1. Byt plats lokalt
+		[newStations[index], newStations[targetIndex]] = [newStations[targetIndex], newStations[index]];
+
+		// 2. Räkna om order (SOM STRING)
+		const reordered = newStations.map((station, i) => ({
+			...station,
+			order: String(i),
+		}));
+
+		// 3. Uppdatera UI direkt
+		setStations(reordered);
+
+		// 4. Skicka till backend
+		try {
+			await updateStationOrder(reordered);
+		} catch (err) {
+			console.error(err);
+		}
 	};
 
 	useEffect(() => {
@@ -116,17 +144,29 @@ export default function StationRegistrering() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{stations.map((station) => (
+						{stations.map((station, index) => (
 							<TableRow key={station.order}>
 								<TableCell className="font-medium">{station.station_name}</TableCell>
 								<TableCell>{station.order}</TableCell>
 								<TableCell className="text-right">
 									<div className="flex items-center justify-end gap-2">
-										<Button variant="ghost" size="icon" className="size-8">
+										<Button
+											variant="ghost"
+											size="icon"
+											className="size-8"
+											onClick={() => moveStation(index, 'down')}
+											disabled={index === stations.length - 1}
+										>
 											<ChevronDownIcon />
 											<span className="sr-only">Flytta ned</span>
 										</Button>
-										<Button variant="ghost" size="icon" className="size-8">
+										<Button
+											variant="ghost"
+											size="icon"
+											className="size-8"
+											onClick={() => moveStation(index, 'up')}
+											disabled={index === 0}
+										>
 											<ChevronUpIcon />
 											<span className="sr-only">Flytta upp</span>
 										</Button>
