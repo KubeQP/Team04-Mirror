@@ -340,19 +340,95 @@ npm run dev
 
 \section{Backendens Interna Struktur}
 
-Backend är uppdelad enligt ett lagerbaserat mönster:
+\begin{tcolorbox}[
+    colback=CadetBlue,
+    colupper=white,
+    boxrule=1.5pt,
+    arc=6pt,
+    left=20pt,
+    right=20pt,
+    top=20pt,
+    bottom=20pt
+]
 
-\begin{tcolorbox}[colback=CadetBlue, colupper=fg]
 \begin{verbatim}
-    API (Routers)
-          |
-          v
-    CRUD-lager
-          |
-          v
-    Databas (SQLAlchemy)
+        Routers (API)
+              |
+              v
+            Schemas
+              |
+              v
+          CRUD-layer
+              |
+              v
+        SQLAlchemy Models
+              |
+              v
+            Database
 \end{verbatim}
+
 \end{tcolorbox}
+
+
+\subsection{Databasmodeller och Relationer}
+
+Systemets kärna består av tre huvudsakliga modeller:
+
+\subsubsection{Competitor}
+
+Representerar en tävlande i systemet.
+
+\begin{itemize}
+    \item id (primärnyckel)
+    \item start\_number (unik)
+    \item name
+\end{itemize}
+
+Varje tävlande kan ha flera tidsregistreringar.
+
+\subsubsection{Station}
+
+Representerar en kontrollstation i tävlingen.
+
+\begin{itemize}
+    \item id (primärnyckel)
+    \item station\_name
+    \item order (ordning i tävlingen)
+\end{itemize}
+
+\subsubsection{TimeEntry}
+
+Representerar en registrerad tid.
+
+\begin{itemize}
+    \item id (primärnyckel)
+    \item competitor\_id (foreign key)
+    \item station\_id (foreign key)
+    \item timestamp
+\end{itemize}
+
+Relationer:
+
+\begin{itemize}
+    \item En Competitor kan ha flera TimeEntry (1:N).
+    \item En Station kan ha flera TimeEntry (1:N).
+    \item TimeEntry binder ihop tävlande och station.
+\end{itemize}
+
+\subsection{Flöde: Från Endpoint till Databas}
+
+När en HTTP-request når backend sker följande:
+
+\begin{enumerate}
+    \item Routern tar emot anropet och validerar inkommande data via Pydantic-schema.
+    \item En databassession skapas via \texttt{get\_db()}.
+    \item Routern anropar motsvarande funktion i CRUD-lagret.
+    \item CRUD-lagret skapar eller hämtar SQLAlchemy-objekt.
+    \item \texttt{db.add()}, \texttt{db.commit()} och \texttt{db.refresh()} används vid skrivning.
+    \item Objektet returneras till routern.
+    \item FastAPI serialiserar objektet till JSON enligt response\_model.
+\end{enumerate}
+
 
 \subsection{Ansvarsfördelning}
 
@@ -403,9 +479,85 @@ Flöde:
     \item Frontend skickar HTTP-request.
     \item Router tar emot anropet.
     \item CRUD-lagret utför databasoperation.
-    \item Resultat returneras som JSON. \textbf{ADD STRUCTURE OF JSON HERE}
-    \item Frontend uppdaterar användargränssnittet.
+    \item Resultat returneras som JSON enligt definierade Pydantic-scheman.
 \end{enumerate}
+
+\subsection{Exempel på JSON-struktur}
+
+\subsubsection{Registrera tävlande}
+
+\textbf{Request:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+POST /api/competitors/register
+
+{
+  "start_number": 101,
+  "name": "Anna Andersson"
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\textbf{Response:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+{
+  "start_number": 101,
+  "name": "Anna Andersson"
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsubsection{Registrera tid}
+
+\textbf{Request:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+POST /api/times/record
+
+{
+  "start_number": 101,
+  "timestamp": "2025-01-01T12:00:00",
+  "station_id": 1
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\textbf{Response:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+{
+  "id": 15,
+  "competitor_id": 3,
+  "station_id": 1,
+  "timestamp": "2025-01-01T12:00:00"
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsubsection{Hämta tider för tävlande}
+
+\textbf{Request:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+GET /api/times/101
+\end{verbatim}
+\end{tcolorbox}
+
+\textbf{Response:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+[
+  {
+    "id": 15,
+    "competitor_id": 3,
+    "station_id": 1,
+    "timestamp": "2025-01-01T12:00:00"
+  }
+]
+\end{verbatim}
+\end{tcolorbox}
+
 
 \noindent
 {\color{BlueViolet} \rule{\linewidth}{0.5mm}}
@@ -426,7 +578,9 @@ Under en tävling distribueras systemet enligt följande:
 \section{Vidareutveckling}
 För att lägga till ny funktionalitet eller uppdatera denna dokumentationen kan följande sektioner hjälpleda utvecklingen. 
 
-Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Detta medför även att refaktorisering ska göras \textbf{CONTINUE HERE}
+Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Detta medför även att refaktorisering ska göras kontinuerligt för att bibehålla kodkvalitet och tydlig struktur.
+All ny funktionalitet ska först specificeras genom tester innan implementation påbörjas.
+Tester placeras i \texttt{tests/}-mappen och ska täcka både lyckade och felaktiga scenarion.
 
 \subsection{Backend}
 
