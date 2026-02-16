@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 
 import Navbar from './components/Navbar';
 import { ThemeProvider } from './components/ThemeProvider';
+import { TooltipProvider } from './components/ui/tooltip';
 
 const navigationData = [
 	{
@@ -36,14 +37,16 @@ export default function App() {
 
 	return (
 		<ThemeProvider>
-			<div className="max-h-screen overflow-hidden">
-				<Navbar navigationData={navigationData} />
+			<TooltipProvider>
+				<div className="max-h-screen overflow-hidden">
+					<Navbar navigationData={navigationData} />
 
-				<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-					<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
-				</main>
-				<Toaster />
-			</div>
+					<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+						<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
+					</main>
+					<Toaster />
+				</div>
+			</TooltipProvider>
 		</ThemeProvider>
 	);
 }

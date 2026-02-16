@@ -1,5 +1,5 @@
 // src/pages/RegistreringStoppTid.tsx
-import { Undo2Icon } from 'lucide-react';
+import { EraserIcon, Undo2Icon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -26,6 +26,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
@@ -160,14 +161,21 @@ export default function RegistreringStoppTid() {
 							</SelectGroup>
 						</SelectContent>
 					</Select>
-					<Button
-						variant="ghost"
-						hidden={selectedStationId === ''}
-						onClick={() => setSelectedStationId('')}
-						size="icon"
-					>
-						<Undo2Icon />
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								hidden={selectedStationId === ''}
+								onClick={() => setSelectedStationId('')}
+								size="icon"
+							>
+								<Undo2Icon />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Ångra val av station</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 			</Field>
 			<Field className="my-4">
@@ -242,7 +250,25 @@ export default function RegistreringStoppTid() {
 					</ScrollArea>
 				</div>
 				<div className="w-full">
-					<h2 className="text-lg font-semibold mb-2">Senaste registreringar</h2>
+					<div className="flex">
+						<h2 className="text-lg flex-1 font-semibold mb-2">Senaste registreringar</h2>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setLatestRegistrations([]);
+										localStorage.removeItem('latestStopTimes');
+									}}
+								>
+									<EraserIcon />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Rensa senaste registreringar (lokalt, påverkar inte backend)</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
 					<ScrollArea className="h-[50vh] rounded-md border px-2">
 						<Table>
 							<TableHeader className="h-12">
