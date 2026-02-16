@@ -9,8 +9,6 @@ from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
 
-from typing import cast
-
 
 def get_competitors(db: Session) -> list[Competitor]:
     """Hämta alla tävlande från databasen."""
