@@ -1,6 +1,6 @@
 import type { StationData } from '../types';
 
-export async function updateStationOrder(stations: StationData[]): Promise<void> {
+export async function updateStationOrder(stations: Omit<StationData, 'id'>[]): Promise<void> {
 	const response = await fetch('http://127.0.0.1:8000/api/stations/updateOrder/', {
 		method: 'PATCH',
 		headers: {

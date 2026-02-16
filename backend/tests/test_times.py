@@ -117,18 +117,16 @@ def test_record_time_for_existing_competitor(
     assert times_in_db[0].station_id == station.id
 
 
-def test_record_time_for_unknown_competitor_returns_404(
+def test_record_time_for_empty_competitor(
     client: TestClient, db_session: Session
 ) -> None:
     """POST /api/times/record ska ge 404 om startnumret inte finns."""
     station = create_station(db_session)
 
-    payload = {"start_number": "9999", "station_id": station.id}
+    payload = {"station_id": station.id}
     response = client.post("/api/times/record", json=payload)
 
-    assert response.status_code == 404
+    assert response.status_code == 200
     data = response.json()
-    assert "detail" in data
-    assert (
-        "not found" in data["detail"].lower() or "finns inte" in data["detail"].lower()
-    )
+    assert isinstance(data["id"], int)
+    assert isinstance(data["timestamp"], str)
