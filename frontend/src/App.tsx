@@ -26,7 +26,8 @@ const navigationData = [
 		title: 'Admin',
 		href: '/admin',
 	},
-];export const competition : number = 0;
+];
+export const competition : number = 0;
 export default function App() {
 	const [competitorsVersion, setCompetitorsVersion] = useState(0);
 
