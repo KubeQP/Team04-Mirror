@@ -24,23 +24,19 @@ const router = createBrowserRouter([
 		children: [
 			{
 				index: true, // path: ""
-				element: <h2>Välkommen till startsidan!</h2>,
+				element: <Resultatvisare />,
 			},
 			{
-				path: 'StationRegistrering',
+				path: 'register/station',
 				element: <StationRegistrering />,
 			},
 			{
-				path: 'Registrering',
+				path: 'register/participant',
 				element: <Registrering />,
 			},
 			{
-				path: 'RegistreringStoppTid',
+				path: 'register/time',
 				element: <RegistreringStoppTid />,
-			},
-			{
-				path: 'resultatvisare',
-				element: <Resultatvisare />,
 			},
 			{
 				path: 'admin',

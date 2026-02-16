@@ -52,8 +52,6 @@ beforeEach(() => {
 	vi.mocked(getCompetitorData).mockResolvedValue(competitors);
 	vi.mocked(getTimeData).mockResolvedValue(times);
 	vi.mocked(getStationData).mockResolvedValue(stations);
-
-	render(<Admin />);
 });
 
 //Alla förväntade tabell värden visas som förväntad
@@ -112,7 +110,9 @@ describe('Dubbelregistrering med samma startnummer och station', () => {
 
 	it('markerar celler med samma startnummer och station som röd', async () => {
 		await waitFor(() => {
-			const redCells = screen.getAllByText('123').filter((el) => (el as HTMLElement).className === 'incorrect-cell');
+			const redCells = screen
+				.getAllByText('123')
+				.filter((el) => (el as HTMLElement).classList.contains('incorrect-cell'));
 			expect(redCells.length).toBeGreaterThan(0);
 		});
 	});

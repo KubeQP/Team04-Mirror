@@ -1,4 +1,12 @@
 Denna release innehåller:
+ - Fixes: 
+  - Manual: Förtydliga, bilder & separera användarmanual och installationsbeskrivning.
+  - Stoptid: Textfält istället för Dropdown.
+  - Admin: namn på station & formattering
+  - Stopptid registrering: 
+   - Svårare att byta station, men möjligt att ångra.
+   - Söka bland tävlande
+ 
 
 Färdigt:
 B1, B2, B3, B5, B6, B7, B8, F1, F4, F17
