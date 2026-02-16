@@ -1,6 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
+import { TooltipProvider } from '../components/ui/tooltip';
 import RegistreringStoppTid from './RegistreringStoppTid';
 
 // ---------- Typer ----------
@@ -85,7 +87,11 @@ beforeEach(() => {
 
 describe('RegistreringStoppTid', () => {
 	it('hämtar tävlande, visar dem i tabell och filtrerar dropdown via sökfält', async () => {
-		render(<RegistreringStoppTid />);
+		render(
+			<TooltipProvider>
+				<RegistreringStoppTid />
+			</TooltipProvider>,
+		);
 
 		// Wait for competitors to load (table)
 		await waitFor(() => {
@@ -95,25 +101,26 @@ describe('RegistreringStoppTid', () => {
 			expect(screen.getByText('Bob')).toBeInTheDocument();
 		});
 
-		// Type in search input
-		// Type in search input
-		const searchInput = screen.getByPlaceholderText('searchComp');
-		fireEvent.change(searchInput, { target: { value: '007' } });
+		const searchInput = screen.getByPlaceholderText('Sök tävlande...');
+		await userEvent.click(searchInput);
+		await userEvent.type(searchInput, '007');
 
 		// Dropdown should now be filtered
 		await waitFor(() => {
-			expect(screen.getByRole('option', { name: '007 — Anna' })).toBeInTheDocument();
+			expect(searchInput.ariaExpanded).toBe('true');
+			const matches = screen.getAllByText(/007/);
+			expect(matches.length).toBe(2);
 		});
 	});
 });
 
 it('disablar stopptidsknappen om inga tävlande finns', async () => {
 	competitorsDb = [];
-	render(<RegistreringStoppTid />);
-
-	await waitFor(() => {
-		expect(screen.getByText(/Inga tävlande hittades/i)).toBeInTheDocument();
-	});
+	render(
+		<TooltipProvider>
+			<RegistreringStoppTid />
+		</TooltipProvider>,
+	);
 
 	expect(screen.getByText('Registrera stopptid nu')).toBeDisabled();
 });

@@ -27,7 +27,7 @@ class TimeEntry(Base):
     __tablename__ = "times"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     competitor_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("competitors.id"), index=True
+        Integer, ForeignKey("competitors.id"), index=True, nullable=True
     )
     station_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("stations.id"), index=True
