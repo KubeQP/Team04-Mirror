@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
@@ -380,24 +381,46 @@ export default function Admin() {
 
 	return (
 		<div>
-			<h2>Admin Sida</h2>
-			<p>Välkommen till administrationssidan.</p>
-			<input type="number" placeholder="Minimitid (min)" value={minTime} onChange={(e) => setMinTime(e.target.value)} />
-			<button
-				type="button"
-				onClick={() => {
-					const value = Number(minTime);
-					setMinTimeSaved(value);
-					localStorage.setItem('minTime', value.toString());
-				}}
-			>
-				Spara
-			</button>
+			<h1 className="text-xl font-bold pb-4">Adminsida:</h1>
+			<div className="flex justify-end mb-4">
+				<div className="text-right space-y-2">
+					<h2 className="text-sm font-semibold">Minimitid</h2>
 
-			{minTimeSaved !== null && <p>Aktuell minimitid: {minTimeSaved} min</p>}
+					<Input
+  						type="number"
+  						placeholder="Minimitid (min)"
+  						value={minTime}
+  						onChange={(e) => {
+    						const val = e.target.value;
+    						if (/^\d*$/.test(val)) {
+      							setMinTime(val);
+    						}
+  						}}
+					/>
+
+
+					<Button
+						type="button"
+						onClick={() => {
+							const value = Number(minTime);
+							setMinTimeSaved(value);
+							localStorage.setItem('minTime', value.toString());
+						}}
+						size="sm"
+					>
+					Spara
+				</Button>
+
+			{minTimeSaved !== null && (
+			<p className="text-xs text-muted-foreground">
+				Aktuell minimitid: {minTimeSaved} min
+			</p>
+			)}
+		</div>
+		</div>
+
 
 			<div className="Admin-tables">
-			<h1 className="text-xl font-bold pb-4">Adminsida:</h1>
 			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
@@ -410,11 +433,11 @@ export default function Admin() {
 				) : (
 					<div className="flex gap-6">
 						<div className="w-1/3">
-							<h2 className="text-lg font-semibold mb-2">Stationer</h2>
+							<h3 className="text-lg font-semibold mb-2">Stationer</h3>
 							{createTable(stationTable)}
 						</div>
 						<div className="w-2/3">
-							<h2 className="text-lg font-semibold mb-2">Tävlande</h2>
+							<h3 className="text-lg font-semibold mb-2">Tävlande</h3>
 							{createTable(competitorTable)}
 						</div>
 					</div>
