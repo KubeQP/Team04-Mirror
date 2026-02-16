@@ -319,6 +319,10 @@ Alternativt:
 pip install -r requirements.txt
 python run.py
 \end{verbatim}
+Vänligen notera att det finns en ytterligare fil \texttt{requirements-dev.txt} som innehåller utvecklingsberoenden, inklusive testverktyg. Dessa är inte nödvändiga, men används av teamet och är ett smidigt verktyg. För att installera dessa kan följande kommando användas innan du kör python-filen:
+\begin{verbatim}
+pip install -r requirements-dev.txt
+\end{verbatim} 
 \end{tcolorbox}
 
 \subsection{Frontend}
@@ -443,6 +447,11 @@ Vänligen notera att det praktiseras \textbf{Test Driven Development} och förut
 \end{enumerate}
 
 \subsection{Teknisk Dokumentation}
+\begin{enumerate}
+    \item Uppdatera arkitekturdiagram vid större förändringar.
+    \item Lägg till beskrivningar av nya moduler och filer.
+    \item Dokumentera API-kontrakt i \texttt{schemas.py}.
+\end{enumerate}
 
 
 \noindent
