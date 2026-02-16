@@ -52,22 +52,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
             [
                 TimeEntry(
                     competitor_id=competitors[0].id,
-                    timestamp=datetime(2025, 6, 27, 12, 31, 39),
+                    timestamp="00:00:00",
                     station_id=station1.id,
                 ),
                 TimeEntry(
                     competitor_id=competitors[1].id,
-                    timestamp=datetime(2025, 6, 27, 12, 32, 15),
+                    timestamp="00:00:00",
                     station_id=station1.id,
                 ),
                 TimeEntry(
                     competitor_id=competitors[0].id,
-                    timestamp=datetime(2025, 6, 27, 12, 47, 38),
+                    timestamp="00:00:00",
                     station_id=station2.id,
                 ),
                 TimeEntry(
                     competitor_id=competitors[1].id,
-                    timestamp=datetime(2025, 6, 27, 12, 52, 5),
+                    timestamp="00:00:00",
                     station_id=station2.id,
                 ),
             ]

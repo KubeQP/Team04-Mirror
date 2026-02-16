@@ -3,9 +3,19 @@
 # Kommentar: CRUD står för Create, Read, Update, Delete och innehåller
 # funktioner för att interagera med databasen, som anropas från routrar.
 
-from datetime import datetime
+from datetime import datetime, date
+from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
+
+STHLM = ZoneInfo("Europe/Stockholm")
+
+# Konverterar HH:MM:SS til isoTime som är hur vi sparar tider i databasen
+def hms_to_dt_today(hms: str) -> datetime:
+    t = datetime.strptime(hms, "%H:%M:%S").time()
+    return datetime.combine(date.today(), t, tzinfo=STHLM)
+
+
 
 from .models import Competitor, Station, TimeEntry
 
@@ -31,15 +41,17 @@ def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]
 
 
 def record_time_for_start_number(
-    db: Session, start_number: str, timestamp: datetime | None, station_id: int | None
+    db: Session, start_number: str, timestamp: str | None, station_id: int | None
 ) -> TimeEntry | None:
     """Registrera en ny tid för en tävlande med angivet startnummer."""
     competitor = db.query(Competitor).filter_by(start_number=start_number).first()
     if competitor is None:
         return None  # hanteras i router
     entry = TimeEntry(
-        competitor_id=competitor.id, timestamp=timestamp, station_id=station_id
+        competitor_id=competitor.id, station_id=station_id
     )
+    if timestamp is not None:
+        entry.timestamp = hms_to_dt_today(timestamp)
     db.add(entry)
     db.commit()
     db.refresh(entry)

@@ -3,12 +3,13 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
+
 # Definierar hur data skickas och tas emot via API:et
 
 
 class RecordTimeIn(BaseModel):
     start_number: str
-    timestamp: datetime | None = None
+    timestamp: str | None = None
     station_id: int | None = None
 
 
