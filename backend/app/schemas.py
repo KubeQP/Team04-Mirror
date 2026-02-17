@@ -73,3 +73,6 @@ class CompetitionsReg(BaseModel):
 
 class CompetitionsOut(BaseModel):
     id: int
+
+class CompetitionsRemove(BaseModel):
+    id: int

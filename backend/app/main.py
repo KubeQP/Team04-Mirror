@@ -110,6 +110,7 @@ app.add_middleware(
 app.include_router(competitors.router, prefix="/api")
 app.include_router(times.router, prefix="/api")
 app.include_router(stations.router, prefix="/api")
+app.include_router(competitions.router, prefix="/api")
 
 # 'Mounta' frontend dist mappen (efter build)
 if os.path.exists("../frontend/dist"):

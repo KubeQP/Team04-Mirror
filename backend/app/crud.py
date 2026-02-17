@@ -139,3 +139,12 @@ def record_new_competition(
 
 def get_competitions(db: Session) -> list[Competition]:
     return db.query(Competition).all()
+
+
+def remove_competition(db: Session, competition_id: int):
+    competition = db.query(Competition).filter(Competition.id == competition_id).first()
+    if competition:
+        db.delete(competition)
+        db.commit()
+        return True
+    return False

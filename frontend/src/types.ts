@@ -24,3 +24,8 @@ export interface StationData {
 	order: string;
 	competition_id: number;
 }
+
+export interface CompetitionData {
+	id: number;
+}
+
