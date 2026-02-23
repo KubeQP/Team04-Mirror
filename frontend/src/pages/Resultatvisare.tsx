@@ -10,7 +10,7 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-// src/pages/Admin.tsx
+
 export default function Resultatvisare() {
 	//declaring constants for the imports
 
@@ -26,48 +26,48 @@ export default function Resultatvisare() {
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
+	const fetchData = async () => {
+		// Competitor data
+		try {
+			const result = await getCompetitorData();
+			setCompetitorData(result);
+			console.log('Fetched competitor data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setCompetitorError(err.message);
+			else if (typeof err === 'string') setCompetitorError(err);
+			else setCompetitorError('Ett okänt fel inträffade');
+		} finally {
+			setCompetitorLoading(false);
+		}
+
+		// Time data
+		try {
+			const result = await getTimeData();
+			setTimeData(result);
+			console.log('Fetched time data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setTimeError(err.message);
+			else if (typeof err === 'string') setTimeError(err);
+			else setTimeError('Ett okänt fel inträffade');
+		} finally {
+			setTimeLoading(false);
+		}
+
+		// Station data
+		try {
+			const result = await getStationData();
+			setStationData(result);
+			console.log('Fetched station data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setStationError(err.message);
+			else if (typeof err === 'string') setStationError(err);
+			else setStationError('Ett okänt fel inträffade');
+		} finally {
+			setStationLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		const fetchData = async () => {
-			// Competitor data
-			try {
-				const result = await getCompetitorData();
-				setCompetitorData(result);
-				console.log('Fetched competitor data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setCompetitorError(err.message);
-				else if (typeof err === 'string') setCompetitorError(err);
-				else setCompetitorError('Ett okänt fel inträffade');
-			} finally {
-				setCompetitorLoading(false);
-			}
-
-			// Time data
-			try {
-				const result = await getTimeData();
-				setTimeData(result);
-				console.log('Fetched time data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setTimeError(err.message);
-				else if (typeof err === 'string') setTimeError(err);
-				else setTimeError('Ett okänt fel inträffade');
-			} finally {
-				setTimeLoading(false);
-			}
-
-			// Station data
-			try {
-				const result = await getStationData();
-				setStationData(result);
-				console.log('Fetched station data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setStationError(err.message);
-				else if (typeof err === 'string') setStationError(err);
-				else setStationError('Ett okänt fel inträffade');
-			} finally {
-				setStationLoading(false);
-			}
-		};
-
 		fetchData();
 	}, []);
 
@@ -156,6 +156,7 @@ export default function Resultatvisare() {
 		tempArray.push(formatTotalTime(ResultObject.Total));
 		tableArray.push(tempArray);
 	});
+	
 	//dynamic table creation
 	function createTable(tableData: string[][]) {
 		if (tableData.length === 0) return null;
