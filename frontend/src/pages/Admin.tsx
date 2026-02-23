@@ -11,24 +11,22 @@ import { getTimeData } from '../api/getTimeData';
 import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-
 export default function Admin() {
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
-	
+
 	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
-	
+
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
-	
-	const [stationTable, setStationTable] = useState<Cell[][]>([]);
-	//// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [resultView] = useState<'startnummer' | 'resultat'>('startnummer');
 
+	const [stationTable, setStationTable] = useState<Cell[][]>([]);
+
+	const [resultView] = useState<'startnummer' | 'resultat'>('startnummer');
 
 	// Fetch data
 	const fetchData = async () => {
@@ -43,7 +41,7 @@ export default function Admin() {
 		} finally {
 			setCompetitorLoading(false);
 		}
-		
+
 		try {
 			const times = await getTimeData();
 			setTimeData(times);
@@ -55,7 +53,7 @@ export default function Admin() {
 		} finally {
 			setTimeLoading(false);
 		}
-		
+
 		try {
 			const stations = await getStationData();
 			setStationData(stations);
@@ -68,11 +66,11 @@ export default function Admin() {
 			setStationLoading(false);
 		}
 	};
-	
+
 	useEffect(() => {
 		fetchData();
 	}, []);
-	
+
 	interface Cell {
 		value: string;
 		correct: boolean;
@@ -88,43 +86,28 @@ export default function Admin() {
 	const competitorsByResult = competitorData
 		? [...competitorData].sort((a, b) => {
 				const aStart = timeData?.find(
-					(t) =>
-						t.competitor_id === a.id &&
-						stationData?.find((s) => s.id === t.station_id)?.order === '0',
+					(t) => t.competitor_id === a.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
 				);
 				const aStop = timeData?.find(
-					(t) =>
-						t.competitor_id === a.id &&
-						stationData?.find((s) => s.id === t.station_id)?.order === '1',
+					(t) => t.competitor_id === a.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
 				);
 
 				const bStart = timeData?.find(
-					(t) =>
-						t.competitor_id === b.id &&
-						stationData?.find((s) => s.id === t.station_id)?.order === '0',
+					(t) => t.competitor_id === b.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
 				);
 				const bStop = timeData?.find(
-					(t) =>
-						t.competitor_id === b.id &&
-						stationData?.find((s) => s.id === t.station_id)?.order === '1',
+					(t) => t.competitor_id === b.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
 				);
 
 				const aTotal =
-					aStart && aStop
-						? new Date(aStop.timestamp).getTime() -
-						  new Date(aStart.timestamp).getTime()
-						: Infinity;
+					aStart && aStop ? new Date(aStop.timestamp).getTime() - new Date(aStart.timestamp).getTime() : Infinity;
 
 				const bTotal =
-					bStart && bStop
-						? new Date(bStop.timestamp).getTime() -
-						  new Date(bStart.timestamp).getTime()
-						: Infinity;
+					bStart && bStop ? new Date(bStop.timestamp).getTime() - new Date(bStart.timestamp).getTime() : Infinity;
 
 				return aTotal - bTotal;
-		  })
+			})
 		: [];
-
 
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
@@ -160,7 +143,6 @@ export default function Admin() {
 		return { value: formatted, correct: true };
 	}
 
-
 	// Redigerbar cell
 	function EditableCell({ cell, rowIndex, cellIndex }: { cell: Cell; rowIndex: number; cellIndex: number }) {
 		const [value, setValue] = useState(cell.value);
@@ -168,7 +150,11 @@ export default function Admin() {
 		useEffect(() => setValue(cell.value), [cell.value]);
 
 		if (!cell.mutable)
-			return <TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>{cell.value}</TableCell>;
+			return (
+				<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
+					{cell.value}
+				</TableCell>
+			);
 
 		return (
 			<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
@@ -193,7 +179,6 @@ export default function Admin() {
 			const validated = validateStationDuplicates(updated);
 
 			return validated;
-
 		});
 
 		const row = stationTable[rowIndex + 1];
@@ -223,7 +208,6 @@ export default function Admin() {
 			timestamp: timeData?.find((t) => t.id === timeId)?.timestamp ?? '-',
 			station_id: row[0].id,
 		});
-
 	}
 
 	const validateStationDuplicates = useCallback((table: Cell[][]): Cell[][] => {
@@ -258,7 +242,6 @@ export default function Admin() {
 		return updated;
 	}, []);
 
-
 	// Bygg stationstabell
 	useEffect(() => {
 		if (!timeData || !stationData || !competitorData) return;
@@ -286,28 +269,21 @@ export default function Admin() {
 
 	// Bygg tävlandetable
 	const competitorsToRender: CompetitorData[] = competitorData
-  		? resultView === 'startnummer'
-    		? [...competitorData].sort((a, b) => Number(a.start_number) - Number(b.start_number))
-    		: competitorsByResult.sort((a, b) => {
-				const getTotal = (c: CompetitorData) => {
-					const start = timeData?.find(
-						(t) =>
-						t.competitor_id === c.id &&
-						stationData?.find((s) => s.id === t.station_id)?.order === '0'
-					);
-					const stop = timeData?.find(
-						(t) =>
-						t.competitor_id === c.id &&
-						stationData?.find((s) => s.id === t.station_id)?.order === '1'
-					);
-					return start && stop
-						? new Date(stop.timestamp).getTime() - new Date(start.timestamp).getTime()
-						: Infinity;
+		? resultView === 'startnummer'
+			? [...competitorData].sort((a, b) => Number(a.start_number) - Number(b.start_number))
+			: competitorsByResult.sort((a, b) => {
+					const getTotal = (c: CompetitorData) => {
+						const start = timeData?.find(
+							(t) => t.competitor_id === c.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
+						);
+						const stop = timeData?.find(
+							(t) => t.competitor_id === c.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
+						);
+						return start && stop ? new Date(stop.timestamp).getTime() - new Date(start.timestamp).getTime() : Infinity;
 					};
-				return getTotal(a) - getTotal(b);
-      })
-  : [];
-
+					return getTotal(a) - getTotal(b);
+				})
+		: [];
 
 	const competitorTable: Cell[][] = [];
 	const headerRow2: Cell[] = [
@@ -320,15 +296,27 @@ export default function Admin() {
 	competitorTable.push(headerRow2);
 
 	competitorsToRender.forEach((competitor) => {
-		const startTimes = timeData?.filter(
-			(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
-		) || [];
-		const stopTimes = timeData?.filter(
-			(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
-		) || [];
+		const startTimes =
+			timeData?.filter(
+				(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
+			) || [];
+		const stopTimes =
+			timeData?.filter(
+				(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
+			) || [];
 
-		const startTime = { value: startTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-', correct: true, mutable: false, id: competitor.id };
-		const stopTime = { value: stopTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-', correct: true, mutable: false, id: competitor.id };
+		const startTime = {
+			value: startTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-',
+			correct: true,
+			mutable: false,
+			id: competitor.id,
+		};
+		const stopTime = {
+			value: stopTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-',
+			correct: true,
+			mutable: false,
+			id: competitor.id,
+		};
 		const totalTimeRaw = calculateTotalTime(startTimes, stopTimes);
 
 		const totalTime: Cell = {
@@ -337,7 +325,6 @@ export default function Admin() {
 			mutable: false,
 			id: competitor.id,
 		};
-
 
 		if (startTime.value === '-' || countTimesInString(startTime.value) > 1) startTime.correct = false;
 		if (stopTime.value === '-' || countTimesInString(stopTime.value) > 1) stopTime.correct = false;
@@ -349,11 +336,10 @@ export default function Admin() {
 			{ value: competitor.start_number, correct: true, mutable: false, id: competitor.id },
 			{ value: competitor.name, correct: true, mutable: false, id: competitor.id },
 			startTime,
-			stopTime, 
+			stopTime,
 			totalTime,
 		];
 		competitorTable.push(competitorRow);
-
 	});
 
 	function createTable(tableData: Cell[][]) {

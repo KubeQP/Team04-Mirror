@@ -85,6 +85,13 @@ export default function StationRegistrering() {
 		if (!stationName.trim()) return;
 		if (!order.trim()) return;
 
+		const parsedOrder = Number(order);
+
+		const maxOrder = stations.length ? Math.max(...stations.map((s) => Number(s.order))) : -1;
+
+		const normalizedOrder =
+			isNaN(parsedOrder) || parsedOrder > maxOrder + 1 ? String(maxOrder + 1) : String(parsedOrder);
+
 		try {
 			const res = await fetch(`${API_BASE_URL}/api/stations/registerstation`, {
 				method: 'POST',
@@ -93,7 +100,7 @@ export default function StationRegistrering() {
 				},
 				body: JSON.stringify({
 					station_name: stationName,
-					order: order,
+					order: normalizedOrder,
 				}),
 			});
 
