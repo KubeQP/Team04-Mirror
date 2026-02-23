@@ -30,7 +30,7 @@ vi.mock('../api/getStationData', () => ({
 	getStationData: vi.fn(),
 }));
 
-vi.mock('../components/competition', () => ({
+vi.mock('../components/Competition', () => ({
 	useCompetition: () => ({ competition: 0, setCompetition: vi.fn() }),
 }));
 
