@@ -39,7 +39,7 @@ npm run dev
 ```
 
 Det startar en utvecklingsserver på
-[http://localhost:5173](http://localhost:5173).
+[http://localhost:5177](http://localhost:5177).
 
 Öppna den i webbläsaren för att se appen. När du gör ändringar i koden kommer
 sidan att uppdateras automatiskt. Avsluta servern med `Ctrl + C` i terminalen

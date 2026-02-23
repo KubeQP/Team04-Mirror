@@ -25,7 +25,7 @@ För att komma åt den lokala webbapplikationen kan du skriva:
 ```bash
 npm run dev
 ```
-Då startas en utvecklingsserver på [http://localhost:5173](http://localhost:5173). Denna kan avslutas med `Ctrl + C`.
+Då startas en utvecklingsserver på [http://localhost:5177](http://localhost:5177). Denna kan avslutas med `Ctrl + C`.
 
 Testa gärna att allting fungerar genom att köra:
 ```bash
