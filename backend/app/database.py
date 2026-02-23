@@ -8,6 +8,8 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
+
+
 SQLALCHEMY_DATABASE_URL = "sqlite:///./race.db"  # hamnar i projektroten
 
 # Enginge hanterar kopplingen till databasen

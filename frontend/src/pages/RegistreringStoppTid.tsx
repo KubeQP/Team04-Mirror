@@ -50,6 +50,7 @@ type LocalTimeEntry = {
 	station_id: number;
 	station_name?: string;
 	timestamp: string;
+	competition_id: number
 };
 
 type OutletCtx = {
@@ -71,18 +72,26 @@ export default function RegistreringStoppTid() {
 	const [latestRegistrations, setLatestRegistrations] = useState<LocalTimeEntry[]>([]);
 
 	useEffect(() => {
-		const stored = localStorage.getItem('latestStopTimes');
-		if (stored) {
-			setLatestRegistrations(JSON.parse(stored));
-		}
-	}, []);
+	const stored = localStorage.getItem('latestStopTimes');
+	if (stored) {
+		const parsed = JSON.parse(stored);
+		console.log('parsed:', parsed);
+    	console.log('competition:', competition);
+    	console.log('filtered:', parsed.filter((t: LocalTimeEntry) => t.competition_id === competition));
+		setLatestRegistrations(parsed.filter((t: LocalTimeEntry) => Number(t.competition_id) === competition));
+	}
+	}, [competition]);
 
 	const fetchData = async () => {
 		const result = await getCompetitorData();
-		setCompetitors(result);
+		setCompetitors(result.filter(c =>
+				c.competition_id === competition
+			));
 
 		const res = await getStationData();
-		setStations(res);
+		setStations(res.filter(c =>
+				c.competition_id === competition
+			));
 	};
 
 	// Hämta vid första mount
@@ -93,7 +102,7 @@ export default function RegistreringStoppTid() {
 	// Hämta igen när någon registrerar en ny tävlande på registreringssidan
 	useEffect(() => {
 		fetchData();
-	}, [competitorsVersion]);
+	}, [competition, competitorsVersion]);
 
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
@@ -101,38 +110,41 @@ export default function RegistreringStoppTid() {
 	);
 
 	const recordStopTimeNow = async () => {
-		const response = await fetch(`${API_BASE_URL}/api/times/record`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				start_number: selectedStartNumber,
-				station_id: selectedStationId,
-				timestamp: new Date().toISOString(),
-				competition_id: competition
-			}),
-		});
+	const response = await fetch(`${API_BASE_URL}/api/times/record`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+		start_number: selectedStartNumber,
+		station_id: selectedStationId,
+		timestamp: new Date().toISOString(),
+		competition_id: competition
+		}),
+	});
 
-		if (!response.ok) {
-			throw new Error('Failed to register time');
-		}
+	if (!response.ok) throw new Error('Failed to register time');
 
-		// Create local entry
-		const newEntry: LocalTimeEntry = {
-			id: crypto.randomUUID(),
-			start_number: selectedStartNumber,
-			name: selectedCompetitor?.name,
-			station_id: selectedStationId as number,
-			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
-			timestamp: new Date().toISOString(),
-		};
-
-		const updated = [newEntry, ...latestRegistrations].slice(0, 20); // keep last 20
-		setLatestRegistrations(updated);
-		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
-
-		return response;
+	const newEntry: LocalTimeEntry = {
+		id: crypto.randomUUID(),
+		start_number: selectedStartNumber,
+		name: selectedCompetitor?.name,
+		station_id: selectedStationId as number,
+		station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
+		timestamp: new Date().toISOString(),
+		competition_id: competition,
 	};
 
+	// Hämta ALLA sparade tider, inte bara de filtrerade
+	const stored = localStorage.getItem('latestStopTimes');
+	const allEntries: LocalTimeEntry[] = stored ? JSON.parse(stored) : [];
+	
+	const updated = [newEntry, ...allEntries].slice(0, 20);
+	localStorage.setItem('latestStopTimes', JSON.stringify(updated));
+	
+	// Uppdatera state med bara denna tävlingens tider
+	setLatestRegistrations(updated.filter(t => t.competition_id === competition));
+
+	return response;
+	};
 	return (
 		<div>
 			<h1 className="text-xl font-bold pb-2">Registrera stopptid:</h1>

@@ -10,7 +10,6 @@ import { createCompetition } from './api/postCompetitionData';
 import { API_BASE_URL } from './config/api';
 import type { CompetitionData } from './types';
 import { useCompetition } from './components/Competition';
-import { CompetitionProvider } from './components/Competition';
 
 const navigationData = [
 	{
@@ -84,24 +83,24 @@ export default function App() {
 
 			// Skapa start och mål-stationer
 			await Promise.all(
-			[{ station_name: 'start', order: 0 }, { station_name: 'mål', order: 1 }].map((station) =>
-				fetch(`${API_BASE_URL}/api/stations/registerstation`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ...station, competition_id: newCompetition.id }),
-				})
-			)
-			);
+				[{ station_name: 'start', order: 0 }, { station_name: 'mål', order: 1 }].map((station) =>
+					fetch(`${API_BASE_URL}/api/stations/registerstation`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ ...station, competition_id: newCompetition.id }),
+					})
+				)
+				);
 
-		} catch (err: unknown) {
-			if (err instanceof Error) {
-			console.error('Fel vid skapande av tävling:', err.message);
-			alert(`Kunde inte skapa tävling: ${err.message}`);
-			} else {
-			console.error('Okänt fel vid skapande av tävling');
-			alert('Ett okänt fel inträffade');
-			}
-		}
+			} catch (err: unknown) {
+					if (err instanceof Error) {
+					console.error('Fel vid skapande av tävling:', err.message);
+					alert(`Kunde inte skapa tävling: ${err.message}`);
+					} else {
+					console.error('Okänt fel vid skapande av tävling');
+					alert('Ett okänt fel inträffade');
+					}
+				}
 		};
 
 // I din App.tsx, uppdatera handleRemoveCompetition:

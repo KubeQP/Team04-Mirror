@@ -48,7 +48,7 @@ export default function Registrering() {
 
 	useEffect(() => {
 		fetchCompetitors();
-	}, []);
+	}, [competition]);
 
 	const addReg = async () => {
 		console.log('add reg');

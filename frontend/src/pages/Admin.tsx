@@ -17,15 +17,17 @@ export default function Admin() {
 	//const [competitionState, setCompetitionState]= useState<number | null>(null);
 	//declaring constants for the imports
 
-	const [unfilteredCompetitorData, setUnfilteredCompetitorData] = useState<Array<CompetitorData> | null>(null);
+	
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
 
+	
 	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
+	
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
@@ -37,7 +39,6 @@ export default function Admin() {
 		// Competitor data
 		try {
 			const result = await getCompetitorData();
-			setUnfilteredCompetitorData(result);
 			setCompetitorData(result.filter(c =>
 				c.competition_id === competition));
 			console.log('Fetched competitor data');
@@ -82,12 +83,9 @@ export default function Admin() {
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [competition]);
+	
 
-	useEffect(() => {
-	if (!unfilteredCompetitorData) return;
-	setCompetitorData(unfilteredCompetitorData.filter(c => c.competition_id === competition));
-	}, [competition, unfilteredCompetitorData]);
 
 	interface Cell {
 		value: string;

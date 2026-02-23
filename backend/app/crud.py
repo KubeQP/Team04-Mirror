@@ -147,4 +147,5 @@ def remove_competition(db: Session, competition_id: int):
         db.delete(competition)
         db.commit()
         return True
+    
     return False

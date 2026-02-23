@@ -23,6 +23,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # produktion eller release builds.
     db = SessionLocal()
     if db.query(Competitor).count() == 0:
+        competition0 = Competition()
+        db.add(competition0)
+        db.commit()
         competitors = []
         competitors.append(Competitor(start_number="123", name="Alice",competition_id=1))
         competitors.append(Competitor(start_number="458", name="Bob",competition_id=1))
@@ -78,9 +81,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         )
         db.commit()
 
-        competition0 = Competition()
-        db.add(competition0)
-        db.commit()
     db.close()
 
     yield  # startup done

@@ -28,13 +28,13 @@ export default function StationRegistrering() {
 		if (!res.ok) return;
 		const data = await res.json();
 		setStations((data as Array<Station>).filter(c =>
-				c.competition_id === Number(localStorage.getItem("competition"))
+				c.competition_id === competition
 			).sort((a, b) => Number(a.order) - Number(b.order)));
 	};
 
 	useEffect(() => {
 		fetchStations();
-	}, []);
+	}, [competition]);
 
 	const addStation = async () => {
 		console.log('add station');
