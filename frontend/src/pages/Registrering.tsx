@@ -139,8 +139,13 @@ export default function Registrering() {
 								id="startNbrInput"
 								placeholder="123"
 								type="text"
+								inputMode="numeric"
+								maxLength={3}
 								value={reg}
-								onChange={(e) => setReg(e.target.value)}
+								onChange={(e) => {
+									const value = e.target.value.replace(/\D/g, '').slice(0, 3);
+									setReg(value);
+								}}
 							/>
 						</Field>
 						<Field>

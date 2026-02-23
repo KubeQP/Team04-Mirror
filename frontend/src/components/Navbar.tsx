@@ -62,7 +62,7 @@ const Navbar = ({
 						<div className="h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center">
 							<TimerIcon className="size-5" />
 						</div>
-						<p className="text-primary">PlaceholderAppName</p>
+						<p className="text-primary">Team 04</p>
 					</NavLink>
 					{navigationData.slice(navigationData.length / 2 + 1).map((item) => (
 						<NavLink
