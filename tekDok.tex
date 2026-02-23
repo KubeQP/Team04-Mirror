@@ -1,0 +1,634 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage[dvipsnames]{xcolor}
+
+% Define colors
+\definecolor{bg}{rgb}{0.15,0.15,0.15}        % dark grey background
+\definecolor{fg}{rgb}{0.9,0.9,0.9}           % light foreground text
+\definecolor{comment}{rgb}{0.5,0.8,0.5}      % green comments
+\definecolor{keyword}{rgb}{0.6,0.7,1.0}      % blue keywords
+\definecolor{string}{rgb}{1.0,0.6,0.6}       % red strings
+
+
+% ----- Följande kod: https://tex.stackexchange.com/questions/641153/how-to-make-a-directory-tree-with-forest
+\usepackage[edges]{forest}
+\definecolor{folderbg}{RGB}{124,166,198}
+\definecolor{folderborder}{RGB}{110,144,169}
+\newlength\Size
+\setlength\Size{4pt}
+\tikzset{%
+  folder/.pic={%
+    \filldraw [draw=folderborder, top color=folderbg!50, bottom color=folderbg] (-1.05*\Size,0.2\Size+5pt) rectangle ++(.75*\Size,-0.2\Size-5pt);
+    \filldraw [draw=folderborder, top color=folderbg!50, bottom color=folderbg] (-1.15*\Size,-\Size) rectangle (1.15*\Size,\Size);
+  },
+  file/.pic={%
+    \filldraw [draw=folderborder, top color=folderbg!5, bottom color=folderbg!10] (-\Size,.4*\Size+5pt) coordinate (a) |- (\Size,-1.2*\Size) coordinate (b) -- ++(0,1.6*\Size) coordinate (c) -- ++(-5pt,5pt) coordinate (d) -- cycle (d) |- (c) ;
+  },
+}
+\forestset{%
+  declare autowrapped toks={pic me}{},
+  declare boolean register={pic root},
+  pic root=0,
+  pic dir tree/.style={%
+    for tree={%
+      folder,
+      font=\ttfamily,
+      grow'=0,
+    },
+    before typesetting nodes={%
+      for tree={%
+        edge label+/.option={pic me},
+      },
+      if pic root={
+        tikz+={
+          \pic at ([xshift=\Size].west) {folder};
+        },
+        align={l}
+      }{},
+    },
+  },
+  pic me set/.code n args=2{%
+    \forestset{%
+      #1/.style={%
+        inner xsep=2\Size,
+        pic me={pic {#2}},
+      }
+    }
+  },
+  pic me set={directory}{folder},
+  pic me set={file}{file},
+}
+
+% EXAMPLE:
+% \begin{forest}
+%  pic dir tree,
+%  pic root,
+%  for tree={% folder icons by default; override using file for file icons
+%    directory,
+%    fit=band,
+%  },
+%  [system
+%    [config
+%    ]
+%    [lib
+%      [Access
+%      [Plugin
+%      [List
+%      [file.txt, file
+%      ]
+%      ]
+%      ]
+%     ]
+%    ]
+%    [tmp
+%    ]
+%    [tests
+%    ]
+%  ]
+%\end{forest}
+
+
+
+\geometry{margin=2.5cm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Team04}
+\lhead{Teknisk dokumentation}
+\rfoot{\thepage}
+
+\title{Teknisk Dokumentation\\
+Team04 Tävlingssystem}
+\author{Team04}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduktion}
+
+Detta dokument beskriver den överordnade arkitekturen för ett tävlingshanteringssystem.
+Syftet är att ge en teknisk överblick för framtida utvecklingsteam som ska vidareutveckla eller underhålla systemet.
+
+Dokumentet beskriver:
+\begin{itemize}
+    \item Systemets övergripande arkitektur
+    \item Ingående program och filer
+    \item Bygg- och körinstruktioner
+    \item Intern struktur och ansvarsfördelning
+    \item Använda designprinciper och mönster
+\end{itemize}
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Övergripande Arkitektur och filer}
+
+Systemet är uppbyggt enligt en klient--server-arkitektur och består av två huvuddelar: Backend och frontend.
+
+%\subsection{Arkitekturöversikt}
+
+% Colors att: https://www.overleaf.com/learn/latex/Using_colors_in_LaTeX
+\begin{comment}
+\begin{tcolorbox}[colback=CadetBlue]
+\begin{verbatim}
+    [ Webbläsare ]
+       |
+       | HTTP (REST API)
+       v
+    [ FastAPI Backend ]
+       |
+       v
+    [ Databas ]
+\end{verbatim}
+\end{tcolorbox}
+\end{comment}
+
+%============= UML av Systemet =============
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=0.5\textheight, width=1\linewidth]{SystemArkitektur.png}
+    \caption{UML av systemets arkitektur. Frontend ansvarar för presentation och användarinteraktion.
+Backend ansvarar för logik, datavalidering och datalagring.}
+    \label{UML}
+\end{figure}
+
+
+
+\newpage
+%\section{Systemets Program och Filer}
+\subsection{Systemets Program och Filer}
+
+Nedan visas huvudrepots struktur:
+
+\begin{forest}
+  pic dir tree,
+  pic root,
+  for tree={% folder icons by default; override using file for file icons
+    directory,
+    fit=band,
+  },
+    [team04
+        [backend
+            [app
+                [core
+                    [config.py, file]
+                    [utils.py, file]
+                ]
+                [routers
+                    [competitors.py, file]
+                    [stations.py, file]
+                    [times.py, file]
+                ]
+                [crud.py, file]
+                [database.py, file]
+                [main.py, file]
+                [models.py, file]
+                [schemas.py, file]
+            ]
+            [tests
+                [conftest.py, file]
+                [test\_competitors.py, file]
+                [test\_registers.py, file]
+                [test\_times.py, file]
+            ]
+            [Makefile, file]
+            [pyproject.toml, file]
+            [pytest.ini, file]
+            [requirements-dev.txt, file]
+            [requirements.txt, file]
+            [run.py, file]
+        ]
+        [frontend]
+    ]
+\end{forest}
+
+\begin{forest}
+  pic dir tree,
+  pic root,
+  for tree={% folder icons by default; override using file for file icons
+    directory,
+    fit=band
+  },
+    [team04
+        [backend]
+        [frontend
+            [src
+                [api
+                ]
+                [components
+                ]
+                [config
+                ]
+                [pages
+                ]
+                [App.tsx, file]
+                [index.css, file]
+                [main.tsx, file]
+                [router.tsx, file]
+                [setupTests.ts, file]
+                [types.ts, file]
+            ]
+            [.env, file]
+            [eslint.config.js, file]
+            [index.html, file]
+            [package-lock.json, file]
+            [package.json, file]
+            [prettier.config.js, file]
+            [tsconfig.app.json, file]
+            [tsconfig.json, file]
+            [tsconfig.node.json, file]
+            [vite.config.json, file]
+        ]
+    ]
+\end{forest}
+
+%Från denna struktur består systemet av två huvuddelar: Backend och Frontend.
+
+\newpage
+\subsubsection{Backend}
+
+Backend är implementerad i Python med FastAPI och SQLAlchemy.
+
+\begin{longtable}{|p{5cm}|p{8cm}|}
+\hline
+\textbf{Fil/Mapp} & \textbf{Ansvar} \\
+\hline
+app/ & Applikationskod \\
+models.py & Databasmodeller \\
+schemas.py & Pydantic-scheman (API-kontrakt) \\
+crud.py & Databasoperationer \\
+database.py & Databasanslutning \\
+routers/ & API-endpoints \\
+run.py & Startar backend-servern \\
+tests/ & Backend-tester \\
+\hline
+\end{longtable}
+
+\subsubsection{Frontend}
+
+Frontend är implementerad i React med TypeScript och Vite.
+
+\begin{longtable}{|p{5cm}|p{8cm}|}
+\hline
+\textbf{Fil/Mapp} & \textbf{Ansvar} \\
+\hline
+src/pages/ & Applikationens sidor \\
+src/components/ & Återanvändbara UI-komponenter \\
+src/api/ & API-anrop till backend \\
+router.tsx & Routing-konfiguration \\
+package.json & Projektkonfiguration \\
+\hline
+\end{longtable}
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Bygg och Körning}
+
+\subsection{Backend}
+
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+cd backend
+make install
+make run
+\end{verbatim}
+\end{tcolorbox}
+
+Alternativt:
+
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+pip install -r requirements.txt
+python run.py
+\end{verbatim}
+Vänligen notera att det finns en ytterligare fil \texttt{requirements-dev.txt} som innehåller utvecklingsberoenden, inklusive testverktyg. Dessa är inte nödvändiga, men används av teamet och är ett smidigt verktyg. För att installera dessa kan följande kommando användas innan du kör python-filen:
+\begin{verbatim}
+pip install -r requirements-dev.txt
+\end{verbatim} 
+\end{tcolorbox}
+
+\subsection{Frontend}
+
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+cd frontend
+npm install
+npm run dev
+\end{verbatim}
+\end{tcolorbox}
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Backendens Interna Struktur}
+
+\begin{tcolorbox}[
+    colback=CadetBlue,
+    colupper=white,
+    boxrule=1.5pt,
+    arc=6pt,
+    left=20pt,
+    right=20pt,
+    top=20pt,
+    bottom=20pt
+]
+
+\begin{verbatim}
+        Routers (API)
+              |
+              v
+            Schemas
+              |
+              v
+          CRUD-layer
+              |
+              v
+        SQLAlchemy Models
+              |
+              v
+            Database
+\end{verbatim}
+
+\end{tcolorbox}
+
+
+\subsection{Databasmodeller och Relationer}
+
+Systemets kärna består av tre huvudsakliga modeller:
+
+\subsubsection{Competitor}
+
+Representerar en tävlande i systemet.
+
+\begin{itemize}
+    \item id (primärnyckel)
+    \item start\_number (unik)
+    \item name
+\end{itemize}
+
+Varje tävlande kan ha flera tidsregistreringar.
+
+\subsubsection{Station}
+
+Representerar en kontrollstation i tävlingen.
+
+\begin{itemize}
+    \item id (primärnyckel)
+    \item station\_name
+    \item order (ordning i tävlingen)
+\end{itemize}
+
+\subsubsection{TimeEntry}
+
+Representerar en registrerad tid.
+
+\begin{itemize}
+    \item id (primärnyckel)
+    \item competitor\_id (foreign key)
+    \item station\_id (foreign key)
+    \item timestamp
+\end{itemize}
+
+Relationer:
+
+\begin{itemize}
+    \item En Competitor kan ha flera TimeEntry (1:N).
+    \item En Station kan ha flera TimeEntry (1:N).
+    \item TimeEntry binder ihop tävlande och station.
+\end{itemize}
+
+\subsection{Flöde: Från Endpoint till Databas}
+
+När en HTTP-request når backend sker följande:
+
+\begin{enumerate}
+    \item Routern tar emot anropet och validerar inkommande data via Pydantic-schema.
+    \item En databassession skapas via \texttt{get\_db()}.
+    \item Routern anropar motsvarande funktion i CRUD-lagret.
+    \item CRUD-lagret skapar eller hämtar SQLAlchemy-objekt.
+    \item \texttt{db.add()}, \texttt{db.commit()} och \texttt{db.refresh()} används vid skrivning.
+    \item Objektet returneras till routern.
+    \item FastAPI serialiserar objektet till JSON enligt response\_model.
+\end{enumerate}
+
+
+\subsection{Ansvarsfördelning}
+
+\begin{itemize}
+    \item \textbf{Routers}: Hanterar HTTP-anrop och returnerar JSON-respons.
+    \item \textbf{Schemas}: Definierar datamodeller för API-kommunikation.
+    \item \textbf{CRUD}: Utför databasoperationer.
+    \item \textbf{Models}: Definierar databasens struktur.
+\end{itemize}
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Frontendens Interna Struktur}
+
+Frontend är uppbyggd enligt en komponentbaserad arkitektur.
+
+\begin{tcolorbox}[colback=CadetBlue, colupper=fg]
+\begin{verbatim}
+    Pages
+      |
+      v
+    Components
+      |
+      v
+    API-layer
+\end{verbatim}
+\end{tcolorbox}
+
+\subsection{Ansvarsfördelning}
+
+\begin{itemize}
+    \item \textbf{Pages}: Representerar applikationens olika vyer. Dessa är kopplade till router och ansvarar för att hämta data och rendera UI
+        \begin{itemize}
+            \item Admin sida
+            \item Registreringssida
+            \item Tid regristreringssida
+            \item Stationsregistreringssida
+            \item Resultatsida
+        \end{itemize}
+    \item \textbf{Components}: Återanvändbara UI-komponenter.
+    \item \textbf{API}: Abstraktion för kommunikation med backend.
+        \begin{itemize}
+            \item Både FETCH och PUT anrop används för att hämta och skicka data till backend.
+        \end{itemize}
+    \
+\end{itemize}
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Kommunikation mellan Delarna}
+
+Kommunikationen sker via REST API över HTTP.
+
+Flöde:
+
+\begin{enumerate}
+    \item Frontend skickar HTTP-request.
+    \item Router tar emot anropet.
+    \item CRUD-lagret utför databasoperation.
+    \item Resultat returneras som JSON enligt definierade Pydantic-scheman.
+\end{enumerate}
+
+\subsection{Exempel på JSON-struktur}
+
+\subsubsection{Registrera tävlande}
+
+\textbf{Request:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+POST /api/competitors/register
+
+{
+  "start_number": 101,
+  "name": "Anna Andersson"
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\textbf{Response:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+{
+  "start_number": 101,
+  "name": "Anna Andersson"
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsubsection{Registrera tid}
+
+\textbf{Request:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+POST /api/times/record
+
+{
+  "start_number": 101,
+  "timestamp": "2025-01-01T12:00:00",
+  "station_id": 1
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\textbf{Response:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+{
+  "id": 15,
+  "competitor_id": 3,
+  "station_id": 1,
+  "timestamp": "2025-01-01T12:00:00"
+}
+\end{verbatim}
+\end{tcolorbox}
+
+\subsubsection{Hämta tider för tävlande}
+
+\textbf{Request:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+GET /api/times/101
+\end{verbatim}
+\end{tcolorbox}
+
+\textbf{Response:}
+\begin{tcolorbox}[colback=bg, colupper=fg]
+\begin{verbatim}
+[
+  {
+    "id": 15,
+    "competitor_id": 3,
+    "station_id": 1,
+    "timestamp": "2025-01-01T12:00:00"
+  }
+]
+\end{verbatim}
+\end{tcolorbox}
+
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Distribution under Tävling}
+
+Under en tävling distribueras systemet enligt följande:
+
+\begin{itemize}
+    \item Backend körs på en central server.
+    \item Frontend körs i webbläsare på klientdatorer.
+    \item Kommunikation sker via lokalt nätverk.
+\end{itemize}
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Vidareutveckling}
+För att lägga till ny funktionalitet eller uppdatera denna dokumentationen kan följande sektioner hjälpleda utvecklingen. 
+
+Vänligen notera att det praktiseras \textbf{Test Driven Development} och förutsätts att man följer det för de delar listad nedan. Även refaktorering av kod och uppdatering av dokumentation är en del av vidareutvecklingen, se då till att testerna fortfarande är gröna och att dokumentationen är uppdaterad.
+
+\subsection{Backend}
+
+\begin{enumerate}
+    \item Skapa ny modell i \texttt{models.py} vid behov.
+    \item Skapa motsvarande schema i \texttt{schemas.py}.
+    \item Implementera CRUD-funktion.
+    \item Lägg till endpoint i \texttt{routers/}.
+\end{enumerate}
+
+\subsection{Frontend}
+
+\begin{enumerate}
+    \item Skapa ny sida i \texttt{pages/}.
+    \item Implementera nödvändiga komponenter.
+    \item Lägg till API-anrop i \texttt{api/}.
+    \item Registrera route i \texttt{router.tsx}.
+\end{enumerate}
+
+\subsection{Teknisk Dokumentation}
+Vid större förrändringar av systemet, se till att uppdatera denna tekniska dokumentation. Detta så att den alltid är aktuell och användbar för framtida utvecklingsteam. Detta inkluderar:
+\begin{itemize}
+    \item Uppdatera fildiagram och UML vid större förändringar.
+        \begin{itemize}
+            \item Vi rekommenderar att använda verktyget \href{https://mermaid.js.org/}{Mermaid} för att skapa och uppdatera UML-diagramet, men välj fritt själv. Det finns inga krav för specifika verktyg.
+        \end{itemize}
+    \item Lägg till beskrivningar av nya moduler och filer.
+    \item Dokumentera API-kontrakt i \texttt{schemas.py}.
+\end{itemize}
+
+
+\noindent
+{\color{BlueViolet} \rule{\linewidth}{0.5mm}}
+
+\section{Sammanfattning}
+
+Systemet är modulärt uppbyggt med tydlig separation mellan presentation, logik och datalager.
+%Arkitekturen möjliggör vidareutveckling utan att större delar av systemet påverkas.
+
+Detta dokument syftar till att ge framtida utvecklingsteam en snabb och strukturerad introduktion till systemets uppbyggnad.
+
+\end{document}

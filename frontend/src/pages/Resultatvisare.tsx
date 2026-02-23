@@ -1,5 +1,9 @@
 // frontend/src/pages/Admin.tsx
+import { CrownIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
@@ -159,31 +163,42 @@ export default function Resultatvisare() {
 		const [headerRow, ...bodyRows] = tableData;
 
 		return (
-			<table>
-				<thead>
-					<tr>
-						{headerRow.map((header, index) => (
-							<th key={index}>{header}</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{bodyRows.map((row, rowIndex) => (
-						<tr key={rowIndex}>
-							{row.map((cell, cellIndex) => (
-								<td key={cellIndex}>{cell} </td>
+			<ScrollArea className="rounded-md border px-4 h-[80vh]">
+				<Table>
+					<TableHeader className="h-12">
+						<TableRow>
+							{headerRow.map((header, index) => (
+								<TableHead key={index}>{header}</TableHead>
 							))}
-						</tr>
-					))}
-				</tbody>
-			</table>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{bodyRows.map((row, rowIndex) => (
+							<TableRow key={rowIndex}>
+								{row.map((cell, cellIndex) => (
+									<TableCell className={cellIndex === 0 ? 'font-medium text-base' : ''} key={cellIndex}>
+										{cellIndex === 0 && cell === '1' ? (
+											<div className="flex items-center gap-2">
+												{cell}
+												<CrownIcon className="size-6 text-yellow-500" />
+											</div>
+										) : (
+											cell
+										)}
+									</TableCell>
+								))}
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</ScrollArea>
 		);
 	}
 
 	return (
 		<div>
-			<h2>Resultat Visare</h2>
-			<div className="Admin-tables">
+			<h1 className="text-xl font-bold pb-2">Resultatvisare:</h1>
+			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
 				) : competitorError ? (
@@ -193,9 +208,7 @@ export default function Resultatvisare() {
 				) : stationError ? (
 					<p>Fel vid hämtning av station data: {stationError}</p>
 				) : (
-					<div style={{ display: 'flex', gap: '20px' }}>
-						<div className="Admin-wrapper">{createTable(tableArray)}</div>
-					</div>
+					<div>{createTable(tableArray)}</div>
 				)}
 			</div>
 		</div>

@@ -20,3 +20,10 @@ check-ci:
 
 test:
 	pytest
+
+install:
+	pip install -r requirements.txt
+	pip install -r requirements-dev.txt
+
+run:
+	python -m app.main

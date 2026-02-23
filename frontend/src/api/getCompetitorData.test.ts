@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { API_BASE_URL } from '../config/api';
 import { getCompetitorData } from './getCompetitorData';
 
-
 describe('getCompetitorData', () => {
 	it('hämtar och formaterar data korrekt', async () => {
 		// Mocka fetch, alltså när någon anropar fetch så returner vi själv
