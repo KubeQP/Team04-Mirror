@@ -1,4 +1,4 @@
-// frontend/src/pages/Admin.tsx
+
 import { CrownIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -10,207 +10,239 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-// src/pages/Admin.tsx
 export default function Resultatvisare() {
-	//declaring constants for the imports
+  const [competitorData, setCompetitorData] = useState<CompetitorData[] | null>(null);
+  const [competitorLoading, setCompetitorLoading] = useState(true);
+  const [competitorError, setCompetitorError] = useState<string | null>(null);
 
-	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
-	const [competitorLoading, setCompetitorLoading] = useState(true);
-	const [competitorError, setCompetitorError] = useState<string | null>(null);
+  const [timeData, setTimeData] = useState<TimeData[] | null>(null);
+  const [timeLoading, setTimeLoading] = useState(true);
+  const [timeError, setTimeError] = useState<string | null>(null);
 
-	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
-	const [timeLoading, setTimeLoading] = useState(true);
-	const [timeError, setTimeError] = useState<string | null>(null);
+  const [stationData, setStationData] = useState<StationData[] | null>(null);
+  const [stationLoading, setStationLoading] = useState(true);
+  const [stationError, setStationError] = useState<string | null>(null);
 
-	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
-	const [stationLoading, setStationLoading] = useState(true);
-	const [stationError, setStationError] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try { setCompetitorData(await getCompetitorData()); }
+      catch (err: unknown) { setCompetitorError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel'); }
+      finally { setCompetitorLoading(false); }
 
-	useEffect(() => {
-		const fetchData = async () => {
-			// Competitor data
-			try {
-				const result = await getCompetitorData();
-				setCompetitorData(result);
-				console.log('Fetched competitor data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setCompetitorError(err.message);
-				else if (typeof err === 'string') setCompetitorError(err);
-				else setCompetitorError('Ett okänt fel inträffade');
-			} finally {
-				setCompetitorLoading(false);
-			}
+      try { setTimeData(await getTimeData()); }
+      catch (err: unknown) { setTimeError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel'); }
+      finally { setTimeLoading(false); }
 
-			// Time data
-			try {
-				const result = await getTimeData();
-				setTimeData(result);
-				console.log('Fetched time data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setTimeError(err.message);
-				else if (typeof err === 'string') setTimeError(err);
-				else setTimeError('Ett okänt fel inträffade');
-			} finally {
-				setTimeLoading(false);
-			}
+      try { setStationData(await getStationData()); }
+      catch (err: unknown) { setStationError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel'); }
+      finally { setStationLoading(false); }
+    };
+    fetchData();
+  }, []);
 
-			// Station data
-			try {
-				const result = await getStationData();
-				setStationData(result);
-				console.log('Fetched station data');
-			} catch (err: unknown) {
-				if (err instanceof Error) setStationError(err.message);
-				else if (typeof err === 'string') setStationError(err);
-				else setStationError('Ett okänt fel inträffade');
-			} finally {
-				setStationLoading(false);
-			}
-		};
+  function formatTotalTime(totalSeconds: number) {
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
 
-		fetchData();
-	}, []);
+  interface ResultObject {
+    Rang: number;
+    Nr: string;
+    Name: string;
+    Total: number;
+    stationTimes: string[];
+  }
 
-	function calculateTotalTime(
-		startTimes: { timestamp: string | number | Date }[],
-		stopTimes: { timestamp: string | number | Date }[],
-	): { value: number; correct: boolean } {
-		// Kräver exakt en starttid och exakt en stoptid
-		if (startTimes.length !== 1 || stopTimes.length !== 1) {
-			return { value: -1, correct: false };
-		}
+  // Compute results and table only if data exists
+// ==============================
+// COMPUTE RESULTS + TABLE
+// ==============================
 
-		const start = new Date(startTimes[0].timestamp);
-		const stop = new Date(stopTimes[0].timestamp);
+let Results: ResultObject[] = [];
+let tableArray: string[][] = [];
 
-		// Ogiltiga datum eller stop före start → "-"
-		if (isNaN(start.getTime()) || isNaN(stop.getTime()) || stop <= start) {
-			return { value: -1, correct: false };
-		}
+if (competitorData && timeData && stationData) {
 
-		const diffMs = stop.getTime() - start.getTime();
-		const totalSeconds = Math.floor(diffMs / 1000);
+  // Remove index 0 if that is some placeholder.
+  // We assume after slice(1):
+  // index 0 = Start
+  // last index = Finish
+  const relevantStations = stationData;
 
-		return { value: totalSeconds, correct: true };
-	}
+  Results = competitorData.map(competitor => {
 
-	function formatTotalTime(totalSeconds: number) {
-		const hours = Math.floor(totalSeconds / 3600);
-		const minutes = Math.floor((totalSeconds % 3600) / 60);
-		const seconds = totalSeconds % 60;
+    // Collect exactly one timestamp per station
+    const allStationTimes: (Date | null)[] = relevantStations.map(station => {
 
-		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      const matches = timeData.filter(td =>
+        td.competitor_id === competitor.id &&
+        td.station_id === station.id
+      );
 
-		return formatted;
-	}
+      // Must be exactly one timestamp
+      if (matches.length !== 1) return null;
 
-	interface ResultObject {
-		Rang: number;
-		Nr: string;
-		Name: string;
-		Total: number;
-	}
-	//tableArray - Competitors //flera tider för en station, ingen tid.
-	const Results: ResultObject[] = [];
-	const headerRow: string[] = ['Rang', 'Nr.', 'Namn', 'Totalt'];
+      const date = new Date(matches[0].timestamp);
+      return isNaN(date.getTime()) ? null : date;
+    });
 
-	competitorData?.forEach((competitor) => {
-		const startNumber = { value: competitor.start_number, correct: true };
-		const name = { value: competitor.name, correct: true };
-		const matchingStartTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '0',
-			) || [];
+    const start = allStationTimes[0];
+    const finish = allStationTimes[allStationTimes.length - 1];
 
-		const matchingStopTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '1',
-			) || [];
+    // Must have valid start + finish
+    if (!start || !finish) return null;
 
-		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
+    const stationTimes: string[] = [];
 
-		if (totalTime.value != -1) {
-			const competitorRow: ResultObject = { Rang: 0, Nr: startNumber.value, Name: name.value, Total: totalTime.value };
-			Results.push(competitorRow);
-		}
-	});
+    // ==================
+    // START COLUMN
+    // ==================
+    stationTimes.push(start.toLocaleTimeString());
 
-	Results.sort((a, b) => a.Total - b.Total);
+    // ==================
+    // TID 1..N (exclude start + finish)
+    // ==================
+    for (let i = 1; i < allStationTimes.length - 1; i++) {
+      const t = allStationTimes[i];
+      stationTimes.push(t ? t.toLocaleTimeString() : '-');
+    }
 
-	for (let i: number = 0; i < Results.length; i++) {
-		Results[i].Rang = i + 1;
-	}
+    // ==================
+    // MÅL COLUMN
+    // ==================
+    stationTimes.push(finish.toLocaleTimeString());
 
-	const tableArray: string[][] = [];
-	tableArray.push(headerRow);
+    // ==================
+    // DEL 1..N (between every station)
+    // ==================
+    for (let i = 1; i < allStationTimes.length; i++) {
+      const prev = allStationTimes[i - 1];
+      const curr = allStationTimes[i];
 
-	Results?.forEach((ResultObject) => {
-		const tempArray: string[] = [];
-		tempArray.push(ResultObject.Rang.toString());
-		tempArray.push(ResultObject.Nr);
-		tempArray.push(ResultObject.Name);
-		tempArray.push(formatTotalTime(ResultObject.Total));
-		tableArray.push(tempArray);
-	});
-	//dynamic table creation
-	function createTable(tableData: string[][]) {
-		if (tableData.length === 0) return null;
+      if (prev && curr && curr > prev) {
+        const diffSeconds =
+          Math.round((curr.getTime() - prev.getTime()) / 1000);
 
-		const [headerRow, ...bodyRows] = tableData;
+        stationTimes.push(formatTotalTime(diffSeconds));
+      } else {
+        stationTimes.push('-');
+      }
+    }
 
-		return (
-			<ScrollArea className="rounded-md border px-4 h-[80vh]">
-				<Table>
-					<TableHeader className="h-12">
-						<TableRow>
-							{headerRow.map((header, index) => (
-								<TableHead key={index}>{header}</TableHead>
-							))}
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{bodyRows.map((row, rowIndex) => (
-							<TableRow key={rowIndex}>
-								{row.map((cell, cellIndex) => (
-									<TableCell className={cellIndex === 0 ? 'font-medium text-base' : ''} key={cellIndex}>
-										{cellIndex === 0 && cell === '1' ? (
-											<div className="flex items-center gap-2">
-												{cell}
-												<CrownIcon className="size-6 text-yellow-500" />
-											</div>
-										) : (
-											cell
-										)}
-									</TableCell>
-								))}
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</ScrollArea>
-		);
-	}
+    // ==================
+    // TOTAL TIME
+    // ==================
+    const totalSeconds =
+      Math.round((finish.getTime() - start.getTime())/ 1000);
 
-	return (
-		<div>
-			<h1 className="text-xl font-bold pb-2">Resultatvisare:</h1>
-			<div>
-				{competitorLoading || timeLoading || stationLoading ? (
-					<p>Laddar data...</p>
-				) : competitorError ? (
-					<p>Fel vid hämtning av tävlingsdeltagare: {competitorError}</p>
-				) : timeError ? (
-					<p>Fel vid hämtning av tiddata: {timeError}</p>
-				) : stationError ? (
-					<p>Fel vid hämtning av station data: {stationError}</p>
-				) : (
-					<div>{createTable(tableArray)}</div>
-				)}
-			</div>
-		</div>
-	);
+    return {
+      Rang: 0,
+      Nr: competitor.start_number,
+      Name: competitor.name,
+      Total: totalSeconds,
+      stationTimes
+    };
+
+  }).filter((r): r is ResultObject => r !== null);
+
+  // ==================
+  // SORT + RANK
+  // ==================
+  Results.sort((a, b) => a.Total - b.Total);
+  Results.forEach((r, i) => r.Rang = i + 1);
+
+  // ==================
+  // BUILD HEADER
+  // ==================
+
+  const headerRow: string[] = [
+    'Rang',
+    'Nr.',
+    'Namn',
+    'Starttid'
+  ];
+
+  const stationCount = relevantStations.length;
+  // includes start + sectors + finish
+
+  // Tid 1..N  (exclude start + finish)
+  for (let i = 1; i < stationCount - 1; i++) {
+    headerRow.push(`Tidpunkt ${i}`);
+  }
+
+  // Mål
+  headerRow.push('Måltid');
+
+  // Del 1..N  (between each station)
+  for (let i = 1; i < stationCount; i++) {
+    headerRow.push(relevantStations[i].station_name);
+  }
+
+  headerRow.push('Totaltid');
+
+  // ==================
+  // BUILD TABLE ARRAY
+  // ==================
+
+  tableArray = [
+    headerRow,
+    ...Results.map(r => [
+      r.Rang.toString(),
+      r.Nr,
+      r.Name,
+      ...r.stationTimes,
+      formatTotalTime(r.Total)
+    ])
+  ];
+}
+
+  function createTable(tableData: string[][]) {
+    if (!tableData.length) return null;
+    const [header, ...body] = tableData;
+    return (
+      <ScrollArea className="rounded-md border px-4 h-[80vh]">
+        <Table>
+          <TableHeader className="h-12">
+            <TableRow>{header.map((h,i) => <TableHead key={i}>{h}</TableHead>)}</TableRow>
+          </TableHeader>
+          <TableBody>
+            {body.map((row, ri) => (
+              <TableRow key={ri}>
+                {row.map((cell, ci) => (
+                  <TableCell key={ci} className={ci===0?'font-medium text-base':''}>
+                    {ci===0 && cell==='1' ? (
+                      <div className="flex items-center gap-2">
+                        {cell}<CrownIcon className="size-6 text-yellow-500"/>
+                      </div>
+                    ) : cell}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+    );
+  }
+
+  return (
+    <div>
+      <h1 className="text-xl font-bold pb-2">Resultatvisare:</h1>
+      <div>
+        {competitorLoading || timeLoading || stationLoading ? (
+          <p>Laddar data...</p>
+        ) : competitorError ? (
+          <p>Fel vid hämtning av tävlingsdeltagare: {competitorError}</p>
+        ) : timeError ? (
+          <p>Fel vid hämtning av tiddata: {timeError}</p>
+        ) : stationError ? (
+          <p>Fel vid hämtning av station data: {stationError}</p>
+        ) : (
+          <div>{createTable(tableArray)}</div>
+        )}
+      </div>
+    </div>
+  );
 }
