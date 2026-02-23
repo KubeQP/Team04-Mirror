@@ -123,3 +123,15 @@ def update_time_entry(
     db.commit()
     db.refresh(entry)
     return entry
+
+
+def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
+    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
+
+    if entry is None:
+        return None
+
+    db.delete(entry)
+    db.commit()
+
+    return entry

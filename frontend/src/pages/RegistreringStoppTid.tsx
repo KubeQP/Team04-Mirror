@@ -1,5 +1,5 @@
 // src/pages/RegistreringStoppTid.tsx
-import { EraserIcon, Undo2Icon } from 'lucide-react';
+import { EraserIcon, Trash2Icon, Undo2Icon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -116,9 +116,11 @@ export default function RegistreringStoppTid() {
 			throw new Error('Failed to register time');
 		}
 
+		const { id }: { id: string } = await response.json();
+
 		// Create local entry
 		const newEntry: LocalTimeEntry = {
-			id: crypto.randomUUID(),
+			id,
 			start_number: selectedStartNumber || null,
 			name: selectedCompetitor?.name,
 			station_id: selectedStationId as number,
@@ -131,6 +133,20 @@ export default function RegistreringStoppTid() {
 		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
 
 		return response;
+	};
+
+	const deleteStopTime = async (entryId: string) => {
+		const response = await fetch(`${API_BASE_URL}/api/times/${entryId}`, {
+			method: 'DELETE',
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to delete time entry');
+		}
+
+		const updated = latestRegistrations.filter((entry) => entry.id !== entryId);
+		setLatestRegistrations(updated);
+		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
 	};
 
 	return (
@@ -225,7 +241,7 @@ export default function RegistreringStoppTid() {
 						type="button"
 						variant="secondary"
 						onClick={async () => {
-							await toast.promise(
+							toast.promise(
 								(async () => {
 									await fetchData();
 
@@ -295,6 +311,7 @@ export default function RegistreringStoppTid() {
 									<TableHead>Startnummer</TableHead>
 									<TableHead>Namn</TableHead>
 									<TableHead>Station</TableHead>
+									<TableHead>Ångra</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -304,6 +321,28 @@ export default function RegistreringStoppTid() {
 										<TableCell className="font-medium">{entry.start_number}</TableCell>
 										<TableCell>{entry.name}</TableCell>
 										<TableCell>{entry.station_name}</TableCell>
+										<TableCell>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button
+														variant="ghost"
+														size="icon"
+														onClick={() => {
+															toast.promise(deleteStopTime(entry.id), {
+																loading: 'Tar bort registrering...',
+																success: 'Registrering borttagen',
+																error: 'Kunde inte ta bort registrering',
+															});
+														}}
+													>
+														<Trash2Icon />
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent>
+													<p>Ångra denna registrering (tar bort den från backend)</p>
+												</TooltipContent>
+											</Tooltip>
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
