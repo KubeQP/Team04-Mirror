@@ -26,13 +26,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         competitors = []
         competitors.append(Competitor(start_number="123", name="Alice"))
         competitors.append(Competitor(start_number="458", name="Bob"))
-        competitors.append(Competitor(start_number="459", name="Bob"))
-        competitors.append(Competitor(start_number="452", name="Bob"))
-        competitors.append(Competitor(start_number="453", name="Bob"))
-        competitors.append(Competitor(start_number="426", name="Bob"))
-        competitors.append(Competitor(start_number="436", name="Bob"))
-        competitors.append(Competitor(start_number="446", name="Bob"))
-        competitors.append(Competitor(start_number="486", name="Bob"))
 
         db.add_all(competitors)
         db.commit()
