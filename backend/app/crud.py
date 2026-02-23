@@ -7,7 +7,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from .models import Competitor, Station, TimeEntry, Competition
+from .models import Competition, Competitor, Station, TimeEntry
 
 
 def get_competitors(db: Session) -> list[Competitor]:
@@ -42,7 +42,10 @@ def record_time_for_start_number(
     if competitor is None:
         return None  # hanteras i router
     entry = TimeEntry(
-        competitor_id=competitor.id, timestamp=timestamp, station_id=station_id, competition_id=competition_id
+        competitor_id=competitor.id,
+        timestamp=timestamp,
+        station_id=station_id,
+        competition_id=competition_id,
     )
     db.add(entry)
     db.commit()
@@ -54,7 +57,9 @@ def record_new_reg(
     db: Session, start_number: str, name: str, competition_id: int
 ) -> Competitor:
     """Registrerar en ny competitor med starttid"""
-    entry = Competitor(start_number=start_number, name=name, competition_id=competition_id)
+    entry = Competitor(
+        start_number=start_number, name=name, competition_id=competition_id
+    )
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -65,7 +70,9 @@ def record_new_station(
     db: Session, station_name: str, order: str, competition_id: int
 ) -> Station:
     """Registrera en ny station"""
-    entry = Station(station_name=station_name, order=order, competition_id=competition_id)
+    entry = Station(
+        station_name=station_name, order=order, competition_id=competition_id
+    )
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -128,24 +135,23 @@ def update_time_entry(
     return entry
 
 
-def record_new_competition(
-        db: Session
-):
+def record_new_competition(db: Session) -> Competition:
     entry = Competition()
     db.add(entry)
     db.commit()
     db.refresh(entry)
     return entry
 
+
 def get_competitions(db: Session) -> list[Competition]:
     return db.query(Competition).all()
 
 
-def remove_competition(db: Session, competition_id: int):
+def remove_competition(db: Session, competition_id: int) -> bool:
     competition = db.query(Competition).filter(Competition.id == competition_id).first()
     if competition:
         db.delete(competition)
         db.commit()
         return True
-    
+
     return False

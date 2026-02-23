@@ -15,10 +15,10 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('../components/competition', () => ({
-	useCompetition: () => ({ competition: 0, setCompetition: vi.fn(), }),
+	useCompetition: () => ({ competition: 0, setCompetition: vi.fn() }),
 }));
 
-type Competitor = { start_number: string; name: string , competition_id: number};
+type Competitor = { start_number: string; name: string; competition_id: number };
 
 // En liten "in-memory" lista som låtsas vara backend-DB i testet
 let db: Competitor[] = [];
@@ -37,12 +37,16 @@ beforeEach(() => {
 
 		// POST /competitors/register
 		if (u.endsWith('/competitors/register') && init?.method === 'POST') {
-			const body = JSON.parse(String(init?.body ?? '{}')) as { start_number: string; name: string, competition_id: number};
+			const body = JSON.parse(String(init?.body ?? '{}')) as {
+				start_number: string;
+				name: string;
+				competition_id: number;
+			};
 
 			// låtsas att backend sparar och returnerar posten
 			const exists = db.some((c) => c.start_number === body.start_number);
 			if (!exists) {
-				db.push({ start_number: body.start_number, name: body.name, competition_id:0});
+				db.push({ start_number: body.start_number, name: body.name, competition_id: 0 });
 			}
 
 			return new Response(JSON.stringify(body), { status: 200 });
@@ -50,8 +54,6 @@ beforeEach(() => {
 
 		return new Response('Not found', { status: 404 });
 	});
-
-	
 });
 
 describe('RegisteringStartTid', () => {

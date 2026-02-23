@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .database import Base, SessionLocal, engine
-from .models import Competitor, Station, TimeEntry, Competition
-from .routers import competitors, stations, times, competitions
+from .models import Competition, Competitor, Station, TimeEntry
+from .routers import competitions, competitors, stations, times
 
 
 @asynccontextmanager
@@ -27,15 +27,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         db.add(competition0)
         db.commit()
         competitors = []
-        competitors.append(Competitor(start_number="123", name="Alice",competition_id=1))
-        competitors.append(Competitor(start_number="458", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="459", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="452", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="453", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="426", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="436", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="446", name="Bob",competition_id=1))
-        competitors.append(Competitor(start_number="486", name="Bob",competition_id=1))
+        competitors.append(
+            Competitor(start_number="123", name="Alice", competition_id=1)
+        )
+        competitors.append(Competitor(start_number="458", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="459", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="452", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="453", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="426", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="436", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="446", name="Bob", competition_id=1))
+        competitors.append(Competitor(start_number="486", name="Bob", competition_id=1))
 
         db.add_all(competitors)
         db.commit()
@@ -57,25 +59,25 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                     competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 31, 39),
                     station_id=station1.id,
-                    competition_id=1
+                    competition_id=1,
                 ),
                 TimeEntry(
                     competitor_id=competitors[1].id,
                     timestamp=datetime(2025, 6, 27, 12, 32, 15),
                     station_id=station1.id,
-                    competition_id=1
+                    competition_id=1,
                 ),
                 TimeEntry(
                     competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 47, 38),
                     station_id=station2.id,
-                    competition_id=1
+                    competition_id=1,
                 ),
                 TimeEntry(
                     competitor_id=competitors[1].id,
                     timestamp=datetime(2025, 6, 27, 12, 52, 5),
                     station_id=station2.id,
-                    competition_id=1
+                    competition_id=1,
                 ),
             ]
         )

@@ -1,5 +1,5 @@
-import type { CompetitionData } from '../types';
 import { API_BASE_URL } from '../config/api';
+import type { CompetitionData } from '../types';
 
 export async function createCompetition(): Promise<CompetitionData> {
 	const response = await fetch(`${API_BASE_URL}/api/competitions/register`, {

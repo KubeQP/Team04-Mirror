@@ -17,14 +17,15 @@ def read_competition(db: Session = Depends(get_db)) -> list[Competition]:
 
 
 @router.post("/register", response_model=schemas.CompetitionsReg)
-def reg_competition(
-    db: Session = Depends(get_db)
-):
+def reg_competition(db: Session = Depends(get_db)) -> Competition:
     competition = crud.record_new_competition(db)
     return competition
 
+
 @router.delete("/{competition_id}")
-def delete_competition(competition_id: int, db: Session = Depends(get_db)):
+def delete_competition(
+    competition_id: int, db: Session = Depends(get_db)
+) -> dict[str, str]:
     success = crud.remove_competition(db, competition_id)
     if not success:
         raise HTTPException(status_code=404, detail="Competition not found")

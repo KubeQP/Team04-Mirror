@@ -1,4 +1,5 @@
-import { X, Plus } from 'lucide-react';
+import { Plus,X } from 'lucide-react';
+
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -10,6 +11,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,7 +20,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 
 export interface CompetitionDropdownProps {
 	competitions: Array<{ id: number }>;
@@ -38,9 +39,7 @@ export function CompetitionDropdown({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="outline">
-					{selectedCompetition ? `Tävling ${selectedCompetition}` : 'Välj tävling'} ▾
-				</Button>
+				<Button variant="outline">{selectedCompetition ? `Tävling ${selectedCompetition}` : 'Välj tävling'} ▾</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56">
 				<DropdownMenuLabel>Tävlingar</DropdownMenuLabel>

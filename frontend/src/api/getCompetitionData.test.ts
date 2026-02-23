@@ -13,7 +13,7 @@ describe('getCompetitionsData', () => {
 			ok: true,
 			json: () =>
 				Promise.resolve({
-					id: 10
+					id: 10,
 				}),
 		});
 

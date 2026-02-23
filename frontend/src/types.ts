@@ -28,4 +28,3 @@ export interface StationData {
 export interface CompetitionData {
 	id: number;
 }
-

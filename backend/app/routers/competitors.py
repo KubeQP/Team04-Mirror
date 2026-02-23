@@ -23,7 +23,11 @@ def reg_competitor(
     competitor = crud.record_new_reg(
         db, data.start_number, data.name, data.competition_id
     )
-    return {"start_number": competitor.start_number, "name": competitor.name}
+    return {
+        "start_number": competitor.start_number,
+        "name": competitor.name,
+        "competition_id": competitor.competition_id,
+    }
 
 
 @router.put("/{competitor_id}/", response_model=schemas.CompetitorOut)

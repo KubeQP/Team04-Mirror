@@ -1,9 +1,9 @@
 // src/pages/RegistreringStoppTid.tsx
 import { Undo2Icon } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import { useCompetition } from '@/components/Competition';
 import { Button } from '@/components/ui/button';
 import {
 	Combobox,
@@ -30,7 +30,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { API_BASE_URL } from '../config/api';
-import { useCompetition } from '@/components/Competition';
 
 type Competitor = {
 	start_number: string;
@@ -50,17 +49,11 @@ type LocalTimeEntry = {
 	station_id: number;
 	station_name?: string;
 	timestamp: string;
-	competition_id: number
-};
-
-type OutletCtx = {
-	competitorsVersion: number;
-	notifyCompetitorAdded: () => void; // finns, men används inte här
+	competition_id: number;
 };
 
 export default function RegistreringStoppTid() {
 	const { competition } = useCompetition();
-	const { competitorsVersion } = useOutletContext<OutletCtx>();
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
@@ -72,37 +65,31 @@ export default function RegistreringStoppTid() {
 	const [latestRegistrations, setLatestRegistrations] = useState<LocalTimeEntry[]>([]);
 
 	useEffect(() => {
-	const stored = localStorage.getItem('latestStopTimes');
-	if (stored) {
-		const parsed = JSON.parse(stored);
-		console.log('parsed:', parsed);
-    	console.log('competition:', competition);
-    	console.log('filtered:', parsed.filter((t: LocalTimeEntry) => t.competition_id === competition));
-		setLatestRegistrations(parsed.filter((t: LocalTimeEntry) => Number(t.competition_id) === competition));
-	}
+		const stored = localStorage.getItem('latestStopTimes');
+		if (stored) {
+			const parsed = JSON.parse(stored);
+			console.log('parsed:', parsed);
+			console.log('competition:', competition);
+			console.log(
+				'filtered:',
+				parsed.filter((t: LocalTimeEntry) => t.competition_id === competition),
+			);
+			setLatestRegistrations(parsed.filter((t: LocalTimeEntry) => Number(t.competition_id) === competition));
+		}
 	}, [competition]);
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		const result = await getCompetitorData();
-		setCompetitors(result.filter(c =>
-				c.competition_id === competition
-			));
+		setCompetitors(result.filter((c) => c.competition_id === competition));
 
 		const res = await getStationData();
-		setStations(res.filter(c =>
-				c.competition_id === competition
-			));
-	};
+		setStations(res.filter((c) => c.competition_id === competition));
+	}, [competition]);
 
 	// Hämta vid första mount
 	useEffect(() => {
 		fetchData();
-	}, []);
-
-	// Hämta igen när någon registrerar en ny tävlande på registreringssidan
-	useEffect(() => {
-		fetchData();
-	}, [competition, competitorsVersion]);
+	}, [fetchData]);
 
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
@@ -110,40 +97,40 @@ export default function RegistreringStoppTid() {
 	);
 
 	const recordStopTimeNow = async () => {
-	const response = await fetch(`${API_BASE_URL}/api/times/record`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-		start_number: selectedStartNumber,
-		station_id: selectedStationId,
-		timestamp: new Date().toISOString(),
-		competition_id: competition
-		}),
-	});
+		const response = await fetch(`${API_BASE_URL}/api/times/record`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				start_number: selectedStartNumber,
+				station_id: selectedStationId,
+				timestamp: new Date().toISOString(),
+				competition_id: competition,
+			}),
+		});
 
-	if (!response.ok) throw new Error('Failed to register time');
+		if (!response.ok) throw new Error('Failed to register time');
 
-	const newEntry: LocalTimeEntry = {
-		id: crypto.randomUUID(),
-		start_number: selectedStartNumber,
-		name: selectedCompetitor?.name,
-		station_id: selectedStationId as number,
-		station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
-		timestamp: new Date().toISOString(),
-		competition_id: competition,
-	};
+		const newEntry: LocalTimeEntry = {
+			id: crypto.randomUUID(),
+			start_number: selectedStartNumber,
+			name: selectedCompetitor?.name,
+			station_id: selectedStationId as number,
+			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
+			timestamp: new Date().toISOString(),
+			competition_id: competition,
+		};
 
-	// Hämta ALLA sparade tider, inte bara de filtrerade
-	const stored = localStorage.getItem('latestStopTimes');
-	const allEntries: LocalTimeEntry[] = stored ? JSON.parse(stored) : [];
-	
-	const updated = [newEntry, ...allEntries].slice(0, 20);
-	localStorage.setItem('latestStopTimes', JSON.stringify(updated));
-	
-	// Uppdatera state med bara denna tävlingens tider
-	setLatestRegistrations(updated.filter(t => t.competition_id === competition));
+		// Hämta ALLA sparade tider, inte bara de filtrerade
+		const stored = localStorage.getItem('latestStopTimes');
+		const allEntries: LocalTimeEntry[] = stored ? JSON.parse(stored) : [];
 
-	return response;
+		const updated = [newEntry, ...allEntries].slice(0, 20);
+		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
+
+		// Uppdatera state med bara denna tävlingens tider
+		setLatestRegistrations(updated.filter((t) => t.competition_id === competition));
+
+		return response;
 	};
 	return (
 		<div>

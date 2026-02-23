@@ -1,6 +1,7 @@
 // frontend/src/pages/Admin.tsx
 import { useCallback, useEffect, useState } from 'react';
 
+import { useCompetition } from '@/components/Competition';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,37 +11,31 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
-import { useCompetition } from '@/components/Competition';
 // src/pages/Admin.tsx
 export default function Admin() {
 	const { competition } = useCompetition();
 	//const [competitionState, setCompetitionState]= useState<number | null>(null);
 	//declaring constants for the imports
 
-	
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
 
-	
 	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
-	
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
 
-	const fetchData = async () => {
-
+	const fetchData = useCallback(async () => {
 		// Competitor data
 		try {
 			const result = await getCompetitorData();
-			setCompetitorData(result.filter(c =>
-				c.competition_id === competition));
+			setCompetitorData(result.filter((c) => c.competition_id === competition));
 			console.log('Fetched competitor data');
 			console.log(competition);
 		} catch (err: unknown) {
@@ -54,8 +49,7 @@ export default function Admin() {
 		// Time data
 		try {
 			const result = await getTimeData();
-			setTimeData(result.filter(c =>
-				c.competition_id === competition));
+			setTimeData(result.filter((c) => c.competition_id === competition));
 			console.log('Fetched time data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setTimeError(err.message);
@@ -68,9 +62,7 @@ export default function Admin() {
 		// Station data
 		try {
 			const result = await getStationData();
-			setStationData(result.filter(c =>
-				c.competition_id === competition
-			));
+			setStationData(result.filter((c) => c.competition_id === competition));
 			console.log('Fetched station data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setStationError(err.message);
@@ -79,13 +71,11 @@ export default function Admin() {
 		} finally {
 			setStationLoading(false);
 		}
-	};
+	}, [competition]);
 
 	useEffect(() => {
 		fetchData();
-	}, [competition]);
-	
-
+	}, [fetchData]);
 
 	interface Cell {
 		value: string;
@@ -204,7 +194,7 @@ export default function Admin() {
 			competitor_id: competitor.id,
 			timestamp: timeData?.find((t) => t.id === timeId)?.timestamp ?? '-',
 			station_id: row[0].id,
-			competition_id: competition
+			competition_id: competition,
 		});
 	}
 

@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
-import Navbar from './components/Navbar';
-import { ThemeProvider } from './components/ThemeProvider';
-
 import { getCompetitionData } from './api/getCompetitionData';
 import { createCompetition } from './api/postCompetitionData';
+import { useCompetition } from './components/Competition';
+import Navbar from './components/Navbar';
+import { ThemeProvider } from './components/ThemeProvider';
 import { API_BASE_URL } from './config/api';
 import type { CompetitionData } from './types';
-import { useCompetition } from './components/Competition';
 
 const navigationData = [
 	{
@@ -50,14 +49,25 @@ export default function App() {
 	const [competitionError, setCompetitionError] = useState<string | null>(null);
 	const [selectedCompetition, setSelectedCompetition] = useState<number | null>(null);
 
-	const fetchData = async () => {
+	const handleSelectCompetition = useCallback(
+		(id: number) => {
+			setSelectedCompetition(id);
+			localStorage.setItem('selectedCompetition', id.toString());
+			console.log('Valde tävling med ID:', id);
+			setCompetition(id);
+			localStorage.setItem('competition', competition.toString());
+		},
+		[competition, setCompetition],
+	);
+
+	const fetchData = useCallback(async () => {
 		// Competition data
 		try {
 			const result = await getCompetitionData();
 			setCompetitionData(result);
 
 			if (result.length > 0) {
-				handleSelectCompetition(result[0].id);
+				handleSelectCompetition(Number(localStorage.getItem('selectedCompetition') ?? result[0].id));
 			}
 			console.log('Fetched competition data');
 		} catch (err: unknown) {
@@ -67,11 +77,11 @@ export default function App() {
 		} finally {
 			setCompetitionLoading(false);
 		}
-	};
+	}, [handleSelectCompetition]);
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [fetchData]);
 
 	const handleAddCompetition = async () => {
 		try {
@@ -83,27 +93,29 @@ export default function App() {
 
 			// Skapa start och mål-stationer
 			await Promise.all(
-				[{ station_name: 'start', order: 0 }, { station_name: 'mål', order: 1 }].map((station) =>
+				[
+					{ station_name: 'start', order: 0 },
+					{ station_name: 'mål', order: 1 },
+				].map((station) =>
 					fetch(`${API_BASE_URL}/api/stations/registerstation`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ ...station, competition_id: newCompetition.id }),
-					})
-				)
-				);
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ ...station, competition_id: newCompetition.id }),
+					}),
+				),
+			);
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				console.error('Fel vid skapande av tävling:', err.message);
+				alert(`Kunde inte skapa tävling: ${err.message}`);
+			} else {
+				console.error('Okänt fel vid skapande av tävling');
+				alert('Ett okänt fel inträffade');
+			}
+		}
+	};
 
-			} catch (err: unknown) {
-					if (err instanceof Error) {
-					console.error('Fel vid skapande av tävling:', err.message);
-					alert(`Kunde inte skapa tävling: ${err.message}`);
-					} else {
-					console.error('Okänt fel vid skapande av tävling');
-					alert('Ett okänt fel inträffade');
-					}
-				}
-		};
-
-// I din App.tsx, uppdatera handleRemoveCompetition:
+	// I din App.tsx, uppdatera handleRemoveCompetition:
 
 	const handleRemoveCompetition = async (id: number) => {
 		try {
@@ -117,12 +129,13 @@ export default function App() {
 
 			// Ta bort från state
 			setCompetitionData(competitions.filter((c) => c.id !== id));
-			
+
 			// Om den borttagna tävlingen var vald, återställ till 0
 			if (selectedCompetition === id) {
-				setSelectedCompetition(0);
+				const minId = competitions.reduce((min, c) => (c.id < min ? c.id : min), Infinity);
+				handleSelectCompetition(minId);
 			}
-			
+
 			console.log('Tog bort tävling med ID:', id);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
@@ -133,13 +146,6 @@ export default function App() {
 				alert('Ett okänt fel inträffade');
 			}
 		}
-	};
-
-	const handleSelectCompetition = (id: number) => {
-		setSelectedCompetition(id);
-		console.log('Valde tävling med ID:', id);
-		setCompetition(id);
-		localStorage.setItem("competition", competition.toString())
 	};
 
 	return (
@@ -155,8 +161,19 @@ export default function App() {
 				/>
 
 				<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-					<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
+					{competitionLoading ? (
+						<div className="text-center py-20 text-gray-500">Laddar tävlingar...</div>
+					) : competitionError ? (
+						<div className="text-center py-20 text-red-500">Fel vid hämtning av tävlingar: {competitionError}</div>
+					) : competitions.length === 0 ? (
+						<div className="text-center py-20 text-gray-500">
+							Inga tävlingar hittades. Lägg till en ny tävling ovan.
+						</div>
+					) : (
+						<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
+					)}
 				</main>
+
 				<Toaster />
 			</div>
 		</ThemeProvider>

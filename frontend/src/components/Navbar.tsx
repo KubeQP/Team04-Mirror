@@ -1,12 +1,13 @@
 import { MenuIcon, TimerIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
+import type { CompetitionData } from '@/types';
+
+import { CompetitionDropdown } from './CompetitionDropdown';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
-import { CompetitionDropdown } from './CompetitionDropdown';
-import type { CompetitionData } from '@/types';
 
 type NavigationItem = {
 	title: string;

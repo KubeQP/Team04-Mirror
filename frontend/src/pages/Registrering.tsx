@@ -1,7 +1,8 @@
 import { MoreHorizontalIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
+import { useCompetition } from '@/components/Competition';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
@@ -16,9 +17,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { API_BASE_URL } from '../config/api';
-
-import { useCompetition } from '@/components/Competition';
-
 
 type Competitor = {
 	start_number: string;
@@ -39,16 +37,16 @@ export default function Registrering() {
 	const [name, setName] = useState('');
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-	const fetchCompetitors = async () => {
+	const fetchCompetitors = useCallback(async () => {
 		const res = await fetch(`${API_BASE_URL}/api/competitors/`);
 		if (!res.ok) return;
 		const data = await res.json();
-		setCompetitors((data as Array<Competitor>).filter(c => c.competition_id === competition));
-	};
+		setCompetitors((data as Array<Competitor>).filter((c) => c.competition_id === competition));
+	}, [competition]);
 
 	useEffect(() => {
 		fetchCompetitors();
-	}, [competition]);
+	}, [fetchCompetitors]);
 
 	const addReg = async () => {
 		console.log('add reg');
@@ -79,7 +77,7 @@ export default function Registrering() {
 				body: JSON.stringify({
 					start_number: formattedReg,
 					name: name,
-					competition_id: competition
+					competition_id: competition,
 				}),
 			});
 

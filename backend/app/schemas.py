@@ -71,8 +71,10 @@ class TimeEntryUpdate(BaseModel):
 class CompetitionsReg(BaseModel):
     id: int
 
+
 class CompetitionsOut(BaseModel):
     id: int
+
 
 class CompetitionsRemove(BaseModel):
     id: int
