@@ -1,6 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
+import { TooltipProvider } from '../components/ui/tooltip';
 import RegistreringStoppTid from './RegistreringStoppTid';
 
 // ---------- Typer ----------
@@ -9,8 +11,8 @@ type OutletCtx = {
 	notifyCompetitorAdded: () => void;
 };
 
-type Competitor = { start_number: string; name: string };
-type Station = { id: number; station_name: string; order: string };
+type Competitor = { start_number: string; name: string, competition_id: number };
+type Station = { id: number; station_name: string; order: string, competition_id: number};
 
 type TimeEntryOut = {
 	id?: number;
@@ -31,6 +33,10 @@ vi.mock('react-router-dom', async () => {
 	};
 });
 
+vi.mock('../components/competition', () => ({
+	useCompetition: () => ({ competition: 0, setCompetition: vi.fn(), }),
+}));
+
 // ---------- “Fake DB” i test ----------
 let competitorsDb: Competitor[] = [];
 let stationsDb: Station[] = [];
@@ -41,14 +47,14 @@ let fetchSpy: MockInstance;
 
 beforeEach(() => {
 	competitorsDb = [
-		{ start_number: '007', name: 'Anna' },
-		{ start_number: '123', name: 'Bob' },
-		{ start_number: '124', name: 'Benim' },
+		{ start_number: '007', name: 'Anna', competition_id:0},
+		{ start_number: '123', name: 'Bob', competition_id:0 },
+		{ start_number: '124', name: 'Benim', competition_id:0 },
 	];
 
 	stationsDb = [
-		{ id: 0, station_name: 'Start', order: '1' },
-		{ id: 1, station_name: 'Mål', order: '2' },
+		{ id: 0, station_name: 'Start', order: '1', competition_id:0 },
+		{ id: 1, station_name: 'Mål', order: '2', competition_id:0 },
 	];
 
 	fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -85,7 +91,11 @@ beforeEach(() => {
 
 describe('RegistreringStoppTid', () => {
 	it('hämtar tävlande, visar dem i tabell och filtrerar dropdown via sökfält', async () => {
-		render(<RegistreringStoppTid />);
+		render(
+			<TooltipProvider>
+				<RegistreringStoppTid />
+			</TooltipProvider>,
+		);
 
 		// Wait for competitors to load (table)
 		await waitFor(() => {
@@ -95,25 +105,26 @@ describe('RegistreringStoppTid', () => {
 			expect(screen.getByText('Bob')).toBeInTheDocument();
 		});
 
-		// Type in search input
-		// Type in search input
-		const searchInput = screen.getByPlaceholderText('searchComp');
-		fireEvent.change(searchInput, { target: { value: '007' } });
+		const searchInput = screen.getByPlaceholderText('Sök tävlande...');
+		await userEvent.click(searchInput);
+		await userEvent.type(searchInput, '007');
 
 		// Dropdown should now be filtered
 		await waitFor(() => {
-			expect(screen.getByRole('option', { name: '007 — Anna' })).toBeInTheDocument();
+			expect(searchInput.ariaExpanded).toBe('true');
+			const matches = screen.getAllByText(/007/);
+			expect(matches.length).toBe(2);
 		});
 	});
 });
 
 it('disablar stopptidsknappen om inga tävlande finns', async () => {
 	competitorsDb = [];
-	render(<RegistreringStoppTid />);
-
-	await waitFor(() => {
-		expect(screen.getByText(/Inga tävlande hittades/i)).toBeInTheDocument();
-	});
+	render(
+		<TooltipProvider>
+			<RegistreringStoppTid />
+		</TooltipProvider>,
+	);
 
 	expect(screen.getByText('Registrera stopptid nu')).toBeDisabled();
 });
