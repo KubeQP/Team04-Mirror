@@ -169,7 +169,7 @@ if (competitorData && timeData && stationData) {
 
   // Tid 1..N  (exclude start + finish)
   for (let i = 1; i < stationCount - 1; i++) {
-    headerRow.push(`Tidpunkt ${i}`);
+    headerRow.push(`Tidpunkt ${relevantStations[i].station_name}`);
   }
 
   // Mål
