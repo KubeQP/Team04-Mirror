@@ -3,6 +3,12 @@ import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime
+from urllib.parse import urlparse
+
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
+
+from urllib.parse import urlparse
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -150,11 +156,15 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:8000",
         "http://localhost:8000",
+        "http://localhost:5177",
+        "http://127.0.0.1:5177",
+        os.getenv("API_BASE_URL")
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+    )
+
 
 
 # Inkludera routrar. Smidigt att dela upp i flera filer.
@@ -193,5 +203,11 @@ else:
 # istället för att alltid använda "uvicorn app.main:app --reload"
 if __name__ == "__main__":
     import uvicorn
+    api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:7000")
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    parsed = urlparse(api_url)
+    host = parsed.hostname
+    port = parsed.port or 8000
+
+    uvicorn.run("app.main:app", host=host, port=port, reload=True)
+

@@ -1,7 +1,8 @@
+import { API_BASE_URL } from '../config/api';
 import type { StationData } from '../types';
 
 export async function updateStationOrder(stations: Omit<StationData, 'id'>[]): Promise<void> {
-	const response = await fetch('http://127.0.0.1:8000/api/stations/updateOrder/', {
+	const response = await fetch(`${API_BASE_URL}/api/stations/updateOrder/`, {
 		method: 'PATCH',
 		headers: {
 			'Content-Type': 'application/json',
