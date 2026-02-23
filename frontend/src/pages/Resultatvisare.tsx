@@ -89,10 +89,10 @@ if (competitorData && timeData && stationData) {
     });
 
     const start = allStationTimes[0];
-    const finish = allStationTimes[allStationTimes.length - 1];
+    const finish = allStationTimes[allStationTimes.length - 1] || null;
 
     // Must have valid start + finish
-    if (!start || !finish) return null;
+    if (!start) return null;
 
     const stationTimes: string[] = [];
 
@@ -112,7 +112,7 @@ if (competitorData && timeData && stationData) {
     // ==================
     // MÅL COLUMN
     // ==================
-    stationTimes.push(finish.toLocaleTimeString());
+    stationTimes.push(finish ? finish.toLocaleTimeString() : '-');
 
     // ==================
     // DEL 1..N (between every station)
@@ -135,7 +135,7 @@ if (competitorData && timeData && stationData) {
     // TOTAL TIME
     // ==================
     const totalSeconds =
-      Math.round((finish.getTime() - start.getTime())/ 1000);
+      finish ? Math.round((finish.getTime() - start.getTime())/ 1000): -1;
 
     return {
       Rang: 0,
@@ -150,7 +150,11 @@ if (competitorData && timeData && stationData) {
   // ==================
   // SORT + RANK
   // ==================
-  Results.sort((a, b) => a.Total - b.Total);
+  Results.sort((a, b) => {
+	if (a.Total < 0) return 1;
+	if (b.Total < 0) return -1;
+	return a.Total - b.Total;
+	});
   Results.forEach((r, i) => r.Rang = i + 1);
 
   // ==================
@@ -193,7 +197,7 @@ if (competitorData && timeData && stationData) {
       r.Nr,
       r.Name,
       ...r.stationTimes,
-      formatTotalTime(r.Total)
+      r.Total >= 0 ? formatTotalTime(r.Total) : '-'   
     ])
   ];
 }
