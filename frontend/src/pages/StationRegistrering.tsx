@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { API_BASE_URL } from '../config/api';
-import { competition } from '../App';
+import { useCompetition } from '@/components/Competition';
 
 type Station = {
 	station_name: string;
@@ -18,6 +18,7 @@ type Station = {
 };
 
 export default function StationRegistrering() {
+	const { competition } = useCompetition();
 	const [stationName, setStationName] = useState('');
 	const [order, setOrder] = useState('');
 	const [stations, setStations] = useState<Station[]>([]);

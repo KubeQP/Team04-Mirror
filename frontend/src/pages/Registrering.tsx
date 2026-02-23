@@ -16,7 +16,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { API_BASE_URL } from '../config/api';
-import { competition } from '../App';
+
+import { useCompetition } from '@/components/Competition';
+
 
 type Competitor = {
 	start_number: string;
@@ -30,6 +32,7 @@ type OutletCtx = {
 };
 
 export default function Registrering() {
+	const { competition } = useCompetition();
 	const { notifyCompetitorAdded } = useOutletContext<OutletCtx>();
 
 	const [reg, setReg] = useState('');

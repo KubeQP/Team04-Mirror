@@ -9,6 +9,8 @@ import { getCompetitionData } from './api/getCompetitionData';
 import { createCompetition } from './api/postCompetitionData';
 import { API_BASE_URL } from './config/api';
 import type { CompetitionData } from './types';
+import { useCompetition } from './components/Competition';
+import { CompetitionProvider } from './components/Competition';
 
 const navigationData = [
 	{
@@ -33,9 +35,10 @@ const navigationData = [
 	},
 ];
 
-export let competition: number = 0;
+//export let competition: number = 0;
 
 export default function App() {
+	const { competition, setCompetition } = useCompetition();
 	const [competitorsVersion, setCompetitorsVersion] = useState(0);
 
 	const notifyCompetitorAdded = () => {
@@ -53,6 +56,10 @@ export default function App() {
 		try {
 			const result = await getCompetitionData();
 			setCompetitionData(result);
+
+			if (result.length > 0) {
+				handleSelectCompetition(result[0].id);
+			}
 			console.log('Fetched competition data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setCompetitionError(err.message);
@@ -70,19 +77,32 @@ export default function App() {
 	const handleAddCompetition = async () => {
 		try {
 			const newCompetition = await createCompetition();
-			// Lägg till den nya tävlingen i state
 			setCompetitionData([...competitions, newCompetition]);
-			console.log('Lade till tävling med ID:', newCompetition.id);
+
+			// Välj den nya tävlingen automatiskt
+			handleSelectCompetition(newCompetition.id);
+
+			// Skapa start och mål-stationer
+			await Promise.all(
+			[{ station_name: 'start', order: 0 }, { station_name: 'mål', order: 1 }].map((station) =>
+				fetch(`${API_BASE_URL}/api/stations/registerstation`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ ...station, competition_id: newCompetition.id }),
+				})
+			)
+			);
+
 		} catch (err: unknown) {
 			if (err instanceof Error) {
-				console.error('Fel vid skapande av tävling:', err.message);
-				alert(`Kunde inte skapa tävling: ${err.message}`);
+			console.error('Fel vid skapande av tävling:', err.message);
+			alert(`Kunde inte skapa tävling: ${err.message}`);
 			} else {
-				console.error('Okänt fel vid skapande av tävling');
-				alert('Ett okänt fel inträffade');
+			console.error('Okänt fel vid skapande av tävling');
+			alert('Ett okänt fel inträffade');
 			}
 		}
-	};
+		};
 
 // I din App.tsx, uppdatera handleRemoveCompetition:
 
@@ -119,7 +139,7 @@ export default function App() {
 	const handleSelectCompetition = (id: number) => {
 		setSelectedCompetition(id);
 		console.log('Valde tävling med ID:', id);
-		competition = selectedCompetition ?? 0
+		setCompetition(id);
 		localStorage.setItem("competition", competition.toString())
 	};
 

@@ -10,11 +10,14 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
-import { competition } from '../App';
+import { useCompetition } from '@/components/Competition';
 // src/pages/Admin.tsx
 export default function Admin() {
+	const { competition } = useCompetition();
+	//const [competitionState, setCompetitionState]= useState<number | null>(null);
 	//declaring constants for the imports
 
+	const [unfilteredCompetitorData, setUnfilteredCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
@@ -30,12 +33,15 @@ export default function Admin() {
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
 
 	const fetchData = async () => {
+
 		// Competitor data
 		try {
 			const result = await getCompetitorData();
+			setUnfilteredCompetitorData(result);
 			setCompetitorData(result.filter(c =>
 				c.competition_id === competition));
 			console.log('Fetched competitor data');
+			console.log(competition);
 		} catch (err: unknown) {
 			if (err instanceof Error) setCompetitorError(err.message);
 			else if (typeof err === 'string') setCompetitorError(err);
@@ -77,6 +83,11 @@ export default function Admin() {
 	useEffect(() => {
 		fetchData();
 	}, []);
+
+	useEffect(() => {
+	if (!unfilteredCompetitorData) return;
+	setCompetitorData(unfilteredCompetitorData.filter(c => c.competition_id === competition));
+	}, [competition, unfilteredCompetitorData]);
 
 	interface Cell {
 		value: string;

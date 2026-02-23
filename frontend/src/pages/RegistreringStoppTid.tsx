@@ -30,7 +30,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { API_BASE_URL } from '../config/api';
-import { competition } from '../App';
+import { useCompetition } from '@/components/Competition';
 
 type Competitor = {
 	start_number: string;
@@ -58,6 +58,7 @@ type OutletCtx = {
 };
 
 export default function RegistreringStoppTid() {
+	const { competition } = useCompetition();
 	const { competitorsVersion } = useOutletContext<OutletCtx>();
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
