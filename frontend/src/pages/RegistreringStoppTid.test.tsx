@@ -11,8 +11,8 @@ type OutletCtx = {
 	notifyCompetitorAdded: () => void;
 };
 
-type Competitor = { start_number: string; name: string };
-type Station = { id: number; station_name: string; order: string };
+type Competitor = { start_number: string; name: string; competition_id: number };
+type Station = { id: number; station_name: string; order: string; competition_id: number };
 
 type TimeEntryOut = {
 	id?: number;
@@ -33,6 +33,10 @@ vi.mock('react-router-dom', async () => {
 	};
 });
 
+vi.mock('../components/Competition', () => ({
+	useCompetition: () => ({ competition: 0, setCompetition: vi.fn() }),
+}));
+
 // ---------- “Fake DB” i test ----------
 let competitorsDb: Competitor[] = [];
 let stationsDb: Station[] = [];
@@ -43,14 +47,14 @@ let fetchSpy: MockInstance;
 
 beforeEach(() => {
 	competitorsDb = [
-		{ start_number: '007', name: 'Anna' },
-		{ start_number: '123', name: 'Bob' },
-		{ start_number: '124', name: 'Benim' },
+		{ start_number: '007', name: 'Anna', competition_id: 0 },
+		{ start_number: '123', name: 'Bob', competition_id: 0 },
+		{ start_number: '124', name: 'Benim', competition_id: 0 },
 	];
 
 	stationsDb = [
-		{ id: 0, station_name: 'Start', order: '1' },
-		{ id: 1, station_name: 'Mål', order: '2' },
+		{ id: 0, station_name: 'Start', order: '1', competition_id: 0 },
+		{ id: 1, station_name: 'Mål', order: '2', competition_id: 0 },
 	];
 
 	fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
