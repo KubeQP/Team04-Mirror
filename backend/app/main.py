@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .database import Base, SessionLocal, engine
 from .models import Competitor, Station, TimeEntry
-from .routers import competitors, stations, times, results
+from .routers import competitors, results, stations, times
 
 
 @asynccontextmanager
@@ -24,14 +24,26 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     db = SessionLocal()
     if db.query(Competitor).count() == 0:
         competitors = []
-        competitors.append(Competitor(start_number="123", name="Alice"))   # finish
-        competitors.append(Competitor(start_number="458", name="Bob"))     # finish
-        competitors.append(Competitor(start_number="030", name="John"))    # bara start (DNF men startTime ska synas)
-        competitors.append(Competitor(start_number="020", name="Liam"))    # ingen tid alls (DNF)
-        competitors.append(Competitor(start_number="002", name="Miriam"))  # snabb finisher (ska bli plac 1)
-        competitors.append(Competitor(start_number="047", name="Sixten"))  # finish men långsammare
-        competitors.append(Competitor(start_number="111", name="Eva"))     # bara mål (konstig data)
-        competitors.append(Competitor(start_number="099", name="Noah"))    # finish med tight tid
+        competitors.append(Competitor(start_number="123", name="Alice"))  # finish
+        competitors.append(Competitor(start_number="458", name="Bob"))  # finish
+        competitors.append(
+            Competitor(start_number="030", name="John")
+        )  # bara start (DNF men startTime ska synas)
+        competitors.append(
+            Competitor(start_number="020", name="Liam")
+        )  # ingen tid alls (DNF)
+        competitors.append(
+            Competitor(start_number="002", name="Miriam")
+        )  # snabb finisher (ska bli plac 1)
+        competitors.append(
+            Competitor(start_number="047", name="Sixten")
+        )  # finish men långsammare
+        competitors.append(
+            Competitor(start_number="111", name="Eva")
+        )  # bara mål (konstig data)
+        competitors.append(
+            Competitor(start_number="099", name="Noah")
+        )  # finish med tight tid
         db.add_all(competitors)
         db.commit()
 
@@ -59,7 +71,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                     timestamp=datetime(2025, 6, 27, 12, 47, 38),
                     station_id=station2.id,
                 ),
-
                 # Bob (competitors[1]) – finisher, längre tid än Alice
                 TimeEntry(
                     competitor_id=competitors[1].id,
@@ -71,16 +82,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                     timestamp=datetime(2025, 6, 27, 12, 52, 5),
                     station_id=station2.id,
                 ),
-
                 # John (competitors[2]) – bara start => DNF men startTime ska komma med
                 TimeEntry(
                     competitor_id=competitors[2].id,
                     timestamp=datetime(2025, 6, 27, 9, 52, 5),
                     station_id=station1.id,
                 ),
-
                 # Liam (competitors[3]) – inga tider alls => DNF (lägg INGA TimeEntry för honom)
-
                 # Miriam (competitors[4]) – snabbast, ska bli plac 1
                 TimeEntry(
                     competitor_id=competitors[4].id,
@@ -92,7 +100,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                     timestamp=datetime(2025, 6, 27, 12, 20, 5),
                     station_id=station2.id,
                 ),
-
                 # Sixten (competitors[5]) – finisher, längre än Noah men kortare än Bob (exempel)
                 TimeEntry(
                     competitor_id=competitors[5].id,
@@ -104,14 +111,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                     timestamp=datetime(2025, 6, 27, 12, 40, 0),
                     station_id=station2.id,
                 ),
-
                 # Eva (competitors[6]) – bara mål (konstig data) => DNF men endTime ska komma med
                 TimeEntry(
                     competitor_id=competitors[6].id,
                     timestamp=datetime(2025, 6, 27, 12, 33, 33),
                     station_id=station2.id,
                 ),
-
                 # Noah (competitors[7]) – finisher, nästan som Sixten men lite snabbare
                 TimeEntry(
                     competitor_id=competitors[7].id,

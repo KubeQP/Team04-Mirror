@@ -1,6 +1,5 @@
 # backend/app/schemas.py
 from datetime import datetime
-from typing import List
 
 from pydantic import BaseModel, ConfigDict
 
@@ -60,6 +59,7 @@ class TimeEntryUpdate(BaseModel):
     timestamp: datetime | None = None
     station_id: int | None = None
 
+
 class DriverResult(BaseModel):
     plac: str
     startNbr: str
@@ -68,6 +68,7 @@ class DriverResult(BaseModel):
     startTime: str
     endTime: str
 
+
 class Result(BaseModel):
     teamToken: str
-    jsonResult: List[DriverResult]
+    jsonResult: list[DriverResult]

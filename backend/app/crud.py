@@ -3,14 +3,12 @@
 # Kommentar: CRUD står för Create, Read, Update, Delete och innehåller
 # funktioner för att interagera med databasen, som anropas från routrar.
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
-from .schemas import DriverResult, Result
-
-from typing import cast, List, Optional
+from .schemas import DriverResult
 
 
 def get_competitors(db: Session) -> list[Competitor]:
@@ -113,6 +111,7 @@ def update_time_entry(
     db.refresh(entry)
     return entry
 
+
 def fmt_timedelta(td: timedelta) -> str:
     total_seconds = int(td.total_seconds())
     h = total_seconds // 3600
@@ -121,11 +120,11 @@ def fmt_timedelta(td: timedelta) -> str:
     return f"{h:02}:{m:02}:{s:02}"
 
 
-def get_results(db: Session) -> List["DriverResult"]:
+def get_results(db: Session) -> list[DriverResult]:
     competitors = get_competitors(db)
 
-    finished: List[tuple[int, DriverResult]] = []
-    dnfs: List[DriverResult] = []
+    finished: list[tuple[int, DriverResult]] = []
+    dnfs: list[DriverResult] = []
 
     def time_or_blank(dt) -> str:
         return dt.strftime("%H:%M:%S") if dt else ""

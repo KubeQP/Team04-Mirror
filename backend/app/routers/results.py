@@ -1,8 +1,6 @@
 # backend/app/routers/competitors.py
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import Column
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
 
 from .. import crud, schemas
 from ..database import get_db
@@ -16,11 +14,3 @@ def submit_results(db: Session = Depends(get_db)) -> schemas.Result:
     rows = crud.get_results(db)  # returnerar List[DriverResult] (pydantic) eller ORM
 
     return schemas.Result(teamToken=token, jsonResult=rows)
-
-
-
-
-
-
-
-
