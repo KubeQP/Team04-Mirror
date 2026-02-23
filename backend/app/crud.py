@@ -170,7 +170,7 @@ def get_results(db: Session) -> list[DriverResult]:
     finished: list[tuple[int, DriverResult]] = []
     dnfs: list[DriverResult] = []
 
-    def time_or_blank(dt) -> str:
+    def time_or_blank(dt: datetime | None) -> str:
         return dt.strftime("%H:%M:%S") if dt else ""
 
     for comp in competitors:
