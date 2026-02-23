@@ -7,7 +7,11 @@ from app import models
 def test_register_creates_competitor_and_time_entry(
     client: TestClient, db_session: Session
 ) -> None:
-    payload = {"start_number": "2001", "name": "team4"}  # anpassa till ditt schema
+    payload = {
+        "start_number": "2001",
+        "name": "team4",
+        "competition_id": 1,
+    }
 
     # Act
     res = client.post("/api/competitors/register", json=payload)  # anpassa prefix/route

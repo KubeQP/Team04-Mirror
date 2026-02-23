@@ -1,9 +1,10 @@
 // src/pages/RegistreringStoppTid.tsx
-import { EraserIcon, Undo2Icon } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { EraserIcon, Trash2Icon, Undo2Icon } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import vineBoom from '@/assets/audio/vine-boom.mp3';
+import { useCompetition } from '@/components/Competition';
 import { Button } from '@/components/ui/button';
 import {
 	Combobox,
@@ -50,15 +51,11 @@ type LocalTimeEntry = {
 	station_id: number;
 	station_name?: string;
 	timestamp: string;
-};
-
-type OutletCtx = {
-	competitorsVersion: number;
-	notifyCompetitorAdded: () => void; // finns, men används inte här
+	competition_id: number;
 };
 
 export default function RegistreringStoppTid() {
-	const { competitorsVersion } = useOutletContext<OutletCtx>();
+	const { competition } = useCompetition();
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
@@ -72,27 +69,29 @@ export default function RegistreringStoppTid() {
 	useEffect(() => {
 		const stored = localStorage.getItem('latestStopTimes');
 		if (stored) {
-			setLatestRegistrations(JSON.parse(stored));
+			const parsed = JSON.parse(stored);
+			console.log('parsed:', parsed);
+			console.log('competition:', competition);
+			console.log(
+				'filtered:',
+				parsed.filter((t: LocalTimeEntry) => t.competition_id === competition),
+			);
+			setLatestRegistrations(parsed.filter((t: LocalTimeEntry) => Number(t.competition_id) === competition));
 		}
-	}, []);
+	}, [competition]);
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		const result = await getCompetitorData();
-		setCompetitors(result);
+		setCompetitors(result.filter((c) => c.competition_id === competition));
 
 		const res = await getStationData();
-		setStations(res);
-	};
+		setStations(res.filter((c) => c.competition_id === competition));
+	}, [competition]);
 
 	// Hämta vid första mount
 	useEffect(() => {
 		fetchData();
-	}, []);
-
-	// Hämta igen när någon registrerar en ny tävlande på registreringssidan
-	useEffect(() => {
-		fetchData();
-	}, [competitorsVersion]);
+	}, [fetchData]);
 
 	const selectedCompetitor = useMemo(
 		() => competitors.find((c) => c.start_number === selectedStartNumber),
@@ -107,28 +106,50 @@ export default function RegistreringStoppTid() {
 				start_number: selectedStartNumber,
 				station_id: selectedStationId,
 				timestamp: new Date().toISOString(),
+				competition_id: competition,
 			}),
 		});
 
-		if (!response.ok) {
-			throw new Error('Failed to register time');
-		}
+		if (!response.ok) throw new Error('Failed to register time');
+
+		const { id }: { id: string } = await response.json();
 
 		// Create local entry
 		const newEntry: LocalTimeEntry = {
-			id: crypto.randomUUID(),
+			id,
 			start_number: selectedStartNumber || null,
 			name: selectedCompetitor?.name,
 			station_id: selectedStationId as number,
 			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
 			timestamp: new Date().toISOString(),
+			competition_id: competition,
 		};
 
-		const updated = [newEntry, ...latestRegistrations].slice(0, 20); // keep last 20
-		setLatestRegistrations(updated);
+		// Hämta ALLA sparade tider, inte bara de filtrerade
+		const stored = localStorage.getItem('latestStopTimes');
+		const allEntries: LocalTimeEntry[] = stored ? JSON.parse(stored) : [];
+
+		const updated = [newEntry, ...allEntries].slice(0, 20);
 		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
 
+		// Uppdatera state med bara denna tävlingens tider
+		setLatestRegistrations(updated.filter((t) => t.competition_id === competition));
+
 		return response;
+	};
+
+	const deleteStopTime = async (entryId: string) => {
+		const response = await fetch(`${API_BASE_URL}/api/times/${entryId}`, {
+			method: 'DELETE',
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to delete time entry');
+		}
+
+		const updated = latestRegistrations.filter((entry) => entry.id !== entryId);
+		setLatestRegistrations(updated);
+		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
 	};
 
 	return (
@@ -223,11 +244,20 @@ export default function RegistreringStoppTid() {
 						type="button"
 						variant="secondary"
 						onClick={async () => {
-							toast.promise(fetchData(), {
-								loading: 'Uppdaterar lista...',
-								success: 'Lista uppdaterad',
-								error: 'Kunde inte uppdatera lista',
-							});
+							toast.promise(
+								(async () => {
+									await fetchData();
+
+									// Spela ljud NU – webbläsaren tillåter detta eftersom det sker efter klick
+									const audio = new Audio(vineBoom); // public/assets
+									audio.play().catch(() => console.warn('Kunde inte spela ljud'));
+								})(),
+								{
+									loading: 'Uppdaterar lista...',
+									success: 'Lista uppdaterad',
+									error: 'Kunde inte uppdatera lista',
+								},
+							);
 						}}
 					>
 						Uppdatera lista
@@ -284,6 +314,7 @@ export default function RegistreringStoppTid() {
 									<TableHead>Startnummer</TableHead>
 									<TableHead>Namn</TableHead>
 									<TableHead>Station</TableHead>
+									<TableHead>Ångra</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -293,6 +324,28 @@ export default function RegistreringStoppTid() {
 										<TableCell className="font-medium">{entry.start_number}</TableCell>
 										<TableCell>{entry.name}</TableCell>
 										<TableCell>{entry.station_name}</TableCell>
+										<TableCell>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button
+														variant="ghost"
+														size="icon"
+														onClick={() => {
+															toast.promise(deleteStopTime(entry.id), {
+																loading: 'Tar bort registrering...',
+																success: 'Registrering borttagen',
+																error: 'Kunde inte ta bort registrering',
+															});
+														}}
+													>
+														<Trash2Icon />
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent>
+													<p>Ångra denna registrering (tar bort den från backend)</p>
+												</TooltipContent>
+											</Tooltip>
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>

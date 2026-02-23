@@ -14,6 +14,9 @@ class Competitor(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     start_number: Mapped[str] = mapped_column(String, unique=True, index=True)
     name: Mapped[str] = mapped_column(String)
+    competition_id = mapped_column(
+        Integer, ForeignKey("competitions.id", ondelete="CASCADE")
+    )
 
 
 class Station(Base):
@@ -21,6 +24,9 @@ class Station(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     station_name: Mapped[str] = mapped_column(String)
     order: Mapped[str] = mapped_column(String)
+    competition_id = mapped_column(
+        Integer, ForeignKey("competitions.id", ondelete="CASCADE")
+    )
 
 
 class TimeEntry(Base):
@@ -33,10 +39,28 @@ class TimeEntry(Base):
         Integer, ForeignKey("stations.id"), index=True
     )
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+    )
+    competition_id = mapped_column(
+        Integer, ForeignKey("competitions.id", ondelete="CASCADE")
     )
 
     competitor = relationship("Competitor")
     station = relationship("Station")
+
+
+class Competition(Base):
+    __tablename__ = "competitions"
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+
+    competitors = relationship(
+        "Competitor", backref="competition", cascade="all, delete-orphan"
+    )
+    stations = relationship(
+        "Station", backref="competition", cascade="all, delete-orphan"
+    )
+    times = relationship(
+        "TimeEntry", backref="competition", cascade="all, delete-orphan"
+    )

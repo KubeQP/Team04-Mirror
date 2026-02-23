@@ -14,7 +14,11 @@ vi.mock('react-router-dom', async () => {
 	};
 });
 
-type Competitor = { start_number: string; name: string };
+vi.mock('../components/Competition', () => ({
+	useCompetition: () => ({ competition: 0, setCompetition: vi.fn() }),
+}));
+
+type Competitor = { start_number: string; name: string; competition_id: number };
 
 // En liten "in-memory" lista som låtsas vara backend-DB i testet
 let db: Competitor[] = [];
@@ -33,12 +37,16 @@ beforeEach(() => {
 
 		// POST /competitors/register
 		if (u.endsWith('/competitors/register') && init?.method === 'POST') {
-			const body = JSON.parse(String(init?.body ?? '{}')) as { start_number: string; name: string };
+			const body = JSON.parse(String(init?.body ?? '{}')) as {
+				start_number: string;
+				name: string;
+				competition_id: number;
+			};
 
 			// låtsas att backend sparar och returnerar posten
 			const exists = db.some((c) => c.start_number === body.start_number);
 			if (!exists) {
-				db.push({ start_number: body.start_number, name: body.name });
+				db.push({ start_number: body.start_number, name: body.name, competition_id: 0 });
 			}
 
 			return new Response(JSON.stringify(body), { status: 200 });
@@ -46,12 +54,11 @@ beforeEach(() => {
 
 		return new Response('Not found', { status: 404 });
 	});
-
-	render(<RegistreringStartTid />);
 });
 
 describe('RegisteringStartTid', () => {
 	it('registrerar ett korrekt startnummer', async () => {
+		render(<RegistreringStartTid />);
 		// fyll startnummer
 		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: '001' },
@@ -71,6 +78,7 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar felaktig registrering med bokstäver', async () => {
+		render(<RegistreringStartTid />);
 		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: 'abc' },
 		});
@@ -87,6 +95,7 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar registrering med extra nollor framför', async () => {
+		render(<RegistreringStartTid />);
 		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: '000210' },
 		});
@@ -102,6 +111,7 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar registrering med färre än tre siffror', async () => {
+		render(<RegistreringStartTid />);
 		fireEvent.change(screen.getByPlaceholderText('123'), {
 			target: { value: '13' },
 		});
@@ -117,6 +127,7 @@ describe('RegisteringStartTid', () => {
 	});
 
 	it('testar registrering med dubletter', async () => {
+		render(<RegistreringStartTid />);
 		for (let i = 0; i < 2; i++) {
 			fireEvent.change(screen.getByPlaceholderText('123'), {
 				target: { value: '011' },

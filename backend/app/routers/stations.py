@@ -20,11 +20,17 @@ def read_stations(db: Session = Depends(get_db)) -> list[Station]:
 def reg_station(
     data: schemas.StationReg, db: Session = Depends(get_db)
 ) -> dict[str, str]:
-    station = crud.record_new_station(db, data.station_name, data.order)
-    return {"station_name": station.station_name, "order": station.order}
+    station = crud.record_new_station(
+        db, data.station_name, data.order, data.competition_id
+    )
+    return {
+        "station_name": station.station_name,
+        "order": station.order,
+        "competition_id": station.competition_id,
+    }
 
 
-@router.patch("/updateOrder/")
+@router.patch("/updateOrder")
 def update_station_order(
     stations: list[schemas.StationReg],
     db: Session = Depends(get_db),
@@ -37,3 +43,18 @@ def update_station_order(
     db.commit()
 
     return stations
+
+
+@router.delete("/delete/{station_order}")
+def delete_station(station_order: int, db: Session = Depends(get_db)) -> dict[str, str]:
+    station = (
+        db.query(models.Station).filter(models.Station.order == station_order).first()
+    )
+
+    if station is None:
+        return {"detail": "Station not found"}
+
+    db.delete(station)
+    db.commit()
+
+    return {"detail": "Station deleted"}
