@@ -1,15 +1,18 @@
-Denna release innehåller:
- - Fixes: 
-  - Manual: Förtydliga, bilder & separera användarmanual och installationsbeskrivning.
-  - Stoptid: Textfält istället för Dropdown.
-  - Admin: namn på station & formattering
-  - Stopptid registrering: 
-   - Svårare att byta station, men möjligt att ångra.
-   - Söka bland tävlande
- 
+Denna release (23/2-26) inehåller:
+- Uppdaterad och förbättrad teknisk dokumentation med utgångspunkt från en review av denna.
+- Resultatvisare: Implementerad och listar deltagarna utifrån givna kriterier.
+- Användarvänlighet: Samtliga sidor som användaren interagerar med har en kontinuerlig design, med tydliga komponenter, tydliga textfält samt anpassade färger och kontraster.
+- Upptäcka fel: Adminsidan detekterar felaktigheter genom att markera specifika textrutor med röd färg.
+- Rätta fel: På adminsidan är det nu möjligt att redigera felaktiga registreringar genom att byta registreringsnummer.
+- Köhantering: Det är nu möjligt att endast registrera en tid utan startnummer, som kan läggas till i efterhand.
+- Publicera resultat: Efter ett lopp produceras och skickas ett korrekt resultat som JSON-data.
 
-Färdigt:
-B1, B2, B3, B5, B6, B7, B8, F1, F4, F17
+   
+Färdigt: 
+   Story B: 9
+   Story F: 0, 2, 3, 5, 6, 7, 8, 9, 11
+   Story T: 1
 
-Delvis implementerad:
-B4, B9, F0
+Delvis imlpementerade: 
+   Story F: 4, 10, 13, 24
+   Story T: 2, 3, 4
