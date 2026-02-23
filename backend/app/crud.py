@@ -171,7 +171,11 @@ def get_results(db: Session) -> list[DriverResult]:
     dnfs: list[DriverResult] = []
 
     def time_or_blank(dt: datetime | None) -> str:
-        return dt.strftime("%H:%M:%S") if dt else ""
+        if dt is None:
+            return ""
+        dt_utc = _as_utc(dt)
+
+        return dt_utc.strftime("%H:%M:%S")
 
     for comp in competitors:
         entries = get_times_by_start_number(db, comp.start_number)
@@ -179,18 +183,13 @@ def get_results(db: Session) -> list[DriverResult]:
         startNbr = str(comp.start_number).zfill(3)
         name = comp.name
 
-        # 🔥 Hitta start och mål via station
         start_entry = next(
-            (e for e in entries if e.station.station_name == "start"),
-            None,
+            (e for e in entries if e.station.station_name == "start"), None
         )
-        end_entry = next(
-            (e for e in entries if e.station.station_name == "mål"),
-            None,
-        )
+        end_entry = next((e for e in entries if e.station.station_name == "mål"), None)
 
-        start_dt = start_entry.timestamp if start_entry else None
-        end_dt = end_entry.timestamp if end_entry else None
+        start_dt = _as_utc(start_entry.timestamp) if start_entry else None
+        end_dt = _as_utc(end_entry.timestamp) if end_entry else None
 
         startTime = time_or_blank(start_dt)
         endTime = time_or_blank(end_dt)
@@ -207,7 +206,6 @@ def get_results(db: Session) -> list[DriverResult]:
                 startTime=startTime,
                 endTime=endTime,
             )
-
             finished.append((int(total_td.total_seconds()), dr))
         else:
             dr = DriverResult(
