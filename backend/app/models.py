@@ -33,9 +33,9 @@ class TimeEntry(Base):
         Integer, ForeignKey("stations.id"), index=True
     )
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
 
     competitor = relationship("Competitor")

@@ -1,9 +1,5 @@
 # backend/app/crud.py
-
-# Kommentar: CRUD står för Create, Read, Update, Delete och innehåller
-# funktioner för att interagera med databasen, som anropas från routrar.
-
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -11,24 +7,45 @@ from .models import Competitor, Station, TimeEntry
 from .schemas import DriverResult
 
 
+def _as_utc(dt: datetime) -> datetime:
+    """Convert naive or any datetime to UTC-aware."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+
+    return dt.astimezone(UTC)
+
+
 def get_competitors(db: Session) -> list[Competitor]:
-    """Hämta alla tävlande från databasen."""
     return db.query(Competitor).all()
 
 
+def get_stations(db: Session) -> list[Station]:
+    return db.query(Station).all()
+
+
+def _utcify_entries(entries: list[TimeEntry]) -> list[TimeEntry]:
+    """Ensure all TimeEntry timestamps are UTC-aware."""
+    for e in entries:
+        e.timestamp = _as_utc(e.timestamp)
+
+    return entries
+
+
 def get_times(db: Session) -> list[TimeEntry]:
-    """Hämta alla tidsregistreringar från databasen."""
-    return db.query(TimeEntry).all()
+    entries = db.query(TimeEntry).all()
+
+    return _utcify_entries(entries)
 
 
 def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]:
-    """Hämta tidsregistreringar för en specifik tävlande baserat på startnummer."""
-    return (
+    entries = (
         db.query(TimeEntry)
         .join(Competitor)
         .filter(Competitor.start_number == start_number)
         .all()
     )
+
+    return _utcify_entries(entries)
 
 
 def record_time_for_start_number(
@@ -38,9 +55,12 @@ def record_time_for_start_number(
     station_id: int | None,
 ) -> TimeEntry:
     competitor = None
-
     if start_number:
         competitor = db.query(Competitor).filter_by(start_number=start_number).first()
+
+    if timestamp is not None:
+        # Convert incoming timestamp to naive UTC for SQLite
+        timestamp = _as_utc(timestamp).replace(tzinfo=None)
 
     entry = TimeEntry(
         competitor_id=competitor.id if competitor else None,
@@ -51,30 +71,66 @@ def record_time_for_start_number(
     db.add(entry)
     db.commit()
     db.refresh(entry)
+
+    # Make timestamp UTC-aware before returning
+    entry.timestamp = _as_utc(entry.timestamp)
+
+    return entry
+
+
+def update_time_entry(
+    db: Session,
+    id: int | None,
+    competitor_id: int | None,
+    timestamp: datetime | None,
+    station_id: int | None,
+) -> TimeEntry | None:
+    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
+    if entry is None:
+        return None
+
+    if competitor_id is not None:
+        entry.competitor_id = competitor_id
+    if timestamp is not None:
+        # Convert to naive UTC for SQLite
+        entry.timestamp = _as_utc(timestamp).replace(tzinfo=None)
+    if station_id is not None:
+        entry.station_id = station_id
+
+    db.commit()
+    db.refresh(entry)
+    # Return UTC-aware datetime
+    entry.timestamp = _as_utc(entry.timestamp)
+
+    return entry
+
+
+def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
+    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
+    if entry is None:
+        return None
+    db.delete(entry)
+    db.commit()
+
     return entry
 
 
 def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
-    """Registrerar en ny competitor med starttid"""
-    entry = Competitor(start_number=start_number, name=name)
-    db.add(entry)
+    competitor = Competitor(start_number=start_number, name=name)
+    db.add(competitor)
     db.commit()
-    db.refresh(entry)
-    return entry
+    db.refresh(competitor)
+
+    return competitor
 
 
 def record_new_station(db: Session, station_name: str, order: str) -> Station:
-    """Registrera en ny station"""
-    entry = Station(station_name=station_name, order=order)
-    db.add(entry)
+    station = Station(station_name=station_name, order=order)
+    db.add(station)
     db.commit()
-    db.refresh(entry)
-    return entry
+    db.refresh(station)
 
-
-def get_stations(db: Session) -> list[Station]:
-    """Hämta alla stationer från databasen."""
-    return db.query(Station).all()
+    return station
 
 
 def update_competitor(
@@ -84,10 +140,8 @@ def update_competitor(
     name: str | None,
 ) -> Competitor | None:
     competitor = db.query(Competitor).filter(Competitor.id == identifier).first()
-
     if competitor is None and start_number is not None:
         competitor = db.query(Competitor).filter_by(start_number=identifier).first()
-
     if competitor is None:
         return None
 
