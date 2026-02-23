@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="62d5274b-d68f-4f84-a13b-d144bc7fe59a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SystemArkitektur.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/env.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/components.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/api/putCompetitorData.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/api/putTimeData.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Navbar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ThemeProvider.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/button.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/combobox.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/dropdown-menu.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/field.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/input-group.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/input.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/item.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/label.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/scroll-area.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/select.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/separator.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/sheet.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/sonner.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/table.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/textarea.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/ui/tooltip.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/config/api.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/lib/utils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sync-env.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tekDok.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tekDok.tex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ReleaseInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ReleaseInfo.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/competitors.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routers/competitors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/stations.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routers/stations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/routers/times.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/routers/times.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/getCompetitorData.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/getCompetitorData.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/getCompetitorData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/getCompetitorData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/getStationData.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/getStationData.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/getStationData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/getStationData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/getTimeData.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/getTimeData.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/getTimeData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/getTimeData.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ThemeToggle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ThemeToggle.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Admin.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Admin.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Admin.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Admin.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Registrering.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Registrering.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/RegistreringStoppTid.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/RegistreringStoppTid.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Resultatvisare.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Resultatvisare.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/StationRegistrering.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/StationRegistrering.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/router.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.app.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.node.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tsconfig.node.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pvg_användar_manual.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/pvg_användar_manual.pdf" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="39kPV4kO2YsLFfpYCcRWzsVEtWV" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "Merging story11__admin",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28238.7" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="62d5274b-d68f-4f84-a13b-d144bc7fe59a" name="Changes" comment="" />
+      <created>1771237118126</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1771237118126</updated>
+    </task>
+    <servers />
+  </component>
+</project>

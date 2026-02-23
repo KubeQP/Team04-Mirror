@@ -11,7 +11,6 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-// src/pages/Admin.tsx
 export default function Resultatvisare() {
 	//declaring constants for the imports
 	const { competition } = useCompetition();
@@ -158,6 +157,7 @@ export default function Resultatvisare() {
 		tempArray.push(formatTotalTime(ResultObject.Total));
 		tableArray.push(tempArray);
 	});
+
 	//dynamic table creation
 	function createTable(tableData: string[][]) {
 		if (tableData.length === 0) return null;

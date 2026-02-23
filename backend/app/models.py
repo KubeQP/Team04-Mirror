@@ -33,15 +33,15 @@ class TimeEntry(Base):
     __tablename__ = "times"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     competitor_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("competitors.id"), index=True
+        Integer, ForeignKey("competitors.id"), index=True, nullable=True
     )
     station_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("stations.id"), index=True
     )
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
+        DateTime,
         nullable=False,
-        default=lambda: datetime.now(UTC),
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
     competition_id = mapped_column(
         Integer, ForeignKey("competitions.id", ondelete="CASCADE")

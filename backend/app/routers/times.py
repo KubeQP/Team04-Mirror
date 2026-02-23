@@ -1,5 +1,5 @@
 # backend/app/routers/competitors.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.models import TimeEntry
@@ -36,16 +36,15 @@ def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
     entry = crud.record_time_for_start_number(
         db, data.start_number, data.timestamp, data.station_id, data.competition_id
     )
-    if entry is None:
-        raise HTTPException(status_code=404, detail="Competitor not found")
+
     return entry
 
 
-@router.put("/{time_id}/", response_model=TimeEntryOut)
+@router.put("/{time_id}", response_model=TimeEntryOut)
 def update_time_entry(
     data: TimeEntryUpdate,
     db: Session = Depends(get_db),
-) -> TimeEntry:
+) -> TimeEntry | None:
     entry = crud.update_time_entry(
         db,
         data.id,
@@ -55,7 +54,14 @@ def update_time_entry(
         data.competition_id,
     )
 
-    if entry is None:
-        raise HTTPException(status_code=404, detail="Time entry not found")
-
     return entry
+
+
+@router.delete("/{time_id}")
+def delete_time_entry(time_id: int, db: Session = Depends(get_db)) -> dict[str, str]:
+    entry = crud.delete_time_entry(db, time_id)
+
+    if entry is None:
+        return {"detail": "Time entry not found"}
+
+    return {"detail": "Time entry deleted"}

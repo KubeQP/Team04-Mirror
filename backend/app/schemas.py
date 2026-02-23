@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class RecordTimeIn(BaseModel):
-    start_number: str
+    start_number: str | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
     competition_id: int
@@ -24,7 +24,7 @@ class CompetitorOut(BaseModel):
 
 class TimeEntryOut(BaseModel):
     id: int
-    competitor_id: int
+    competitor_id: int | None = None
     station_id: int | None = None
     timestamp: datetime
     competition_id: int
@@ -78,3 +78,17 @@ class CompetitionsOut(BaseModel):
 
 class CompetitionsRemove(BaseModel):
     id: int
+
+
+class DriverResult(BaseModel):
+    plac: str
+    startNbr: str
+    name: str
+    totalTime: str
+    startTime: str
+    endTime: str
+
+
+class Result(BaseModel):
+    teamToken: str
+    jsonResult: list[DriverResult]

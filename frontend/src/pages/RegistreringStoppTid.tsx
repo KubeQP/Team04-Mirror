@@ -1,8 +1,9 @@
 // src/pages/RegistreringStoppTid.tsx
-import { Undo2Icon } from 'lucide-react';
+import { EraserIcon, Trash2Icon, Undo2Icon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import vineBoom from '@/assets/audio/vine-boom.mp3';
 import { useCompetition } from '@/components/Competition';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +27,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
@@ -44,7 +46,7 @@ type Station = {
 
 type LocalTimeEntry = {
 	id: string;
-	start_number: string;
+	start_number: string | null;
 	name?: string;
 	station_id: number;
 	station_name?: string;
@@ -57,7 +59,7 @@ export default function RegistreringStoppTid() {
 
 	const [competitors, setCompetitors] = useState<Competitor[]>([]);
 
-	const [selectedStartNumber, setSelectedStartNumber] = useState<string>('');
+	const [selectedStartNumber, setSelectedStartNumber] = useState<string | null>(null);
 
 	const [selectedStationId, setSelectedStationId] = useState<number | ''>('');
 	const [stations, setStations] = useState<Station[]>([]);
@@ -110,9 +112,12 @@ export default function RegistreringStoppTid() {
 
 		if (!response.ok) throw new Error('Failed to register time');
 
+		const { id }: { id: string } = await response.json();
+
+		// Create local entry
 		const newEntry: LocalTimeEntry = {
-			id: crypto.randomUUID(),
-			start_number: selectedStartNumber,
+			id,
+			start_number: selectedStartNumber || null,
 			name: selectedCompetitor?.name,
 			station_id: selectedStationId as number,
 			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
@@ -132,6 +137,21 @@ export default function RegistreringStoppTid() {
 
 		return response;
 	};
+
+	const deleteStopTime = async (entryId: string) => {
+		const response = await fetch(`${API_BASE_URL}/api/times/${entryId}`, {
+			method: 'DELETE',
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to delete time entry');
+		}
+
+		const updated = latestRegistrations.filter((entry) => entry.id !== entryId);
+		setLatestRegistrations(updated);
+		localStorage.setItem('latestStopTimes', JSON.stringify(updated));
+	};
+
 	return (
 		<div>
 			<h1 className="text-xl font-bold pb-2">Registrera stopptid:</h1>
@@ -162,20 +182,31 @@ export default function RegistreringStoppTid() {
 							</SelectGroup>
 						</SelectContent>
 					</Select>
-					<Button
-						variant="ghost"
-						hidden={selectedStationId === ''}
-						onClick={() => setSelectedStationId('')}
-						size="icon"
-					>
-						<Undo2Icon />
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="ghost"
+								hidden={selectedStationId === ''}
+								onClick={() => setSelectedStationId('')}
+								size="icon"
+							>
+								<Undo2Icon />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Ångra val av station</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 			</Field>
 			<Field className="my-4">
 				<FieldLabel>Välj tävlande</FieldLabel>
 				<Field orientation="horizontal" className="gap-2">
-					<Combobox items={competitors} value={selectedStartNumber} onInputValueChange={setSelectedStartNumber}>
+					<Combobox
+						items={competitors}
+						value={selectedStartNumber ?? ''}
+						onInputValueChange={(value) => setSelectedStartNumber(value === '' ? null : value)}
+					>
 						<ComboboxInput placeholder="Sök tävlande..." className="w-1/4" maxLength={3} />
 						<ComboboxContent>
 							<ComboboxEmpty>Kunde inte hitta några tävlande.</ComboboxEmpty>
@@ -195,11 +226,14 @@ export default function RegistreringStoppTid() {
 					</Combobox>
 					<Button
 						type="button"
-						disabled={!selectedStartNumber || !selectedStationId}
+						disabled={!selectedStationId}
 						onClick={async () => {
 							toast.promise(recordStopTimeNow(), {
 								loading: 'Registrerar stopptid...',
-								success: `Stopptid registrerad för: ${selectedCompetitor?.name} (${selectedStartNumber})`,
+								success: () =>
+									selectedStartNumber
+										? `Stopptid registrerad för: ${selectedCompetitor?.name ?? ''} (${selectedStartNumber})`
+										: 'Stopptid registrerad utan kopplad tävlande',
 								error: 'Kunde inte registrera stopptid',
 							});
 						}}
@@ -210,11 +244,20 @@ export default function RegistreringStoppTid() {
 						type="button"
 						variant="secondary"
 						onClick={async () => {
-							toast.promise(fetchData(), {
-								loading: 'Uppdaterar lista...',
-								success: 'Lista uppdaterad',
-								error: 'Kunde inte uppdatera lista',
-							});
+							toast.promise(
+								(async () => {
+									await fetchData();
+
+									// Spela ljud NU – webbläsaren tillåter detta eftersom det sker efter klick
+									const audio = new Audio(vineBoom); // public/assets
+									audio.play().catch(() => console.warn('Kunde inte spela ljud'));
+								})(),
+								{
+									loading: 'Uppdaterar lista...',
+									success: 'Lista uppdaterad',
+									error: 'Kunde inte uppdatera lista',
+								},
+							);
 						}}
 					>
 						Uppdatera lista
@@ -244,7 +287,25 @@ export default function RegistreringStoppTid() {
 					</ScrollArea>
 				</div>
 				<div className="w-full">
-					<h2 className="text-lg font-semibold mb-2">Senaste registreringar</h2>
+					<div className="flex">
+						<h2 className="text-lg flex-1 font-semibold mb-2">Senaste registreringar</h2>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setLatestRegistrations([]);
+										localStorage.removeItem('latestStopTimes');
+									}}
+								>
+									<EraserIcon />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Rensa senaste registreringar (lokalt, påverkar inte backend)</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
 					<ScrollArea className="h-[50vh] rounded-md border px-2">
 						<Table>
 							<TableHeader className="h-12">
@@ -253,6 +314,7 @@ export default function RegistreringStoppTid() {
 									<TableHead>Startnummer</TableHead>
 									<TableHead>Namn</TableHead>
 									<TableHead>Station</TableHead>
+									<TableHead>Ångra</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -262,6 +324,28 @@ export default function RegistreringStoppTid() {
 										<TableCell className="font-medium">{entry.start_number}</TableCell>
 										<TableCell>{entry.name}</TableCell>
 										<TableCell>{entry.station_name}</TableCell>
+										<TableCell>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Button
+														variant="ghost"
+														size="icon"
+														onClick={() => {
+															toast.promise(deleteStopTime(entry.id), {
+																loading: 'Tar bort registrering...',
+																success: 'Registrering borttagen',
+																error: 'Kunde inte ta bort registrering',
+															});
+														}}
+													>
+														<Trash2Icon />
+													</Button>
+												</TooltipTrigger>
+												<TooltipContent>
+													<p>Ångra denna registrering (tar bort den från backend)</p>
+												</TooltipContent>
+											</Tooltip>
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>

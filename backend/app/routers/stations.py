@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app import models
 from app.models import Station
 
 from .. import crud, schemas
@@ -27,3 +28,33 @@ def reg_station(
         "order": station.order,
         "competition_id": station.competition_id,
     }
+
+
+@router.patch("/updateOrder")
+def update_station_order(
+    stations: list[schemas.StationReg],
+    db: Session = Depends(get_db),
+) -> list[schemas.StationReg]:
+    for station in stations:
+        db.query(models.Station).filter(
+            models.Station.station_name == station.station_name
+        ).update({"order": station.order})
+
+    db.commit()
+
+    return stations
+
+
+@router.delete("/delete/{station_order}")
+def delete_station(station_order: int, db: Session = Depends(get_db)) -> dict[str, str]:
+    station = (
+        db.query(models.Station).filter(models.Station.order == station_order).first()
+    )
+
+    if station is None:
+        return {"detail": "Station not found"}
+
+    db.delete(station)
+    db.commit()
+
+    return {"detail": "Station deleted"}

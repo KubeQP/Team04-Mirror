@@ -3,14 +3,21 @@ import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime
+from urllib.parse import urlparse
+
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
+
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
 from .database import Base, SessionLocal, engine
 from .models import Competition, Competitor, Station, TimeEntry
-from .routers import competitions, competitors, stations, times
+from .routers import competitions, competitors, results, stations, times
 
 
 @asynccontextmanager
@@ -31,13 +38,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
             Competitor(start_number="123", name="Alice", competition_id=1)
         )
         competitors.append(Competitor(start_number="458", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="459", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="452", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="453", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="426", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="436", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="446", name="Bob", competition_id=1))
-        competitors.append(Competitor(start_number="486", name="Bob", competition_id=1))
 
         db.add_all(competitors)
         db.commit()
@@ -55,6 +55,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 
         db.add_all(
             [
+                # Alice (competitors[0]) – finisher
                 TimeEntry(
                     competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 31, 39),
@@ -101,6 +102,9 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:8000",
         "http://localhost:8000",
+        "http://localhost:5177",
+        "http://127.0.0.1:5177",
+        os.getenv("API_BASE_URL"),
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -113,11 +117,27 @@ app.include_router(competitors.router, prefix="/api")
 app.include_router(times.router, prefix="/api")
 app.include_router(stations.router, prefix="/api")
 app.include_router(competitions.router, prefix="/api")
+app.include_router(results.router, prefix="/api")
+
+FRONTEND_DIST = "../frontend/dist"
 
 # 'Mounta' frontend dist mappen (efter build)
-if os.path.exists("../frontend/dist"):
-    print("Mounting static files from ../frontend/dist")
-    app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
+if os.path.exists(FRONTEND_DIST):
+    print(f"Mounting static files from {FRONTEND_DIST}.")
+
+    app.mount(
+        "/assets", StaticFiles(directory=f"{FRONTEND_DIST}/assets"), name="assets"
+    )
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str) -> FileResponse:
+        file_path = os.path.join(FRONTEND_DIST, full_path)
+
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+
+        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+
 else:
     print("No frontend dist folder found, not serving static files.")
     print(
@@ -130,4 +150,10 @@ else:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:7000")
+
+    parsed = urlparse(api_url)
+    host = parsed.hostname
+    port = parsed.port or 8000
+
+    uvicorn.run("app.main:app", host=host, port=port, reload=True)

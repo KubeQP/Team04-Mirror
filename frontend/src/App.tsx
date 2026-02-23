@@ -7,6 +7,7 @@ import { createCompetition } from './api/postCompetitionData';
 import { useCompetition } from './components/Competition';
 import Navbar from './components/Navbar';
 import { ThemeProvider } from './components/ThemeProvider';
+import { TooltipProvider } from './components/ui/tooltip';
 import { API_BASE_URL } from './config/api';
 import type { CompetitionData } from './types';
 
@@ -134,32 +135,33 @@ export default function App() {
 
 	return (
 		<ThemeProvider>
-			<div className="max-h-screen overflow-hidden">
-				<Navbar
-					competitions={competitions}
-					selectedCompetition={selectedCompetition}
-					handleAddCompetition={handleAddCompetition}
-					handleRemoveCompetition={handleRemoveCompetition}
-					handleSelectCompetition={handleSelectCompetition}
-					navigationData={navigationData}
-				/>
+			<TooltipProvider>
+				<div className="max-h-screen overflow-hidden">
+					<Navbar
+						competitions={competitions}
+						selectedCompetition={selectedCompetition}
+						handleAddCompetition={handleAddCompetition}
+						handleRemoveCompetition={handleRemoveCompetition}
+						handleSelectCompetition={handleSelectCompetition}
+						navigationData={navigationData}
+					/>
 
-				<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-					{competitionLoading ? (
-						<div className="text-center py-20 text-gray-500">Laddar tävlingar...</div>
-					) : competitionError ? (
-						<div className="text-center py-20 text-red-500">Fel vid hämtning av tävlingar: {competitionError}</div>
-					) : competitions.length === 0 ? (
-						<div className="text-center py-20 text-gray-500">
-							Inga tävlingar hittades. Lägg till en ny tävling ovan.
-						</div>
-					) : (
-						<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
-					)}
-				</main>
-
-				<Toaster />
-			</div>
+					<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+						{competitionLoading ? (
+							<div className="text-center py-20 text-gray-500">Laddar tävlingar...</div>
+						) : competitionError ? (
+							<div className="text-center py-20 text-red-500">Fel vid hämtning av tävlingar: {competitionError}</div>
+						) : competitions.length === 0 ? (
+							<div className="text-center py-20 text-gray-500">
+								Inga tävlingar hittades. Lägg till en ny tävling ovan.
+							</div>
+						) : (
+							<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
+						)}
+					</main>
+					<Toaster />
+				</div>
+			</TooltipProvider>
 		</ThemeProvider>
 	);
 }
