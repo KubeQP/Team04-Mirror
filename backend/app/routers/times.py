@@ -40,7 +40,7 @@ def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
     return entry
 
 
-@router.put("/{time_id}/", response_model=TimeEntryOut)
+@router.put("/{time_id}", response_model=TimeEntryOut)
 def update_time_entry(
     data: TimeEntryUpdate,
     db: Session = Depends(get_db),
@@ -50,3 +50,13 @@ def update_time_entry(
     )
 
     return entry
+
+
+@router.delete("/{time_id}")
+def delete_time_entry(time_id: int, db: Session = Depends(get_db)) -> dict[str, str]:
+    entry = crud.delete_time_entry(db, time_id)
+
+    if entry is None:
+        return {"detail": "Time entry not found"}
+
+    return {"detail": "Time entry deleted"}

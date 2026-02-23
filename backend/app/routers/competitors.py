@@ -24,14 +24,30 @@ def reg_competitor(
     return {"start_number": competitor.start_number, "name": competitor.name}
 
 
-@router.put("/{competitor_id}/", response_model=schemas.CompetitorOut)
+@router.put("/{identifier}", response_model=schemas.CompetitorOut)
 def update_competitor(
+    identifier: str,
     data: schemas.CompetitorUpdate,
     db: Session = Depends(get_db),
 ) -> Competitor:
-    competitor = crud.update_competitor(db, data.id, data.start_number, data.name)
+    competitor = crud.update_competitor(db, identifier, data.start_number, data.name)
 
     if competitor is None:
         raise HTTPException(status_code=404, detail="Competitor not found")
 
     return competitor
+
+
+@router.delete("/{start_number}")
+def delete_competitor(
+    start_number: str, db: Session = Depends(get_db)
+) -> dict[str, str]:
+    competitor = db.query(Competitor).filter_by(start_number=start_number).first()
+
+    if competitor is None:
+        raise HTTPException(status_code=404, detail="Competitor not found")
+
+    db.delete(competitor)
+    db.commit()
+
+    return {"detail": "Competitor deleted"}

@@ -78,9 +78,15 @@ def get_stations(db: Session) -> list[Station]:
 
 
 def update_competitor(
-    db: Session, id: int | None, start_number: str | None, name: str | None
+    db: Session,
+    identifier: str,
+    start_number: str | None,
+    name: str | None,
 ) -> Competitor | None:
-    competitor = db.query(Competitor).filter(Competitor.id == id).first()
+    competitor = db.query(Competitor).filter(Competitor.id == identifier).first()
+
+    if competitor is None and start_number is not None:
+        competitor = db.query(Competitor).filter_by(start_number=identifier).first()
 
     if competitor is None:
         return None
@@ -92,6 +98,7 @@ def update_competitor(
 
     db.commit()
     db.refresh(competitor)
+
     return competitor
 
 
@@ -117,6 +124,7 @@ def update_time_entry(
     db.commit()
     db.refresh(entry)
     return entry
+
 
 
 def fmt_timedelta(td: timedelta) -> str:
@@ -189,3 +197,15 @@ def get_results(db: Session) -> list[DriverResult]:
         dr.plac = str(i)
 
     return [dr for _, dr in finished] + dnfs
+
+def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
+    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
+
+    if entry is None:
+        return None
+
+    db.delete(entry)
+    db.commit()
+
+    return entry
+

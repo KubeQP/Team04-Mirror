@@ -1,8 +1,9 @@
 import { ChevronDownIcon, ChevronUpIcon, Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -18,7 +19,6 @@ type Station = {
 
 export default function StationRegistrering() {
 	const [stationName, setStationName] = useState('');
-	const [order, setOrder] = useState('');
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const fetchStations = async () => {
@@ -55,6 +55,25 @@ export default function StationRegistrering() {
 		}
 	};
 
+	const deleteStation = async (order: string) => {
+		try {
+			const res = await fetch(`${API_BASE_URL}/api/stations/delete/${order}`, {
+				method: 'DELETE',
+			});
+			console.log('Delete response:', res);
+
+			if (!res.ok) {
+				const err = await res.json();
+
+				throw new Error(err.detail || 'Unknown error');
+			}
+
+			await fetchStations();
+		} catch (err) {
+			throw new Error(err instanceof Error ? err.message : 'Fetch error');
+		}
+	};
+
 	useEffect(() => {
 		fetchStations();
 	}, []);
@@ -63,7 +82,6 @@ export default function StationRegistrering() {
 		console.log('add station');
 
 		if (!stationName.trim()) return;
-		if (!order.trim()) return;
 
 		try {
 			const res = await fetch(`${API_BASE_URL}/api/stations/registerstation`, {
@@ -73,7 +91,7 @@ export default function StationRegistrering() {
 				},
 				body: JSON.stringify({
 					station_name: stationName,
-					order: order,
+					order: stations.length.toString(),
 				}),
 			});
 
@@ -89,7 +107,6 @@ export default function StationRegistrering() {
 			// NU uppdaterar vi från databasen
 			await fetchStations();
 
-			setOrder('');
 			setStationName('');
 		} catch (err) {
 			console.error('Fetch error:', err);
@@ -106,9 +123,9 @@ export default function StationRegistrering() {
 				}}
 			>
 				<div className="flex items-end gap-4">
-					<FieldGroup className="grid max-w-sm grid-cols-2">
-						<Field>
-							<FieldLabel>Namn</FieldLabel>
+					<Field className="max-w-xs">
+						<FieldLabel>Namn</FieldLabel>
+						<Field orientation="horizontal" className="gap-2">
 							<Input
 								id="stationNamnInput"
 								placeholder="Start"
@@ -116,21 +133,11 @@ export default function StationRegistrering() {
 								value={stationName}
 								onChange={(e) => setStationName(e.target.value)}
 							/>
+							<Button type="submit" variant="default" disabled={!stationName.trim()}>
+								Registrera
+							</Button>
 						</Field>
-						<Field>
-							<FieldLabel>Ordning</FieldLabel>
-							<Input
-								id="orderInput"
-								placeholder="0"
-								type="text"
-								value={order}
-								onChange={(e) => setOrder(e.target.value)}
-							/>
-						</Field>
-					</FieldGroup>
-					<Button type="submit" variant="default" disabled={!order.trim() || !stationName.trim()}>
-						Registrera
-					</Button>
+					</Field>
 				</div>
 			</form>
 			<h2 className="mt-6 text-lg font-semibold pb-2">Stationer</h2>
@@ -178,6 +185,13 @@ export default function StationRegistrering() {
 											variant="ghost"
 											size="icon"
 											className="size-8 hover:bg-destructive hover:text-destructive-foreground dark:hover:bg-destructive dark:hover:text-destructive-foreground"
+											onClick={async () => {
+												toast.promise(deleteStation(station.order), {
+													loading: 'Raderar station...',
+													success: 'Station raderad',
+													error: (err) => `Kunde inte radera: ${err.message}`,
+												});
+											}}
 										>
 											<Trash2Icon />
 											<span className="sr-only">Radera</span>
