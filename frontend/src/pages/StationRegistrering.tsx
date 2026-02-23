@@ -1,7 +1,8 @@
 import { ChevronDownIcon, ChevronUpIcon, Trash2Icon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { useCompetition } from '@/components/Competition';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -15,18 +16,24 @@ import { API_BASE_URL } from '../config/api';
 type Station = {
 	station_name: string;
 	order: string;
+	competition_id: number;
 };
 
 export default function StationRegistrering() {
+	const { competition } = useCompetition();
 	const [stationName, setStationName] = useState('');
 	const [stations, setStations] = useState<Station[]>([]);
 
-	const fetchStations = async () => {
+	const fetchStations = useCallback(async () => {
 		const res = await fetch(`${API_BASE_URL}/api/stations/getstations`);
 		if (!res.ok) return;
 		const data = await res.json();
-		setStations((data as Array<Station>).sort((a, b) => Number(a.order) - Number(b.order)));
-	};
+		setStations(
+			(data as Array<Station>)
+				.filter((c) => c.competition_id === competition)
+				.sort((a, b) => Number(a.order) - Number(b.order)),
+		);
+	}, [competition]);
 
 	const moveStation = async (index: number, direction: 'up' | 'down') => {
 		const newStations = [...stations];
@@ -76,7 +83,7 @@ export default function StationRegistrering() {
 
 	useEffect(() => {
 		fetchStations();
-	}, []);
+	}, [fetchStations]);
 
 	const addStation = async () => {
 		console.log('add station');
@@ -91,6 +98,7 @@ export default function StationRegistrering() {
 				},
 				body: JSON.stringify({
 					station_name: stationName,
+					competition_id: competition,
 					order: stations.length.toString(),
 				}),
 			});

@@ -20,8 +20,14 @@ def read_stations(db: Session = Depends(get_db)) -> list[Station]:
 def reg_station(
     data: schemas.StationReg, db: Session = Depends(get_db)
 ) -> dict[str, str]:
-    station = crud.record_new_station(db, data.station_name, data.order)
-    return {"station_name": station.station_name, "order": station.order}
+    station = crud.record_new_station(
+        db, data.station_name, data.order, data.competition_id
+    )
+    return {
+        "station_name": station.station_name,
+        "order": station.order,
+        "competition_id": station.competition_id,
+    }
 
 
 @router.patch("/updateOrder")

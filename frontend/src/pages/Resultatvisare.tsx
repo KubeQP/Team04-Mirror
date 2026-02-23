@@ -1,7 +1,8 @@
 // frontend/src/pages/Admin.tsx
 import { CrownIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { useCompetition } from '@/components/Competition';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -10,9 +11,9 @@ import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-
 export default function Resultatvisare() {
 	//declaring constants for the imports
+	const { competition } = useCompetition();
 
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
@@ -26,11 +27,11 @@ export default function Resultatvisare() {
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		// Competitor data
 		try {
 			const result = await getCompetitorData();
-			setCompetitorData(result);
+			setCompetitorData(result.filter((c) => c.competition_id === competition));
 			console.log('Fetched competitor data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setCompetitorError(err.message);
@@ -43,7 +44,7 @@ export default function Resultatvisare() {
 		// Time data
 		try {
 			const result = await getTimeData();
-			setTimeData(result);
+			setTimeData(result.filter((c) => c.competition_id === competition));
 			console.log('Fetched time data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setTimeError(err.message);
@@ -56,7 +57,7 @@ export default function Resultatvisare() {
 		// Station data
 		try {
 			const result = await getStationData();
-			setStationData(result);
+			setStationData(result.filter((c) => c.competition_id === competition));
 			console.log('Fetched station data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setStationError(err.message);
@@ -65,11 +66,11 @@ export default function Resultatvisare() {
 		} finally {
 			setStationLoading(false);
 		}
-	};
+	}, [competition]);
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	}, [fetchData]);
 
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],
@@ -156,7 +157,7 @@ export default function Resultatvisare() {
 		tempArray.push(formatTotalTime(ResultObject.Total));
 		tableArray.push(tempArray);
 	});
-	
+
 	//dynamic table creation
 	function createTable(tableData: string[][]) {
 		if (tableData.length === 0) return null;

@@ -34,7 +34,7 @@ def read_times_for_competitor(
 def record_time(data: RecordTimeIn, db: Session = Depends(get_db)) -> TimeEntry:
     """Posta en ny tidsregistrering för en tävlande med angivet startnummer."""
     entry = crud.record_time_for_start_number(
-        db, data.start_number, data.timestamp, data.station_id
+        db, data.start_number, data.timestamp, data.station_id, data.competition_id
     )
 
     return entry
@@ -46,7 +46,12 @@ def update_time_entry(
     db: Session = Depends(get_db),
 ) -> TimeEntry | None:
     entry = crud.update_time_entry(
-        db, data.id, data.competitor_id, data.timestamp, data.station_id
+        db,
+        data.id,
+        data.competitor_id,
+        data.timestamp,
+        data.station_id,
+        data.competition_id,
     )
 
     return entry
