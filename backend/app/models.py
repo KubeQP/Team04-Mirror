@@ -54,3 +54,13 @@ class TimeEntry(Base):
 class Competition(Base):
     __tablename__ = "competitions"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+
+    competitors = relationship(
+        "Competitor", backref="competition", cascade="all, delete-orphan"
+    )
+    stations = relationship(
+        "Station", backref="competition", cascade="all, delete-orphan"
+    )
+    times = relationship(
+        "TimeEntry", backref="competition", cascade="all, delete-orphan"
+    )

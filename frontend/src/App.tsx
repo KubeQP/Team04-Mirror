@@ -90,20 +90,6 @@ export default function App() {
 
 			// Välj den nya tävlingen automatiskt
 			handleSelectCompetition(newCompetition.id);
-
-			// Skapa start och mål-stationer
-			await Promise.all(
-				[
-					{ station_name: 'start', order: 0 },
-					{ station_name: 'mål', order: 1 },
-				].map((station) =>
-					fetch(`${API_BASE_URL}/api/stations/registerstation`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ ...station, competition_id: newCompetition.id }),
-					}),
-				),
-			);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				console.error('Fel vid skapande av tävling:', err.message);
@@ -114,8 +100,6 @@ export default function App() {
 			}
 		}
 	};
-
-	// I din App.tsx, uppdatera handleRemoveCompetition:
 
 	const handleRemoveCompetition = async (id: number) => {
 		try {
