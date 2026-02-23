@@ -156,31 +156,6 @@ def update_competitor(
     return competitor
 
 
-def update_time_entry(
-    db: Session,
-    id: int | None,
-    competitor_id: int | None,
-    timestamp: datetime | None,
-    station_id: int | None,
-) -> TimeEntry | None:
-    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
-
-    if entry is None:
-        return None
-
-    if competitor_id is not None:
-        entry.competitor_id = competitor_id
-    if timestamp is not None:
-        entry.timestamp = timestamp
-    if station_id is not None:
-        entry.station_id = station_id
-
-    db.commit()
-    db.refresh(entry)
-    return entry
-
-
-
 def fmt_timedelta(td: timedelta) -> str:
     total_seconds = int(td.total_seconds())
     h = total_seconds // 3600
@@ -251,15 +226,3 @@ def get_results(db: Session) -> list[DriverResult]:
         dr.plac = str(i)
 
     return [dr for _, dr in finished] + dnfs
-
-def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
-    entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
-
-    if entry is None:
-        return None
-
-    db.delete(entry)
-    db.commit()
-
-    return entry
-
