@@ -6,10 +6,6 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from dotenv import load_dotenv
-
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
-
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -18,6 +14,8 @@ from starlette.responses import FileResponse
 from .database import Base, SessionLocal, engine
 from .models import Competition, Competitor, Station, TimeEntry
 from .routers import competitions, competitors, results, stations, times
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
 
 
 @asynccontextmanager
@@ -104,7 +102,7 @@ app.add_middleware(
         "http://localhost:8000",
         "http://localhost:5177",
         "http://127.0.0.1:5177",
-        os.getenv("API_BASE_URL"),
+        os.getenv("API_BASE_URL", "http://127.0.0.1:8000"),
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -150,10 +148,10 @@ else:
 if __name__ == "__main__":
     import uvicorn
 
-    api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:7000")
+    api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
 
     parsed = urlparse(api_url)
-    host = parsed.hostname
+    host = parsed.hostname if parsed.hostname else "127.0.0.1"
     port = parsed.port or 8000
 
     uvicorn.run("app.main:app", host=host, port=port, reload=True)

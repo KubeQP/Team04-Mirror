@@ -19,10 +19,6 @@ def get_competitors(db: Session) -> list[Competitor]:
     return db.query(Competitor).all()
 
 
-def get_stations(db: Session) -> list[Station]:
-    return db.query(Station).all()
-
-
 def _utcify_entries(entries: list[TimeEntry]) -> list[TimeEntry]:
     """Ensure all TimeEntry timestamps are UTC-aware."""
     for e in entries:
@@ -50,11 +46,11 @@ def get_times_by_start_number(db: Session, start_number: str) -> list[TimeEntry]
 
 def record_time_for_start_number(
     db: Session,
-    start_number: str,
+    start_number: str | None,
     timestamp: datetime | None,
     station_id: int | None,
     competition_id: int | None,
-) -> TimeEntry | None:
+) -> TimeEntry:
     """Registrera en ny tid för en tävlande med angivet startnummer."""
     competitor = None
     if start_number:
@@ -65,7 +61,6 @@ def record_time_for_start_number(
         timestamp = _as_utc(timestamp).replace(tzinfo=None)
 
     entry = TimeEntry(
-        competitor_id=competitor.id,
         timestamp=timestamp,
         station_id=station_id,
         competition_id=competition_id,
@@ -199,47 +194,6 @@ def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
     db.commit()
 
     return entry
-
-
-def record_new_reg(db: Session, start_number: str, name: str) -> Competitor:
-    competitor = Competitor(start_number=start_number, name=name)
-    db.add(competitor)
-    db.commit()
-    db.refresh(competitor)
-
-    return competitor
-
-
-def record_new_station(db: Session, station_name: str, order: str) -> Station:
-    station = Station(station_name=station_name, order=order)
-    db.add(station)
-    db.commit()
-    db.refresh(station)
-
-    return station
-
-
-def update_competitor(
-    db: Session,
-    identifier: str,
-    start_number: str | None,
-    name: str | None,
-) -> Competitor | None:
-    competitor = db.query(Competitor).filter(Competitor.id == identifier).first()
-    if competitor is None and start_number is not None:
-        competitor = db.query(Competitor).filter_by(start_number=identifier).first()
-    if competitor is None:
-        return None
-
-    if start_number is not None:
-        competitor.start_number = start_number
-    if name is not None:
-        competitor.name = name
-
-    db.commit()
-    db.refresh(competitor)
-
-    return competitor
 
 
 def fmt_timedelta(td: timedelta) -> str:

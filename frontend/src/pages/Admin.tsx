@@ -39,6 +39,8 @@ export default function Admin() {
 
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
 
+	const [resultView, setResultView] = useState<'resultat' | 'startnummer'>('startnummer');
+
 	const fetchData = useCallback(async () => {
 		// Competitor data
 		try {
