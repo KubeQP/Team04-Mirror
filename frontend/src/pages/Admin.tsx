@@ -11,29 +11,30 @@ import { getTimeData } from '../api/getTimeData';
 import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
-// src/pages/Admin.tsx
-export default function Admin() {
-	//declaring constants for the imports
 
+export default function Admin() {
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
-
+	
 	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
-
+	
 	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
-
+	
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
+	//// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [resultView] = useState<'startnummer' | 'resultat'>('startnummer');
 
+
+	// Fetch data
 	const fetchData = async () => {
-		// Competitor data
 		try {
-			const result = await getCompetitorData();
-			setCompetitorData(result);
+			const competitors = await getCompetitorData();
+			setCompetitorData(competitors);
 			console.log('Fetched competitor data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setCompetitorError(err.message);
@@ -42,11 +43,10 @@ export default function Admin() {
 		} finally {
 			setCompetitorLoading(false);
 		}
-
-		// Time data
+		
 		try {
-			const result = await getTimeData();
-			setTimeData(result);
+			const times = await getTimeData();
+			setTimeData(times);
 			console.log('Fetched time data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setTimeError(err.message);
@@ -55,11 +55,10 @@ export default function Admin() {
 		} finally {
 			setTimeLoading(false);
 		}
-
-		// Station data
+		
 		try {
-			const result = await getStationData();
-			setStationData(result);
+			const stations = await getStationData();
+			setStationData(stations);
 			console.log('Fetched station data');
 		} catch (err: unknown) {
 			if (err instanceof Error) setStationError(err.message);
@@ -69,25 +68,64 @@ export default function Admin() {
 			setStationLoading(false);
 		}
 	};
-
+	
 	useEffect(() => {
 		fetchData();
 	}, []);
-
+	
 	interface Cell {
 		value: string;
 		correct: boolean;
 		mutable: boolean;
 		id: number;
 	}
-
-	//Hjälp-funktion för att skriva tagen tid som HH:MM:SS
+	// Hjälpfunktioner
 	function formatTime(timestamp?: string): string {
 		if (!timestamp) return '-';
 		return new Date(timestamp).toLocaleTimeString('sv-SE', { hour12: false });
 	}
 
-	// Hjälp-funktion räknar antal tider i en sträng
+	const competitorsByResult = competitorData
+		? [...competitorData].sort((a, b) => {
+				const aStart = timeData?.find(
+					(t) =>
+						t.competitor_id === a.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '0',
+				);
+				const aStop = timeData?.find(
+					(t) =>
+						t.competitor_id === a.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '1',
+				);
+
+				const bStart = timeData?.find(
+					(t) =>
+						t.competitor_id === b.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '0',
+				);
+				const bStop = timeData?.find(
+					(t) =>
+						t.competitor_id === b.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '1',
+				);
+
+				const aTotal =
+					aStart && aStop
+						? new Date(aStop.timestamp).getTime() -
+						  new Date(aStart.timestamp).getTime()
+						: Infinity;
+
+				const bTotal =
+					bStart && bStop
+						? new Date(bStop.timestamp).getTime() -
+						  new Date(bStart.timestamp).getTime()
+						: Infinity;
+
+				return aTotal - bTotal;
+		  })
+		: [];
+
+
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
 		return matches ? matches.length : 0;
@@ -96,10 +134,10 @@ export default function Admin() {
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],
 		stopTimes: { timestamp: string | number | Date }[],
-	): { value: string; correct: boolean; mutable: false; id: 0 } {
+	): { value: string; correct: boolean } {
 		// Kräver exakt en starttid och exakt en stoptid
 		if (startTimes.length !== 1 || stopTimes.length !== 1) {
-			return { value: '-', correct: false, mutable: false, id: 0 };
+			return { value: '-', correct: false };
 		}
 
 		const start = new Date(startTimes[0].timestamp);
@@ -107,7 +145,7 @@ export default function Admin() {
 
 		// Ogiltiga datum eller stop före start → "-"
 		if (isNaN(start.getTime()) || isNaN(stop.getTime()) || stop <= start) {
-			return { value: '-', correct: false, mutable: false, id: 0 };
+			return { value: '-', correct: false };
 		}
 
 		const diffMs = stop.getTime() - start.getTime();
@@ -119,23 +157,18 @@ export default function Admin() {
 
 		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-		return { value: formatted, correct: true, mutable: false, id: 0 };
+		return { value: formatted, correct: true };
 	}
 
+
+	// Redigerbar cell
 	function EditableCell({ cell, rowIndex, cellIndex }: { cell: Cell; rowIndex: number; cellIndex: number }) {
 		const [value, setValue] = useState(cell.value);
 
-		useEffect(() => {
-			setValue(cell.value);
-		}, [cell.value]);
+		useEffect(() => setValue(cell.value), [cell.value]);
 
-		if (!cell.mutable) {
-			return (
-				<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
-					{cell.value}
-				</TableCell>
-			);
-		}
+		if (!cell.mutable)
+			return <TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>{cell.value}</TableCell>;
 
 		return (
 			<TableCell className={cell.correct === false ? 'bg-destructive text-destructive-foreground border' : ''}>
@@ -152,21 +185,19 @@ export default function Admin() {
 		);
 	}
 
+	// Uppdatera cell
 	async function handleCellUpdate(rowIndex: number, cellIndex: number, newValue: string) {
 		setStationTable((prev) => {
 			const updated = [...prev];
-			updated[rowIndex + 1][cellIndex] = {
-				...updated[rowIndex + 1][cellIndex],
-				value: newValue,
-			};
+			updated[rowIndex + 1][cellIndex] = { ...updated[rowIndex + 1][cellIndex], value: newValue };
 			const validated = validateStationDuplicates(updated);
 
 			return validated;
+
 		});
 
 		const row = stationTable[rowIndex + 1];
 		const timeId = row[2].id;
-
 		const competitor = competitorData?.find((c) => c.start_number === newValue);
 
 		if (!competitor) {
@@ -192,6 +223,7 @@ export default function Admin() {
 			timestamp: timeData?.find((t) => t.id === timeId)?.timestamp ?? '-',
 			station_id: row[0].id,
 		});
+
 	}
 
 	const validateStationDuplicates = useCallback((table: Cell[][]): Cell[][] => {
@@ -226,52 +258,57 @@ export default function Admin() {
 		return updated;
 	}, []);
 
+
+	// Bygg stationstabell
 	useEffect(() => {
 		if (!timeData || !stationData || !competitorData) return;
 
 		const table: Cell[][] = [];
-
-		const headerRow: Cell[] = [
+		table.push([
 			{ value: 'Station', correct: true, mutable: false, id: 0 },
 			{ value: 'Nr.', correct: true, mutable: false, id: 0 },
 			{ value: 'Tid', correct: true, mutable: false, id: 0 },
-		];
-
-		table.push(headerRow);
+		]);
 
 		timeData.forEach((timeSlot) => {
 			const station = stationData.find((s) => s.id === timeSlot.station_id);
 			const competitor = competitorData.find((c) => c.id === timeSlot.competitor_id);
 
-			const stationCell: Cell = {
-				value: station?.station_name ?? '-',
-				correct: true,
-				mutable: false,
-				id: station?.id ?? 0,
-			};
-
-			const numberCell: Cell = {
-				value: competitor?.start_number ?? '-',
-				correct: true,
-				mutable: true,
-				id: timeSlot.id,
-			};
-
-			const timeCell: Cell = {
-				value: formatTime(timeSlot.timestamp),
-				correct: true,
-				mutable: false,
-				id: timeSlot.id,
-			};
-
-			table.push([stationCell, numberCell, timeCell]);
+			table.push([
+				{ value: station?.station_name ?? '-', correct: true, mutable: false, id: station?.id ?? 0 },
+				{ value: competitor?.start_number ?? '-', correct: true, mutable: true, id: timeSlot.id },
+				{ value: formatTime(timeSlot.timestamp), correct: true, mutable: false, id: timeSlot.id },
+			]);
 		});
 
-		const validated = validateStationDuplicates(table);
-		setStationTable(validated);
+		setStationTable(validateStationDuplicates(table));
 	}, [timeData, stationData, competitorData, validateStationDuplicates]);
 
-	//Table - Competitors //flera tider för en station, ingen tid.
+	// Bygg tävlandetable
+	const competitorsToRender: CompetitorData[] = competitorData
+  		? resultView === 'startnummer'
+    		? [...competitorData].sort((a, b) => Number(a.start_number) - Number(b.start_number))
+    		: competitorsByResult.sort((a, b) => {
+				const getTotal = (c: CompetitorData) => {
+					const start = timeData?.find(
+						(t) =>
+						t.competitor_id === c.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '0'
+					);
+					const stop = timeData?.find(
+						(t) =>
+						t.competitor_id === c.id &&
+						stationData?.find((s) => s.id === t.station_id)?.order === '1'
+					);
+					return start && stop
+						? new Date(stop.timestamp).getTime() - new Date(start.timestamp).getTime()
+						: Infinity;
+					};
+				return getTotal(a) - getTotal(b);
+      })
+  : [];
+
+
 	const competitorTable: Cell[][] = [];
 	const headerRow2: Cell[] = [
 		{ value: 'Nr.', correct: true, mutable: false, id: 0 },
@@ -280,49 +317,44 @@ export default function Admin() {
 		{ value: 'Mål', correct: true, mutable: false, id: 0 },
 		{ value: 'Totalt', correct: true, mutable: false, id: 0 },
 	];
-
 	competitorTable.push(headerRow2);
-	competitorData?.forEach((competitor) => {
-		const startNumber = { value: competitor.start_number, correct: true, mutable: false, id: competitor.id };
-		const name = { value: competitor.name, correct: true, mutable: false, id: competitor.id };
-		const matchingStartTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '0',
-			) || [];
-		const startTime = {
-			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
-			value: matchingStartTimes.length > 0 ? matchingStartTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
-			correct: true,
-			mutable: false,
-			id: competitor.id,
-		};
-		const matchingStopTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '1',
-			) || [];
-		const stopTime = {
-			// Vi mappar alla hittade tider, formaterar dem, och fogar ihop dem till en sträng
-			value: matchingStopTimes.length > 0 ? matchingStopTimes.map((t) => formatTime(t.timestamp)).join(', ') : '-',
-			correct: true,
-			mutable: false,
-			id: competitor.id,
-		};
-		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
 
-		if (startTime.value === '-') startTime.correct = false;
-		if (stopTime.value === '-') stopTime.correct = false;
+	competitorsToRender.forEach((competitor) => {
+		const startTimes = timeData?.filter(
+			(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
+		) || [];
+		const stopTimes = timeData?.filter(
+			(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
+		) || [];
+
+		const startTime = { value: startTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-', correct: true, mutable: false, id: competitor.id };
+		const stopTime = { value: stopTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-', correct: true, mutable: false, id: competitor.id };
+		const totalTimeRaw = calculateTotalTime(startTimes, stopTimes);
+
+		const totalTime: Cell = {
+			value: totalTimeRaw.value,
+			correct: totalTimeRaw.correct,
+			mutable: false,
+			id: competitor.id,
+		};
+
+
+		if (startTime.value === '-' || countTimesInString(startTime.value) > 1) startTime.correct = false;
+		if (stopTime.value === '-' || countTimesInString(stopTime.value) > 1) stopTime.correct = false;
+
 		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
 		if (countTimesInString(stopTime.value) > 1) stopTime.correct = false;
 
-		const competitorRow: Cell[] = [startNumber, name, startTime, stopTime, totalTime];
+		const competitorRow: Cell[] = [
+			{ value: competitor.start_number, correct: true, mutable: false, id: competitor.id },
+			{ value: competitor.name, correct: true, mutable: false, id: competitor.id },
+			startTime,
+			stopTime, 
+			totalTime,
+		];
 		competitorTable.push(competitorRow);
-	});
 
-	//dynamic table creation
+	});
 
 	function createTable(tableData: Cell[][]) {
 		if (tableData.length === 0) return null;
