@@ -3,11 +3,12 @@
 # Kommentar: CRUD står för Create, Read, Update, Delete och innehåller
 # funktioner för att interagera med databasen, som anropas från routrar.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
+from .schemas import DriverResult
 
 
 def get_competitors(db: Session) -> list[Competitor]:
@@ -125,6 +126,78 @@ def update_time_entry(
     return entry
 
 
+
+def fmt_timedelta(td: timedelta) -> str:
+    total_seconds = int(td.total_seconds())
+    h = total_seconds // 3600
+    m = (total_seconds % 3600) // 60
+    s = total_seconds % 60
+    return f"{h:02}:{m:02}:{s:02}"
+
+
+def get_results(db: Session) -> list[DriverResult]:
+    competitors = get_competitors(db)
+
+    finished: list[tuple[int, DriverResult]] = []
+    dnfs: list[DriverResult] = []
+
+    def time_or_blank(dt) -> str:
+        return dt.strftime("%H:%M:%S") if dt else ""
+
+    for comp in competitors:
+        entries = get_times_by_start_number(db, comp.start_number)
+
+        startNbr = str(comp.start_number).zfill(3)
+        name = comp.name
+
+        # 🔥 Hitta start och mål via station
+        start_entry = next(
+            (e for e in entries if e.station.station_name == "start"),
+            None,
+        )
+        end_entry = next(
+            (e for e in entries if e.station.station_name == "mål"),
+            None,
+        )
+
+        start_dt = start_entry.timestamp if start_entry else None
+        end_dt = end_entry.timestamp if end_entry else None
+
+        startTime = time_or_blank(start_dt)
+        endTime = time_or_blank(end_dt)
+
+        if start_dt and end_dt:
+            total_td = end_dt - start_dt
+            totalTime = fmt_timedelta(total_td)
+
+            dr = DriverResult(
+                plac="",
+                startNbr=startNbr,
+                name=name,
+                totalTime=totalTime,
+                startTime=startTime,
+                endTime=endTime,
+            )
+
+            finished.append((int(total_td.total_seconds()), dr))
+        else:
+            dr = DriverResult(
+                plac="DNF",
+                startNbr=startNbr,
+                name=name,
+                totalTime="",
+                startTime=startTime,
+                endTime=endTime,
+            )
+            dnfs.append(dr)
+
+    finished.sort(key=lambda x: x[0])
+
+    for i, (_, dr) in enumerate(finished, start=1):
+        dr.plac = str(i)
+
+    return [dr for _, dr in finished] + dnfs
+
 def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
     entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
 
@@ -135,3 +208,4 @@ def delete_time_entry(db: Session, id: int) -> TimeEntry | None:
     db.commit()
 
     return entry
+

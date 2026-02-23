@@ -58,3 +58,17 @@ class TimeEntryUpdate(BaseModel):
     competitor_id: int | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
+
+
+class DriverResult(BaseModel):
+    plac: str
+    startNbr: str
+    name: str
+    totalTime: str
+    startTime: str
+    endTime: str
+
+
+class Result(BaseModel):
+    teamToken: str
+    jsonResult: list[DriverResult]
