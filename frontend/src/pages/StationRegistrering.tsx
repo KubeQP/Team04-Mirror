@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -19,7 +19,6 @@ type Station = {
 
 export default function StationRegistrering() {
 	const [stationName, setStationName] = useState('');
-	const [order, setOrder] = useState('');
 	const [stations, setStations] = useState<Station[]>([]);
 
 	const fetchStations = async () => {
@@ -83,14 +82,6 @@ export default function StationRegistrering() {
 		console.log('add station');
 
 		if (!stationName.trim()) return;
-		if (!order.trim()) return;
-
-		const parsedOrder = Number(order);
-
-		const maxOrder = stations.length ? Math.max(...stations.map((s) => Number(s.order))) : -1;
-
-		const normalizedOrder =
-			isNaN(parsedOrder) || parsedOrder > maxOrder + 1 ? String(maxOrder + 1) : String(parsedOrder);
 
 		try {
 			const res = await fetch(`${API_BASE_URL}/api/stations/registerstation`, {
@@ -100,7 +91,7 @@ export default function StationRegistrering() {
 				},
 				body: JSON.stringify({
 					station_name: stationName,
-					order: normalizedOrder,
+					order: stations.length.toString(),
 				}),
 			});
 
@@ -116,7 +107,6 @@ export default function StationRegistrering() {
 			// NU uppdaterar vi från databasen
 			await fetchStations();
 
-			setOrder('');
 			setStationName('');
 		} catch (err) {
 			console.error('Fetch error:', err);
@@ -133,9 +123,9 @@ export default function StationRegistrering() {
 				}}
 			>
 				<div className="flex items-end gap-4">
-					<FieldGroup className="grid max-w-sm grid-cols-2">
-						<Field>
-							<FieldLabel>Namn</FieldLabel>
+					<Field className="max-w-xs">
+						<FieldLabel>Namn</FieldLabel>
+						<Field orientation="horizontal" className="gap-2">
 							<Input
 								id="stationNamnInput"
 								placeholder="Start"
@@ -143,21 +133,11 @@ export default function StationRegistrering() {
 								value={stationName}
 								onChange={(e) => setStationName(e.target.value)}
 							/>
+							<Button type="submit" variant="default" disabled={!stationName.trim()}>
+								Registrera
+							</Button>
 						</Field>
-						<Field>
-							<FieldLabel>Ordning</FieldLabel>
-							<Input
-								id="orderInput"
-								placeholder="0"
-								type="text"
-								value={order}
-								onChange={(e) => setOrder(e.target.value)}
-							/>
-						</Field>
-					</FieldGroup>
-					<Button type="submit" variant="default" disabled={!order.trim() || !stationName.trim()}>
-						Registrera
-					</Button>
+					</Field>
 				</div>
 			</form>
 			<h2 className="mt-6 text-lg font-semibold pb-2">Stationer</h2>
