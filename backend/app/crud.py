@@ -69,11 +69,23 @@ def record_new_station(db: Session, station_name: str, order: str) -> Station:
     db.commit()
     db.refresh(entry)
     return entry
+    
+def update_station_order(db: Session, stations: list[dict]) -> None:
+    for station_data in stations:
+        station = (
+            db.query(Station)
+            .filter(Station.station_name == station_data["station_name"])
+            .first()
+        )
 
+        if station:
+            station.order = station_data["order"]
+
+    db.commit()
 
 def get_stations(db: Session) -> list[Station]:
     """Hämta alla stationer från databasen."""
-    return db.query(Station).all()
+    return db.query(Station).order_by(Station.order).all()
 
 
 def update_competitor(

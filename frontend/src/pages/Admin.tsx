@@ -118,10 +118,12 @@ export default function Admin() {
 			})
 		: [];
 
+		/*
 	function countTimesInString(value: string): number {
 		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
 		return matches ? matches.length : 0;
 	}
+		*/
 
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],
@@ -298,58 +300,88 @@ export default function Admin() {
 	const headerRow2: Cell[] = [
 		{ value: 'Nr.', correct: true, mutable: false, id: 0 },
 		{ value: 'Namn', correct: true, mutable: false, id: 0 },
-		{ value: 'Start', correct: true, mutable: false, id: 0 },
-		{ value: 'Mål', correct: true, mutable: false, id: 0 },
-		{ value: 'Totalt', correct: true, mutable: false, id: 0 },
 	];
+		stationData?.forEach((station) => {
+			headerRow2.push({
+				value: station.station_name,
+				correct: true,
+				mutable: false,
+				id: station.id,
+			});
+		});
+		headerRow2.push({
+		value: 'Totalt',
+		correct: true,
+		mutable: false,
+		id: 0,
+		});
 	competitorTable.push(headerRow2);
 
 	competitorsToRender.forEach((competitor) => {
-		const startTimes =
-			timeData?.filter(
-				(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '0',
-			) || [];
-		const stopTimes =
-			timeData?.filter(
-				(t) => t.competitor_id === competitor.id && stationData?.find((s) => s.id === t.station_id)?.order === '1',
-			) || [];
+	const competitorRow: Cell[] = [
+		{ value: competitor.start_number, correct: true, mutable: false, id: competitor.id },
+		{ value: competitor.name, correct: true, mutable: false, id: competitor.id },
+	];
 
-		const startTime = {
-			value: startTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-',
-			correct: true,
-			mutable: false,
-			id: competitor.id,
-		};
-		const stopTime = {
-			value: stopTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-',
-			correct: true,
-			mutable: false,
-			id: competitor.id,
-		};
-		const totalTimeRaw = calculateTotalTime(startTimes, stopTimes);
+	// Get all times for this competitor
+	const allTimes =
+		timeData?.filter((t) => t.competitor_id === competitor.id) || [];
 
-		const totalTime: Cell = {
-			value: totalTimeRaw.value,
-			correct: totalTimeRaw.correct,
-			mutable: false,
-			id: competitor.id,
-		};
+	// Sort by timestamp (important for total calculation)
+	const sortedTimes = [...allTimes].sort(
+		(a, b) =>
+		new Date(a.timestamp).getTime() -
+		new Date(b.timestamp).getTime()
+	);
 
-		if (startTime.value === '-' || countTimesInString(startTime.value) > 1) startTime.correct = false;
-		if (stopTime.value === '-' || countTimesInString(stopTime.value) > 1) stopTime.correct = false;
+	// 🔹 Add one column per station
+	stationData?.forEach((station) => {
+		const stationTimes = sortedTimes.filter(
+		(t) => t.station_id === station.id
+		);
 
-		if (countTimesInString(startTime.value) > 1) startTime.correct = false;
-		if (countTimesInString(stopTime.value) > 1) stopTime.correct = false;
+		const value =
+		stationTimes.map((t) => formatTime(t.timestamp)).join(', ') || '-';
 
-		const competitorRow: Cell[] = [
-			{ value: competitor.start_number, correct: true, mutable: false, id: competitor.id },
-			{ value: competitor.name, correct: true, mutable: false, id: competitor.id },
-			startTime,
-			stopTime,
-			totalTime,
-		];
-		competitorTable.push(competitorRow);
+		competitorRow.push({
+		value,
+		correct: stationTimes.length === 1, // exactly one scan = valid
+		mutable: false,
+		id: competitor.id,
+		});
 	});
+
+  // 🔹 Calculate total from first → last station
+  let totalCell: Cell = {
+    value: '-',
+    correct: false,
+    mutable: false,
+    id: competitor.id,
+  };
+
+  if (stationData && stationData.length >= 2) {
+  const firstStation = stationData[0];
+  const lastStation = stationData[stationData.length - 1];
+
+  const startTimeEntry = allTimes.find((t) => t.station_id === firstStation.id);
+  const endTimeEntry = allTimes.find((t) => t.station_id === lastStation.id);
+
+  if (startTimeEntry && endTimeEntry) {
+    const result = calculateTotalTime([startTimeEntry], [endTimeEntry]);
+    totalCell = {
+      value: result.value,
+      correct: result.correct,
+      mutable: false,
+      id: competitor.id,
+    };
+  }
+}
+
+
+  competitorRow.push(totalCell);
+
+  competitorTable.push(competitorRow);
+});
 
 	function createTable(tableData: Cell[][]) {
 		if (tableData.length === 0) return null;
