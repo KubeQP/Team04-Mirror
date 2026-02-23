@@ -7,6 +7,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
 from .database import Base, SessionLocal, engine
 from .models import Competitor, Station, TimeEntry
@@ -26,13 +27,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         competitors = []
         competitors.append(Competitor(start_number="123", name="Alice"))
         competitors.append(Competitor(start_number="458", name="Bob"))
-        competitors.append(Competitor(start_number="459", name="Bob"))
-        competitors.append(Competitor(start_number="452", name="Bob"))
-        competitors.append(Competitor(start_number="453", name="Bob"))
-        competitors.append(Competitor(start_number="426", name="Bob"))
-        competitors.append(Competitor(start_number="436", name="Bob"))
-        competitors.append(Competitor(start_number="446", name="Bob"))
-        competitors.append(Competitor(start_number="486", name="Bob"))
 
         db.add_all(competitors)
         db.commit()
@@ -103,10 +97,25 @@ app.include_router(competitors.router, prefix="/api")
 app.include_router(times.router, prefix="/api")
 app.include_router(stations.router, prefix="/api")
 
+FRONTEND_DIST = "../frontend/dist"
+
 # 'Mounta' frontend dist mappen (efter build)
-if os.path.exists("../frontend/dist"):
-    print("Mounting static files from ../frontend/dist")
-    app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
+if os.path.exists(FRONTEND_DIST):
+    print(f"Mounting static files from {FRONTEND_DIST}.")
+
+    app.mount(
+        "/assets", StaticFiles(directory=f"{FRONTEND_DIST}/assets"), name="assets"
+    )
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str) -> FileResponse:
+        file_path = os.path.join(FRONTEND_DIST, full_path)
+
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+
+        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+
 else:
     print("No frontend dist folder found, not serving static files.")
     print(

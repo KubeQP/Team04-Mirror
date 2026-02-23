@@ -3,6 +3,15 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { getCompetitorData } from '../api/getCompetitorData';
@@ -26,7 +35,7 @@ export default function Admin() {
 
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
 
-	const [resultView] = useState<'startnummer' | 'resultat'>('startnummer');
+	const [resultView, setResultView] = useState<'startnummer' | 'resultat'>('startnummer');
 
 	// Fetch data
 	const fetchData = async () => {
@@ -389,7 +398,25 @@ export default function Admin() {
 							{createTable(stationTable)}
 						</div>
 						<div className="w-2/3">
-							<h2 className="text-lg font-semibold mb-2">Tävlande</h2>
+							<div className="flex">
+								<h2 className="text-lg font-semibold mb-2 flex-1">Tävlande</h2>
+								<Select value={resultView} onValueChange={(view: 'resultat' | 'startnummer') => setResultView(view)}>
+									<SelectTrigger className="w-full max-w-48">
+										<SelectValue placeholder="Välj station" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectGroup>
+											<SelectLabel>Sortering</SelectLabel>
+											<SelectItem key="resultat" value="resultat">
+												Resultat
+											</SelectItem>
+											<SelectItem key="startnummer" value="startnummer">
+												Startnummer
+											</SelectItem>
+										</SelectGroup>
+									</SelectContent>
+								</Select>
+							</div>
 							{createTable(competitorTable)}
 						</div>
 					</div>
