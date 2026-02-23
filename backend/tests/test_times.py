@@ -25,16 +25,16 @@ def test_get_times_with_data(client: TestClient, db_session: Session) -> None:
     """GET /api/times ska returnera alla tider i databasen."""
     station = create_station(db_session)
 
-    c1 = Competitor(start_number="1001", name="Team 1")
-    c2 = Competitor(start_number="1002", name="Team 2")
+    c1 = Competitor(start_number="1001", name="Team 1", competition_id=1)
+    c2 = Competitor(start_number="1002", name="Team 2", competition_id=1)
     db_session.add_all([c1, c2])
     db_session.commit()
     db_session.refresh(c1)
     db_session.refresh(c2)
 
-    t1 = TimeEntry(competitor_id=c1.id, station_id=station.id)
-    t2 = TimeEntry(competitor_id=c1.id, station_id=station.id)
-    t3 = TimeEntry(competitor_id=c2.id, station_id=station.id)
+    t1 = TimeEntry(competitor_id=c1.id, station_id=station.id, competition_id=1)
+    t2 = TimeEntry(competitor_id=c1.id, station_id=station.id, competition_id=1)
+    t3 = TimeEntry(competitor_id=c2.id, station_id=station.id, competition_id=1)
     db_session.add_all([t1, t2, t3])
     db_session.commit()
 
@@ -53,8 +53,8 @@ def test_get_times_by_start_number(client: TestClient, db_session: Session) -> N
     """GET /api/times/{start_number} ska bara ge tider för rätt tävlande."""
     station = create_station(db_session)
 
-    c1 = Competitor(start_number="1001", name="Team 1")
-    c2 = Competitor(start_number="1002", name="Team 2")
+    c1 = Competitor(start_number="1001", name="Team 1", competition_id=1)
+    c2 = Competitor(start_number="1002", name="Team 2", competition_id=1)
     db_session.add_all([c1, c2])
     db_session.commit()
     db_session.refresh(c1)
@@ -62,9 +62,9 @@ def test_get_times_by_start_number(client: TestClient, db_session: Session) -> N
 
     db_session.add_all(
         [
-            TimeEntry(competitor_id=c1.id, station_id=station.id),
-            TimeEntry(competitor_id=c1.id, station_id=station.id),
-            TimeEntry(competitor_id=c2.id, station_id=station.id),
+            TimeEntry(competitor_id=c1.id, station_id=station.id, competition_id=1),
+            TimeEntry(competitor_id=c1.id, station_id=station.id, competition_id=1),
+            TimeEntry(competitor_id=c2.id, station_id=station.id, competition_id=1),
         ]
     )
     db_session.commit()
@@ -102,6 +102,7 @@ def test_record_time_for_existing_competitor(
         "start_number": "1001",
         "timeStamp": "2026-02-16T14:30:00Z",
         "station_id": station.id,
+        "competition_id": 1,
     }
 
     response = client.post("/api/times/record", json=payload)
@@ -123,7 +124,7 @@ def test_record_time_for_empty_competitor(
     """POST /api/times/record ska ge 404 om startnumret inte finns."""
     station = create_station(db_session)
 
-    payload = {"station_id": station.id}
+    payload = {"station_id": station.id, "competition_id": 1}
     response = client.post("/api/times/record", json=payload)
 
     assert response.status_code == 200

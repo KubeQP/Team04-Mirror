@@ -14,8 +14,8 @@ def test_get_competitors_empty(client: TestClient) -> None:
 
 def test_get_competitors_with_data(client: TestClient, db_session: Session) -> None:
     """Endpointen ska returnera de tävlande som finns i databasen."""
-    c1 = models.Competitor(start_number="1001", name="Team 1")
-    c2 = models.Competitor(start_number="1002", name="Team 2")
+    c1 = models.Competitor(start_number="1001", name="Team 1", competition_id=1)
+    c2 = models.Competitor(start_number="1002", name="Team 2", competition_id=1)
     db_session.add_all([c1, c2])
     db_session.commit()
 

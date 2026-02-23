@@ -6,18 +6,16 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from dotenv import load_dotenv
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
-
-from urllib.parse import urlparse
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
 from .database import Base, SessionLocal, engine
-from .models import Competitor, Station, TimeEntry
-from .routers import competitors, results, stations, times
+from .models import Competition, Competitor, Station, TimeEntry
+from .routers import competitions, competitors, results, stations, times
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
 
 
 @asynccontextmanager
@@ -30,35 +28,23 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # produktion eller release builds.
     db = SessionLocal()
     if db.query(Competitor).count() == 0:
+        competition0 = Competition()
+        db.add(competition0)
+        db.commit()
         competitors = []
-        competitors.append(Competitor(start_number="123", name="Alice"))  # finish
-        competitors.append(Competitor(start_number="458", name="Bob"))  # finish
         competitors.append(
-            Competitor(start_number="030", name="John")
-        )  # bara start (DNF men startTime ska synas)
-        competitors.append(
-            Competitor(start_number="020", name="Liam")
-        )  # ingen tid alls (DNF)
-        competitors.append(
-            Competitor(start_number="002", name="Miriam")
-        )  # snabb finisher (ska bli plac 1)
-        competitors.append(
-            Competitor(start_number="047", name="Sixten")
-        )  # finish men långsammare
-        competitors.append(
-            Competitor(start_number="111", name="Eva")
-        )  # bara mål (konstig data)
-        competitors.append(
-            Competitor(start_number="099", name="Noah")
-        )  # finish med tight tid
+            Competitor(start_number="123", name="Alice", competition_id=1)
+        )
+        competitors.append(Competitor(start_number="458", name="Bob", competition_id=1))
+
         db.add_all(competitors)
         db.commit()
 
         for i in competitors:
             db.refresh(i)
 
-        station1 = Station(station_name="start", order="0")
-        station2 = Station(station_name="mål", order="1")
+        station1 = Station(station_name="start", order="0", competition_id=1)
+        station2 = Station(station_name="mål", order="1", competition_id=1)
         db.add_all([station1, station2])
         db.commit()
 
@@ -72,72 +58,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                     competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 31, 39),
                     station_id=station1.id,
+                    competition_id=1,
+                ),
+                TimeEntry(
+                    competitor_id=competitors[1].id,
+                    timestamp=datetime(2025, 6, 27, 12, 32, 15),
+                    station_id=station1.id,
+                    competition_id=1,
                 ),
                 TimeEntry(
                     competitor_id=competitors[0].id,
                     timestamp=datetime(2025, 6, 27, 12, 47, 38),
                     station_id=station2.id,
-                ),
-                # Bob (competitors[1]) – finisher, längre tid än Alice
-                TimeEntry(
-                    competitor_id=competitors[1].id,
-                    timestamp=datetime(2025, 6, 27, 12, 32, 15),
-                    station_id=station1.id,
+                    competition_id=1,
                 ),
                 TimeEntry(
                     competitor_id=competitors[1].id,
                     timestamp=datetime(2025, 6, 27, 12, 52, 5),
                     station_id=station2.id,
-                ),
-                # John (competitors[2]) – bara start => DNF men startTime ska komma med
-                TimeEntry(
-                    competitor_id=competitors[2].id,
-                    timestamp=datetime(2025, 6, 27, 9, 52, 5),
-                    station_id=station1.id,
-                ),
-                # Liam (competitors[3]) – inga tider alls => DNF (lägg INGA TimeEntry för honom)
-                # Miriam (competitors[4]) – snabbast, ska bli plac 1
-                TimeEntry(
-                    competitor_id=competitors[4].id,
-                    timestamp=datetime(2025, 6, 27, 12, 10, 0),
-                    station_id=station1.id,
-                ),
-                TimeEntry(
-                    competitor_id=competitors[4].id,
-                    timestamp=datetime(2025, 6, 27, 12, 20, 5),
-                    station_id=station2.id,
-                ),
-                # Sixten (competitors[5]) – finisher, längre än Noah men kortare än Bob (exempel)
-                TimeEntry(
-                    competitor_id=competitors[5].id,
-                    timestamp=datetime(2025, 6, 27, 12, 15, 0),
-                    station_id=station1.id,
-                ),
-                TimeEntry(
-                    competitor_id=competitors[5].id,
-                    timestamp=datetime(2025, 6, 27, 12, 40, 0),
-                    station_id=station2.id,
-                ),
-                # Eva (competitors[6]) – bara mål (konstig data) => DNF men endTime ska komma med
-                TimeEntry(
-                    competitor_id=competitors[6].id,
-                    timestamp=datetime(2025, 6, 27, 12, 33, 33),
-                    station_id=station2.id,
-                ),
-                # Noah (competitors[7]) – finisher, nästan som Sixten men lite snabbare
-                TimeEntry(
-                    competitor_id=competitors[7].id,
-                    timestamp=datetime(2025, 6, 27, 12, 18, 0),
-                    station_id=station1.id,
-                ),
-                TimeEntry(
-                    competitor_id=competitors[7].id,
-                    timestamp=datetime(2025, 6, 27, 12, 41, 10),
-                    station_id=station2.id,
+                    competition_id=1,
                 ),
             ]
         )
         db.commit()
+
     db.close()
 
     yield  # startup done
@@ -158,19 +102,19 @@ app.add_middleware(
         "http://localhost:8000",
         "http://localhost:5177",
         "http://127.0.0.1:5177",
-        os.getenv("API_BASE_URL")
+        os.getenv("API_BASE_URL", "http://127.0.0.1:8000"),
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    )
-
+)
 
 
 # Inkludera routrar. Smidigt att dela upp i flera filer.
 app.include_router(competitors.router, prefix="/api")
 app.include_router(times.router, prefix="/api")
 app.include_router(stations.router, prefix="/api")
+app.include_router(competitions.router, prefix="/api")
 app.include_router(results.router, prefix="/api")
 
 FRONTEND_DIST = "../frontend/dist"
@@ -203,11 +147,11 @@ else:
 # istället för att alltid använda "uvicorn app.main:app --reload"
 if __name__ == "__main__":
     import uvicorn
-    api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:7000")
+
+    api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
 
     parsed = urlparse(api_url)
-    host = parsed.hostname
+    host = parsed.hostname if parsed.hostname else "127.0.0.1"
     port = parsed.port or 8000
 
     uvicorn.run("app.main:app", host=host, port=port, reload=True)
-
