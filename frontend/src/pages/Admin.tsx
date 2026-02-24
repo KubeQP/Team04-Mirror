@@ -1,4 +1,4 @@
-// frontend/src/pages/Admin.tsx
+
 import { useCallback, useEffect, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
@@ -118,12 +118,6 @@ export default function Admin() {
 			})
 		: [];
 
-		/*
-	function countTimesInString(value: string): number {
-		const matches = value.match(/\b\d{2}:\d{2}:\d{2}\b/g);
-		return matches ? matches.length : 0;
-	}
-		*/
 
 	function calculateTotalTime(
 		startTimes: { timestamp: string | number | Date }[],

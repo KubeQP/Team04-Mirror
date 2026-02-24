@@ -55,20 +55,11 @@ export default function Resultatvisare() {
     stationTimes: string[];
   }
 
-  // Compute results and table only if data exists
-// ==============================
-// COMPUTE RESULTS + TABLE
-// ==============================
-
 let Results: ResultObject[] = [];
 let tableArray: string[][] = [];
 
 if (competitorData && timeData && stationData) {
 
-  // Remove index 0 if that is some placeholder.
-  // We assume after slice(1):
-  // index 0 = Start
-  // last index = Finish
   const relevantStations = stationData;
 
   Results = competitorData.map(competitor => {
@@ -96,27 +87,15 @@ if (competitorData && timeData && stationData) {
 
     const stationTimes: string[] = [];
 
-    // ==================
-    // START COLUMN
-    // ==================
     stationTimes.push(start.toLocaleTimeString());
 
-    // ==================
-    // TID 1..N (exclude start + finish)
-    // ==================
     for (let i = 1; i < allStationTimes.length - 1; i++) {
       const t = allStationTimes[i];
       stationTimes.push(t ? t.toLocaleTimeString() : '-');
     }
 
-    // ==================
-    // MÅL COLUMN
-    // ==================
     stationTimes.push(finish ? finish.toLocaleTimeString() : '-');
 
-    // ==================
-    // DEL 1..N (between every station)
-    // ==================
     for (let i = 1; i < allStationTimes.length; i++) {
       const prev = allStationTimes[i - 1];
       const curr = allStationTimes[i];
@@ -131,9 +110,6 @@ if (competitorData && timeData && stationData) {
       }
     }
 
-    // ==================
-    // TOTAL TIME
-    // ==================
     const totalSeconds =
       finish ? Math.round((finish.getTime() - start.getTime())/ 1000): -1;
 
@@ -147,19 +123,12 @@ if (competitorData && timeData && stationData) {
 
   }).filter((r): r is ResultObject => r !== null);
 
-  // ==================
-  // SORT + RANK
-  // ==================
   Results.sort((a, b) => {
 	if (a.Total < 0) return 1;
 	if (b.Total < 0) return -1;
 	return a.Total - b.Total;
 	});
   Results.forEach((r, i) => r.Rang = i + 1);
-
-  // ==================
-  // BUILD HEADER
-  // ==================
 
   const headerRow: string[] = [
     'Rang',
@@ -169,26 +138,18 @@ if (competitorData && timeData && stationData) {
   ];
 
   const stationCount = relevantStations.length;
-  // includes start + sectors + finish
 
-  // Tid 1..N  (exclude start + finish)
   for (let i = 1; i < stationCount - 1; i++) {
     headerRow.push(`Tidpunkt ${relevantStations[i].station_name}`);
   }
 
-  // Mål
   headerRow.push('Måltid');
 
-  // Del 1..N  (between each station)
   for (let i = 1; i < stationCount; i++) {
     headerRow.push(relevantStations[i].station_name);
   }
 
   headerRow.push('Totaltid');
-
-  // ==================
-  // BUILD TABLE ARRAY
-  // ==================
 
   tableArray = [
     headerRow,
