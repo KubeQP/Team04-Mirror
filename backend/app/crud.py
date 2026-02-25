@@ -70,7 +70,8 @@ def record_new_station(db: Session, station_name: str, order: str) -> Station:
     db.refresh(entry)
     return entry
     
-def update_station_order(db: Session, stations: list[dict]) -> None:
+#def update_station_order(db: Session, stations: list[dict]) -> None:
+def update_station_order(db: Session, stations: list[dict[str, str | int]]) -> None:
     for station_data in stations:
         station = (
             db.query(Station)
