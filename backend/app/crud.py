@@ -81,7 +81,7 @@ def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
         )
 
         if station:
-            station.order = cast(int(station_data["order"]))
+            station.order = cast(int,station_data["order"])
 
     db.commit()
 
