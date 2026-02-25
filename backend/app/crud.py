@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
 
-from typing import Any
+from typing import Any, cast
 
 
 def get_competitors(db: Session) -> list[Competitor]:
@@ -81,7 +81,7 @@ def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
         )
 
         if station:
-            station.order = int(station_data["order"])
+            station.order = cast(int(station_data["order"]))
 
     db.commit()
 
