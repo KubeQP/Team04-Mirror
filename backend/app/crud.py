@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 from .models import Competitor, Station, TimeEntry
 
+from typing import Any
+
 
 def get_competitors(db: Session) -> list[Competitor]:
     """Hämta alla tävlande från databasen."""
@@ -70,7 +72,7 @@ def record_new_station(db: Session, station_name: str, order: str) -> Station:
     db.refresh(entry)
     return entry
     
-def update_station_order(db: Session, stations: list[dict]) -> None:
+def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
     for station_data in stations:
         station = (
             db.query(Station)
