@@ -71,7 +71,8 @@ def record_new_station(db: Session, station_name: str, order: str) -> Station:
     db.commit()
     db.refresh(entry)
     return entry
-    
+
+
 def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
     for station_data in stations:
         station = (
@@ -81,9 +82,10 @@ def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
         )
 
         if station:
-            station.order = int(station_data["order"]) # type: ignore
+            station.order = int(station_data["order"])  # type: ignore
 
     db.commit()
+
 
 def get_stations(db: Session) -> list[Station]:
     """Hämta alla stationer från databasen."""
