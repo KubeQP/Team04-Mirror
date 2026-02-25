@@ -7,12 +7,11 @@ Denna release (23/2-26) inehåller:
 - Köhantering: Det är nu möjligt att endast registrera en tid utan startnummer, som kan läggas till i efterhand.
 - Publicera resultat: Efter ett lopp produceras och skickas ett korrekt resultat som JSON-data.
 
-   
-Färdigt: 
-   Story B: 9
-   Story F: 0, 2, 3, 5, 6, 7, 8, 9, 11
-   Story T: 1
-
 Delvis imlpementerade: 
    Story F: 4, 10, 13, 24
    Story T: 2, 3, 4
+   
+Färdigt sedan förra release: 
+   Story B: 9
+   Story F: 0, 2, 3, 5, 6, 7, 8, 9, 11
+   Story T: 1
