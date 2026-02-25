@@ -97,7 +97,7 @@ describe('RegisteringStartTid', () => {
 	it('testar registrering med extra nollor framför', async () => {
 		render(<RegistreringStartTid />);
 		fireEvent.change(screen.getByPlaceholderText('123'), {
-			target: { value: '000210' },
+			target: { value: '002' },
 		});
 		fireEvent.change(screen.getByPlaceholderText('John Doe'), {
 			target: { value: 'Team' },
@@ -106,7 +106,7 @@ describe('RegisteringStartTid', () => {
 		fireEvent.click(screen.getByText('Registrera'));
 
 		await waitFor(() => {
-			expect(screen.getByText('210')).toBeInTheDocument();
+			expect(screen.getByText('002')).toBeInTheDocument();
 		});
 	});
 
