@@ -1,6 +1,6 @@
 
 import { CrownIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { type JSX,useEffect, useState } from 'react';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -52,11 +52,11 @@ export default function Resultatvisare() {
     Nr: string;
     Name: string;
     Total: number;
-    stationTimes: string[];
+    stationTimes: (JSX.Element | string)[];
   }
 
 let Results: ResultObject[] = [];
-let tableArray: string[][] = [];
+let tableArray: (string | JSX.Element)[][] = [];
 
 if (competitorData && timeData && stationData) {
 
@@ -82,35 +82,56 @@ if (competitorData && timeData && stationData) {
     const start = allStationTimes[0];
     const finish = allStationTimes[allStationTimes.length - 1] || null;
 
+	for (let i = 1; i < allStationTimes.length; i++) {
+	const prev = allStationTimes[i - 1];
+	const curr = allStationTimes[i];
+
+	if (prev && curr && curr < prev) {
+		return null;
+		}
+	}
+
     // Must have valid start + finish
     if (!start) return null;
 
-    const stationTimes: string[] = [];
+	
+	const stationTimes: (JSX.Element | string)[] = [];
 
-    stationTimes.push(start.toLocaleTimeString());
+	for (let i = 0; i < allStationTimes.length; i++) {
+	const curr = allStationTimes[i];
+	const prev = i > 0 ? allStationTimes[i - 1] : null;
 
-    for (let i = 1; i < allStationTimes.length - 1; i++) {
-      const t = allStationTimes[i];
-      stationTimes.push(t ? t.toLocaleTimeString() : '-');
-    }
+	if (!curr) {
+		stationTimes.push('-');
+		continue;
+	}
 
-    stationTimes.push(finish ? finish.toLocaleTimeString() : '-');
+	const timeString = curr.toLocaleTimeString();
 
-    for (let i = 1; i < allStationTimes.length; i++) {
-      const prev = allStationTimes[i - 1];
-      const curr = allStationTimes[i];
+	if (i === 0) {
+		stationTimes.push(timeString);
+		continue;
+	}
 
-      if (prev && curr && curr > prev) {
-        const diffSeconds =
-          Math.round((curr.getTime() - prev.getTime()) / 1000);
+	
+	if (prev && curr > prev) {
+	const diffSeconds = Math.round(
+		(curr.getTime() - prev.getTime()) / 1000
+	);
 
-        stationTimes.push(formatTotalTime(diffSeconds));
-      } else {
-        stationTimes.push('-');
-      }
-    }
+	stationTimes.push(
+		<div className="flex flex-col">
+		<span>{timeString}</span>
+		<span className="text-xs text-muted-foreground">
+			+{formatTotalTime(diffSeconds)}
+		</span>
+		</div>
+	);
+	} else {
+		stationTimes.push(timeString);
+	}
 
-    const totalSeconds =
+	}const totalSeconds =
       finish ? Math.round((finish.getTime() - start.getTime())/ 1000): -1;
 
     return {
@@ -130,29 +151,17 @@ if (competitorData && timeData && stationData) {
 	});
   Results.forEach((r, i) => r.Rang = i + 1);
 
-  const headerRow: string[] = [
-    'Rang',
-    'Nr.',
-    'Namn',
-    'Starttid'
-  ];
+  
+const headerRow: string[] = [
+  'Rang',
+  'Nr.',
+  'Namn',
+  ...relevantStations.map(s => s.station_name),
+  'Totaltid'
+];
 
-  const stationCount = relevantStations.length;
-
-  for (let i = 1; i < stationCount - 1; i++) {
-    headerRow.push(`Tidpunkt ${relevantStations[i].station_name}`);
-  }
-
-  headerRow.push('Måltid');
-
-  for (let i = 1; i < stationCount; i++) {
-    headerRow.push(relevantStations[i].station_name);
-  }
-
-  headerRow.push('Totaltid');
-
-  tableArray = [
-    headerRow,
+tableArray = [
+	headerRow,
     ...Results.map(r => [
       r.Rang.toString(),
       r.Nr,
@@ -163,7 +172,7 @@ if (competitorData && timeData && stationData) {
   ];
 }
 
-  function createTable(tableData: string[][]) {
+  function createTable(tableData: (string | JSX.Element)[][]) {
     if (!tableData.length) return null;
     const [header, ...body] = tableData;
     return (
