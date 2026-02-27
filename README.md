@@ -30,6 +30,7 @@ team04/
 │   │   ├── test_competitors.py
 │   │   ├── test_registers.py
 │   │   └── test_times.py
+│   ├── .env
 │   ├── Makefile
 │   ├── pyproject.toml
 │   ├── pytest.ini
