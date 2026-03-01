@@ -195,7 +195,7 @@ backend-build-linux:
     - cd backend
     - source .venv/bin/activate
     - pip install pyinstaller
-    - pyinstaller --onefile --add-data "../.env:." run.py
+    - pyinstaller --onefile --add-data ".env:." run.py
     - mkdir ../app/backend
     - cp dist/run ../app/backend
   artifacts:
