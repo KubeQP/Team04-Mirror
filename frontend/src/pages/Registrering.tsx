@@ -124,7 +124,7 @@ export default function Registrering() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold pb-4">Registrering:</h1>
+			<h1 className="text-xl font-bold pb-4">Registrera tävlande:</h1>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();

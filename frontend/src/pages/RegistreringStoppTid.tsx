@@ -154,7 +154,7 @@ export default function RegistreringStoppTid() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold pb-2">Registrera stopptid:</h1>
+			<h1 className="text-xl font-bold pb-2">Tidsregistrering:</h1>
 
 			<Field className="my-2">
 				<FieldLabel>Station</FieldLabel>
@@ -238,7 +238,7 @@ export default function RegistreringStoppTid() {
 							});
 						}}
 					>
-						Registrera stopptid nu
+						Registrera tid nu
 					</Button>
 					<Button
 						type="button"
