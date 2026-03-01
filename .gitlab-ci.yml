@@ -26,6 +26,7 @@ backend-setup:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
 
 # ---------------------------
 # Frontend setup (Node deps)
@@ -42,6 +43,7 @@ frontend-setup:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
 
 # ---------------------------
 # Backend lint (ruff + mypy)
@@ -56,6 +58,7 @@ backend-lint:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
   allow_failure: true
 
 # ---------------------------
@@ -71,6 +74,7 @@ backend-format:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
   allow_failure: true
 
 # ---------------------------
@@ -86,6 +90,7 @@ backend-check:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
   allow_failure: true
 
 # ---------------------------
@@ -100,6 +105,7 @@ frontend-lint:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
   allow_failure: true
 
 # ---------------------------
@@ -114,6 +120,7 @@ frontend-format:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
   allow_failure: true
 
 # ---------------------------
@@ -128,6 +135,7 @@ frontend-check:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
   allow_failure: true
 
 # ---------------------------
@@ -143,6 +151,7 @@ backend-test:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
 
 # ---------------------------
 # Frontend tests
@@ -156,6 +165,7 @@ frontend-test:
   rules:
     - if: '$CI_MERGE_REQUEST_ID != ""'
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
 
 # ---------------------------
 # Frontend build (main branch only)
@@ -173,6 +183,7 @@ frontend-build:
       - app
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
 
 # ---------------------------
 # Backend build (main branch only)
@@ -192,6 +203,7 @@ backend-build-linux:
       - app
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
 
 # ---------------------------
 # Archive build (main branch only)
@@ -207,3 +219,4 @@ zip-build:
       - build.zip
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "serverBuild"'
