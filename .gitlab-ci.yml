@@ -213,7 +213,13 @@ zip-build:
   image: alpine:latest
   script:
     - apk add --no-cache zip
-    - zip -r build.zip app
+    # Copy docs to workspace root so it gets included
+    - mkdir docs
+    - cp pvg_användar_manual.pdf docs/
+    - cp tekDok.pdf docs/
+    - cp Teknisk_dokumentation.pdf docs/
+    - cp Installation.pdf docs/
+    - zip -r build.zip app docs
   artifacts:
     paths:
       - build.zip
