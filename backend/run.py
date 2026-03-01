@@ -15,4 +15,4 @@ if __name__ == "__main__":
     host = parsed.hostname if parsed.hostname else "127.0.0.1"
     port = parsed.port or 8000
 
-    uvicorn.run(app, host=host, port=port, reload=False)
+    uvicorn.run("app.main:app", host=host, port=port, reload=False)
