@@ -221,6 +221,7 @@ zip-build:
     - mkdir docs
     - cp pvg_användar_manual.pdf docs/
     - cp tekDok.pdf docs/
+    - cp ReleaseInfo.txt docs/
     - cp Installation.pdf docs/
     - zip -r build.zip app docs
   artifacts:
