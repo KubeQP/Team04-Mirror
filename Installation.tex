@@ -1,0 +1,59 @@
+\documentclass{article}
+\usepackage{fontspec} % XeLaTeX hanterar UTF-8 automatiskt
+\usepackage{hyperref} % klickbara länkar (valfritt)
+\usepackage{enumitem}
+
+\title{Installation och Körning av Team04 Applikation}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Installation och Uppstart}
+
+\subsection*{1. Förberedelser}
+\begin{itemize}[leftmargin=*]
+    \item Kontrollera att servern har \textbf{Python 3.14} och \textbf{Node.js 24} installerade.
+\end{itemize}
+
+\subsection*{2. Ladda ner och packa upp}
+\begin{itemize}[leftmargin=*]
+    \item Hämta zip-filen som innehåller \texttt{app} mappen och dokumentation.
+    \item Packa upp zip-filen på servern i önskad katalog.
+\end{itemize}
+
+\subsection*{3. Backend}
+\begin{itemize}[leftmargin=*]
+    \item Backend är redan byggd som en fristående binär med \texttt{pyinstaller}, så inga extra Python-bibliotek behövs.
+\end{itemize}
+
+\subsection*{4. Frontend}
+\begin{itemize}[leftmargin=*]
+    \item Frontend är redan byggd och ligger i \texttt{app/frontend/dist}.
+    \item Inga extra byggkommandon behövs på servern.
+\end{itemize}
+
+\subsection*{5. Starta applikationen}
+\begin{itemize}[leftmargin=*]
+    \item Gå till \texttt{app/backend}.
+    \item Kör backend-binären:
+    \begin{verbatim}
+    ./run
+    \end{verbatim}
+    \item Applikationen startar på den host och port som är satt innan programet kompilerades. (exempel: \texttt{http://100.84.14.107:8000}).
+\end{itemize}
+
+\subsection*{6. Verifiering}
+\begin{itemize}[leftmargin=*]
+    \item Öppna webbläsaren och navigera till serverns IP och port, eller eventuell URL.
+\end{itemize}
+
+\section*{Noteringar}
+\begin{itemize}[leftmargin=*]
+    \item Inga utvecklingsberoenden behövs på servern.
+    \item Endast \texttt{app}-mappen behöver laddas upp.
+\end{itemize}
+
+\end{document}
