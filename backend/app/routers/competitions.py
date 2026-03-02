@@ -17,8 +17,8 @@ def read_competition(db: Session = Depends(get_db)) -> list[Competition]:
 
 
 @router.post("/register", response_model=schemas.CompetitionsReg)
-def reg_competition(db: Session = Depends(get_db)) -> Competition:
-    competition = crud.record_new_competition(db)
+def reg_competition(data: schemas.CompetitionsCreate, db: Session = Depends(get_db)) -> Competition:
+    competition = crud.record_new_competition(db, data.token)
     return competition
 
 

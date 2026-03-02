@@ -183,8 +183,8 @@ def update_time_entry(
     return entry
 
 
-def record_new_competition(db: Session) -> Competition:
-    entry = Competition()
+def record_new_competition(db: Session, token: str) -> Competition:
+    entry = Competition(token = token)
     db.add(entry)
     db.commit()
     db.refresh(entry)
@@ -225,6 +225,7 @@ def fmt_timedelta(td: timedelta) -> str:
 
 def get_results(db: Session, token: str) -> list[DriverResult]:
     competitors = get_competitors(db)
+    
     if token == "97cea6ae-fc50-45b6-b231-43c92b5b8832":
         competitors = [r for r in competitors if r.competition_id == 1]
     elif token == "5de9dfe9-2ad3-4b42-a56c-55521a71f028":
