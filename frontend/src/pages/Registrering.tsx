@@ -8,6 +8,7 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -25,6 +26,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 
 import { API_BASE_URL } from '../config/api';
 
@@ -50,6 +52,7 @@ export default function Registrering() {
 	const [editStartNumber, setEditStartNumber] = useState('');
 	const [editName, setEditName] = useState('');
 	const [openDropdownFor, setOpenDropdownFor] = useState<string | null>(null);
+	const [textareaValue, setTextareaValue] = useState('');
 
 	const openEditDialog = (competitor: Competitor) => {
 		setEditingCompetitor(competitor);
@@ -68,18 +71,29 @@ export default function Registrering() {
 		fetchCompetitors();
 	}, [fetchCompetitors]);
 
-	const addReg = async () => {
+	const addReg = async (rawReg: string, rawName: string) => {
 		console.log('add reg');
+		console.log(reg);
+		if (!rawReg.trim()) {
+			console.error('Error', 'trim reg' + rawReg);
+			return;
+		}
+		if (isNaN(Number(rawReg))) {
+			console.error('Error', 'NAN');
+			return;
+		}
+		if (!rawName.trim()) {
+			console.error('Error', 'trim name');
+			return;
+		}
+		console.log('past inital checks');
 
-		if (!reg.trim()) return;
-		if (isNaN(Number(reg))) return;
-		if (!name.trim()) return;
-
-		const regWithoutInitialZeros = reg.replace(/^0+/, '');
+		const regWithoutInitialZeros = rawReg.replace(/^0+/, '');
 		const formattedReg = regWithoutInitialZeros.padStart(3, '0');
 
 		const exists = competitors.some((r) => r.start_number === formattedReg);
 		if (exists) {
+			console.log('exists');
 			return;
 		}
 
@@ -89,6 +103,7 @@ export default function Registrering() {
 		//const formattedTime = now.toLocaleTimeString('sv-SE');
 
 		try {
+			console.log('intry ');
 			const res = await fetch(`${API_BASE_URL}/api/competitors/register`, {
 				method: 'POST',
 				headers: {
@@ -96,7 +111,7 @@ export default function Registrering() {
 				},
 				body: JSON.stringify({
 					start_number: formattedReg,
-					name: name,
+					name: rawName,
 					competition_id: competition,
 				}),
 			});
@@ -115,11 +130,33 @@ export default function Registrering() {
 
 			setReg('');
 			setName('');
-
+			console.log('somethig ahs happened');
 			notifyCompetitorAdded();
 		} catch (err) {
 			console.error('Fetch error:', err);
 		}
+	};
+
+	const handleImport = async () => {
+		// Use textareaValue here
+		const input = textareaValue;
+		const rows = input.trim().split('\n');
+
+		// Process each row
+		const result = rows.map((row) => {
+			// Split each row into parts using the comma as a separator
+			const [startNumber, name] = row.split(',').map((part) => part.trim());
+			return { startNumber, name };
+		});
+
+		result.forEach((value) => {
+			//setReg(value.startNumber);
+			console.log(value.startNumber, value.name);
+			//console.log(reg);
+			//setName(value.name);
+			addReg(value.startNumber, value.name);
+		});
+		// Your import logic here
 	};
 
 	return (
@@ -128,7 +165,7 @@ export default function Registrering() {
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
-					addReg();
+					addReg(reg, name);
 				}}
 			>
 				<div className="flex items-end gap-4">
@@ -162,6 +199,39 @@ export default function Registrering() {
 					<Button type="submit" variant="default" disabled={!reg.trim() || !name.trim()}>
 						Registrera
 					</Button>
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Import</Button>
+						</DialogTrigger>
+						<DialogContent className="sm:max-w-md">
+							<DialogHeader>
+								<DialogDescription>Paste in the competitiors you wish to import with the format.</DialogDescription>
+							</DialogHeader>
+							<div className="flex items-center gap-2">
+								<div className="grid flex-1 gap-2">
+									<Textarea
+										id="textarea-message"
+										placeholder="019, Alice och Bob
+									039, Charlie och Denver"
+										value={textareaValue}
+										onChange={(e) => setTextareaValue(e.target.value)}
+									/>
+								</div>
+							</div>
+							<DialogFooter className="sm:justify-start">
+								<DialogClose asChild>
+									<Button
+										type="button"
+										onClick={async () => {
+											await handleImport();
+										}}
+									>
+										Import
+									</Button>
+								</DialogClose>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				</div>
 			</form>
 			<h2 className="text-lg mt-6 font-semibold mb-2">Registrerade tävlande</h2>
