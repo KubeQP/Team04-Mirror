@@ -25,7 +25,7 @@ const navigationData = [
 		href: '/register/participant',
 	},
 	{
-		title: 'Stopptid',
+		title: 'Tidsregistrering',
 		href: '/register/time',
 	},
 	{
