@@ -1,11 +1,10 @@
 # backend/run.py
 import os
-from urllib.parse import urlparse
-from app.main import app
-
 
 import uvicorn
 from dotenv import load_dotenv
+
+from app.main import app
 
 # Load .env from same folder as the binary
 BASE_DIR = os.path.dirname(__file__)
@@ -16,13 +15,12 @@ else:
     print(f"No .env found at {dotenv_path}, using defaults.")
 
 # Determine host & port from API_BASE_URL
-api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:8004")
-parsed = urlparse(api_url)
-#host = parsed.hostname or "127.0.0.1"
+# api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:8004")
+# parsed = urlparse(api_url)
+# host = parsed.hostname or "127.0.0.1"
 host = "0.0.0.0"
-port = parsed.port or 8004
+port = 8004
 
-print(f"API_BASE_URL = {api_url}")
 print(f"Starting server on {host}:{port}")
 
 # Start Uvicorn
