@@ -55,6 +55,7 @@ class TimeEntry(Base):
 class Competition(Base):
     __tablename__ = "competitions"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    token: Mapped[str] = mapped_column(String)
 
     competitors = relationship(
         "Competitor", backref="competition", cascade="all, delete-orphan"

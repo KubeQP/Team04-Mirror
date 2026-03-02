@@ -72,10 +72,17 @@ class TimeEntryUpdate(BaseModel):
 
 class CompetitionsReg(BaseModel):
     id: int
+    token: str | None = None
+
+
+class CompetitionsCreate(BaseModel):
+    token: str
 
 
 class CompetitionsOut(BaseModel):
     id: int
+    token: str | None = None
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CompetitionsRemove(BaseModel):
