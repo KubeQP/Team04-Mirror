@@ -18,12 +18,11 @@ else:
 # Determine host & port from API_BASE_URL
 api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:8004")
 parsed = urlparse(api_url)
-# host = parsed.hostname or "127.0.0.1"
-host = "0.0.0.0"
+host = parsed.hostname or "127.0.0.1"
 port = parsed.port or 8004
 
 print(f"API_BASE_URL = {api_url}")
 print(f"Starting server on {host}:{port}")
 
 # Start Uvicorn
-uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
+uvicorn.run(app, host=host, port=port, reload=False)
