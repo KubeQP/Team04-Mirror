@@ -1,5 +1,6 @@
 # backend/app/crud.py
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -64,6 +65,7 @@ def record_time_for_start_number(
         timestamp=timestamp,
         station_id=station_id,
         competition_id=competition_id,
+        start_number=start_number,
         competitor_id=competitor.id if competitor else None,
     )
 
@@ -103,9 +105,23 @@ def record_new_station(
     return entry
 
 
+def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
+    for station_data in stations:
+        station = (
+            db.query(Station)
+            .filter(Station.station_name == station_data["station_name"])
+            .first()
+        )
+
+        if station:
+            station.order = int(station_data["order"])  # type: ignore
+
+    db.commit()
+
+
 def get_stations(db: Session) -> list[Station]:
     """Hämta alla stationer från databasen."""
-    return db.query(Station).all()
+    return db.query(Station).order_by(Station.order).all()
 
 
 def update_competitor(
@@ -140,6 +156,7 @@ def update_time_entry(
     competitor_id: int | None,
     timestamp: datetime | None,
     station_id: int | None,
+    start_number: str | None,
     competition_id: int | None,
 ) -> TimeEntry | None:
     entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
@@ -155,6 +172,8 @@ def update_time_entry(
         entry.station_id = station_id
     if competition_id is not None:
         entry.competition_id = competition_id
+    if start_number is not None:
+        entry.start_number = start_number
 
     db.commit()
     db.refresh(entry)

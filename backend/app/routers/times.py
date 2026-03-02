@@ -51,6 +51,7 @@ def update_time_entry(
         data.competitor_id,
         data.timestamp,
         data.station_id,
+        data.start_number,
         data.competition_id,
     )
 

@@ -76,6 +76,7 @@ Systemet är uppdelat i två huvuddelar: [Backend](#backend)  och [Frontend](#fr
 |`routers/` |API-endpoints|
 |`run.py` | Startar backend-servern
 |`tests/` | Backend-tester|
+|`.env` | Globala variabler | 
 
 ## Frontend
 Är implementerad med React med TypeScript och Vite. Nedan listas bland de viktigaste delar av backenden och vad de ansvarar för.
@@ -87,6 +88,7 @@ Systemet är uppdelat i två huvuddelar: [Backend](#backend)  och [Frontend](#fr
 |`src/api/` | API-anrop till backend|
 |`router.tsx` | Routing-konfiguration|
 |`package.json` | Projektkonfiguration|
+|`.env` | Globala variabler
 
 ---
 

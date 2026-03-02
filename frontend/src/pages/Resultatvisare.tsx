@@ -1,6 +1,5 @@
-// frontend/src/pages/Admin.tsx
 import { CrownIcon } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { type JSX, useCallback, useEffect, useState } from 'react';
 
 import { useCompetition } from '@/components/Competition';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -19,11 +18,11 @@ export default function Resultatvisare() {
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
 
-	const [timeData, setTimeData] = useState<Array<TimeData> | null>(null);
+	const [timeData, setTimeData] = useState<TimeData[] | null>(null);
 	const [timeLoading, setTimeLoading] = useState(true);
 	const [timeError, setTimeError] = useState<string | null>(null);
 
-	const [stationData, setStationData] = useState<Array<StationData> | null>(null);
+	const [stationData, setStationData] = useState<StationData[] | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
 
@@ -69,40 +68,39 @@ export default function Resultatvisare() {
 	}, [competition]);
 
 	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				setCompetitorData(await getCompetitorData());
+			} catch (err: unknown) {
+				setCompetitorError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel');
+			} finally {
+				setCompetitorLoading(false);
+			}
+
+			try {
+				setTimeData(await getTimeData());
+			} catch (err: unknown) {
+				setTimeError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel');
+			} finally {
+				setTimeLoading(false);
+			}
+
+			try {
+				setStationData(await getStationData());
+			} catch (err: unknown) {
+				setStationError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel');
+			} finally {
+				setStationLoading(false);
+			}
+		};
 		fetchData();
 	}, [fetchData]);
 
-	function calculateTotalTime(
-		startTimes: { timestamp: string | number | Date }[],
-		stopTimes: { timestamp: string | number | Date }[],
-	): { value: number; correct: boolean } {
-		// Kräver exakt en starttid och exakt en stoptid
-		if (startTimes.length !== 1 || stopTimes.length !== 1) {
-			return { value: -1, correct: false };
-		}
-
-		const start = new Date(startTimes[0].timestamp);
-		const stop = new Date(stopTimes[0].timestamp);
-
-		// Ogiltiga datum eller stop före start → "-"
-		if (isNaN(start.getTime()) || isNaN(stop.getTime()) || stop <= start) {
-			return { value: -1, correct: false };
-		}
-
-		const diffMs = stop.getTime() - start.getTime();
-		const totalSeconds = Math.floor(diffMs / 1000);
-
-		return { value: totalSeconds, correct: true };
-	}
-
 	function formatTotalTime(totalSeconds: number) {
-		const hours = Math.floor(totalSeconds / 3600);
-		const minutes = Math.floor((totalSeconds % 3600) / 60);
-		const seconds = totalSeconds % 60;
-
-		const formatted = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-		return formatted;
+		const h = Math.floor(totalSeconds / 3600);
+		const m = Math.floor((totalSeconds % 3600) / 60);
+		const s = totalSeconds % 60;
+		return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 	}
 
 	interface ResultObject {
@@ -110,76 +108,126 @@ export default function Resultatvisare() {
 		Nr: string;
 		Name: string;
 		Total: number;
-	}
-	//tableArray - Competitors //flera tider för en station, ingen tid.
-	const Results: ResultObject[] = [];
-	const headerRow: string[] = ['Rang', 'Nr.', 'Namn', 'Totalt'];
-
-	competitorData?.forEach((competitor) => {
-		const startNumber = { value: competitor.start_number, correct: true };
-		const name = { value: competitor.name, correct: true };
-		const matchingStartTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '0',
-			) || [];
-
-		const matchingStopTimes =
-			timeData?.filter(
-				(time) =>
-					time.competitor_id === competitor.id &&
-					stationData?.find((station) => station.id === time.station_id)?.order === '1',
-			) || [];
-
-		const totalTime = calculateTotalTime(matchingStartTimes, matchingStopTimes);
-
-		if (totalTime.value != -1) {
-			const competitorRow: ResultObject = { Rang: 0, Nr: startNumber.value, Name: name.value, Total: totalTime.value };
-			Results.push(competitorRow);
-		}
-	});
-
-	Results.sort((a, b) => a.Total - b.Total);
-
-	for (let i: number = 0; i < Results.length; i++) {
-		Results[i].Rang = i + 1;
+		stationTimes: (JSX.Element | string)[];
 	}
 
-	const tableArray: string[][] = [];
-	tableArray.push(headerRow);
+	let Results: ResultObject[] = [];
+	let tableArray: (string | JSX.Element)[][] = [];
 
-	Results?.forEach((ResultObject) => {
-		const tempArray: string[] = [];
-		tempArray.push(ResultObject.Rang.toString());
-		tempArray.push(ResultObject.Nr);
-		tempArray.push(ResultObject.Name);
-		tempArray.push(formatTotalTime(ResultObject.Total));
-		tableArray.push(tempArray);
-	});
+	if (competitorData && timeData && stationData) {
+		const relevantStations = stationData;
 
-	//dynamic table creation
-	function createTable(tableData: string[][]) {
-		if (tableData.length === 0) return null;
+		Results = competitorData
+			.map((competitor) => {
+				// Collect exactly one timestamp per station
+				const allStationTimes: (Date | null)[] = relevantStations.map((station) => {
+					const matches = timeData.filter((td) => td.competitor_id === competitor.id && td.station_id === station.id);
 
-		const [headerRow, ...bodyRows] = tableData;
+					// Must be exactly one timestamp
+					if (matches.length !== 1) return null;
 
+					const date = new Date(matches[0].timestamp);
+					return isNaN(date.getTime()) ? null : date;
+				});
+
+				const start = allStationTimes[0];
+				const finish = allStationTimes[allStationTimes.length - 1] || null;
+
+				for (let i = 1; i < allStationTimes.length; i++) {
+					const prev = allStationTimes[i - 1];
+					const curr = allStationTimes[i];
+
+					if (prev && curr && curr < prev) {
+						return null;
+					}
+				}
+
+				// Must have valid start + finish
+				if (!start) return null;
+
+				const stationTimes: (JSX.Element | string)[] = [];
+
+				for (let i = 0; i < allStationTimes.length; i++) {
+					const curr = allStationTimes[i];
+					const prev = i > 0 ? allStationTimes[i - 1] : null;
+
+					if (!curr) {
+						stationTimes.push('-');
+						continue;
+					}
+
+					const timeString = curr.toLocaleTimeString();
+
+					if (i === 0) {
+						stationTimes.push(timeString);
+						continue;
+					}
+
+					if (prev && curr > prev) {
+						const diffSeconds = Math.round((curr.getTime() - prev.getTime()) / 1000);
+
+						stationTimes.push(
+							<div className="flex flex-col">
+								<span>{timeString}</span>
+								<span className="text-xs text-muted-foreground">+{formatTotalTime(diffSeconds)}</span>
+							</div>,
+						);
+					} else {
+						stationTimes.push(timeString);
+					}
+				}
+				const totalSeconds = finish ? Math.round((finish.getTime() - start.getTime()) / 1000) : -1;
+
+				return {
+					Rang: 0,
+					Nr: competitor.start_number,
+					Name: competitor.name,
+					Total: totalSeconds,
+					stationTimes,
+				};
+			})
+			.filter((r): r is ResultObject => r !== null);
+
+		Results.sort((a, b) => {
+			if (a.Total < 0) return 1;
+			if (b.Total < 0) return -1;
+			return a.Total - b.Total;
+		});
+		Results.forEach((r, i) => (r.Rang = i + 1));
+
+		const headerRow: string[] = ['Rang', 'Nr.', 'Namn', ...relevantStations.map((s) => s.station_name), 'Totaltid'];
+
+		tableArray = [
+			headerRow,
+			...Results.map((r) => [
+				r.Rang.toString(),
+				r.Nr,
+				r.Name,
+				...r.stationTimes,
+				r.Total >= 0 ? formatTotalTime(r.Total) : '-',
+			]),
+		];
+	}
+
+	function createTable(tableData: (string | JSX.Element)[][]) {
+		if (!tableData.length) return null;
+		const [header, ...body] = tableData;
 		return (
 			<ScrollArea className="rounded-md border px-4 h-[80vh]">
 				<Table>
 					<TableHeader className="h-12">
 						<TableRow>
-							{headerRow.map((header, index) => (
-								<TableHead key={index}>{header}</TableHead>
+							{header.map((h, i) => (
+								<TableHead key={i}>{h}</TableHead>
 							))}
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{bodyRows.map((row, rowIndex) => (
-							<TableRow key={rowIndex}>
-								{row.map((cell, cellIndex) => (
-									<TableCell className={cellIndex === 0 ? 'font-medium text-base' : ''} key={cellIndex}>
-										{cellIndex === 0 && cell === '1' ? (
+						{body.map((row, ri) => (
+							<TableRow key={ri}>
+								{row.map((cell, ci) => (
+									<TableCell key={ci} className={ci === 0 ? 'font-medium text-base' : ''}>
+										{ci === 0 && cell === '1' ? (
 											<div className="flex items-center gap-2">
 												{cell}
 												<CrownIcon className="size-6 text-yellow-500" />

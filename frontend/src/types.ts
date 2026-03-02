@@ -15,6 +15,7 @@ export interface TimeData {
 	competitor_id: number;
 	timestamp: string;
 	station_id: number;
+	start_number?: string;
 	competition_id: number;
 }
 
