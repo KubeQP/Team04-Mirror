@@ -64,16 +64,21 @@ export default function StationRegistrering() {
 
 	const deleteStation = async (order: string) => {
 		try {
-			const res = await fetch(`${API_BASE_URL}/api/stations/delete/${order}`, {
+			const result1 = await fetch(`${API_BASE_URL}/api/stations/delete/${order}`, {
 				method: 'DELETE',
 			});
-			console.log('Delete response:', res);
 
-			if (!res.ok) {
-				const err = await res.json();
+			if (!result1.ok) {
+				const err = await result1.json();
 
 				throw new Error(err.detail || 'Unknown error');
 			}
+
+			await updateStationOrder(
+				stations
+					.filter((s) => Number(s.order) > Number(order))
+					.map((s) => ({ ...s, order: String(Number(s.order) - 1) })),
+			);
 
 			await fetchStations();
 		} catch (err) {

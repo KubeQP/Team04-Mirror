@@ -126,5 +126,5 @@ it('disablar stopptidsknappen om inga tävlande finns', async () => {
 		</TooltipProvider>,
 	);
 
-	expect(screen.getByText('Registrera stopptid nu')).toBeDisabled();
+	expect(screen.getByText('Registrera tid nu')).toBeDisabled();
 });
