@@ -12,7 +12,7 @@ from .database import Base
 class Competitor(Base):
     __tablename__ = "competitors"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    start_number: Mapped[str] = mapped_column(String, unique=True, index=True)
+    start_number: Mapped[str] = mapped_column(String)
     name: Mapped[str] = mapped_column(String)
     competition_id = mapped_column(
         Integer, ForeignKey("competitions.id", ondelete="CASCADE")
@@ -55,7 +55,7 @@ class TimeEntry(Base):
 class Competition(Base):
     __tablename__ = "competitions"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    token: Mapped[str] = mapped_column(String)
+    token: Mapped[str] = mapped_column(String, unique=True)
 
     competitors = relationship(
         "Competitor", backref="competition", cascade="all, delete-orphan"

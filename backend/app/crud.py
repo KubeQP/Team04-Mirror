@@ -223,13 +223,21 @@ def fmt_timedelta(td: timedelta) -> str:
     return f"{h:02}:{m:02}:{s:02}"
 
 
+def round_to_seconds(dt: datetime) -> datetime:
+    if dt.microsecond >= 500_000:
+        dt += timedelta(seconds=1)
+
+    return dt.replace(microsecond=0)
+
+
 def get_results(db: Session, token: str) -> list[DriverResult]:
     competitors = get_competitors(db)
 
-    if token == "97cea6ae-fc50-45b6-b231-43c92b5b8832":
-        competitors = [r for r in competitors if r.competition_id == 1]
-    elif token == "5de9dfe9-2ad3-4b42-a56c-55521a71f028":
-        competitors = [r for r in competitors if r.competition_id == 2]
+    competition = db.query(Competition).filter(Competition.token == token).first()
+    if competition is None:
+        return []
+
+    competitors = [c for c in competitors if c.competition_id == competition.id]
 
     finished: list[tuple[int, DriverResult]] = []
     dnfs: list[DriverResult] = []
@@ -250,16 +258,21 @@ def get_results(db: Session, token: str) -> list[DriverResult]:
         start_entry = next(
             (e for e in entries if e.station.station_name == "start"), None
         )
+        print(start_entry)
         end_entry = next((e for e in entries if e.station.station_name == "mål"), None)
 
-        start_dt = _as_utc(start_entry.timestamp) if start_entry else None
-        end_dt = _as_utc(end_entry.timestamp) if end_entry else None
+        start_dt = (
+            round_to_seconds(_as_utc(start_entry.timestamp)) if start_entry else None
+        )
+        end_dt = round_to_seconds(_as_utc(end_entry.timestamp)) if end_entry else None
 
         startTime = time_or_blank(start_dt)
         endTime = time_or_blank(end_dt)
 
         if start_dt and end_dt:
+            print(end_dt, start_dt)
             total_td = end_dt - start_dt
+            print(total_td)
             totalTime = fmt_timedelta(total_td)
 
             dr = DriverResult(
@@ -284,7 +297,12 @@ def get_results(db: Session, token: str) -> list[DriverResult]:
 
     finished.sort(key=lambda x: x[0])
 
-    for i, (_, dr) in enumerate(finished, start=1):
-        dr.plac = str(i)
+    plac = 1
+    for i, (_, dr) in enumerate(finished):
+        if i > 0 and dr.totalTime == finished[i - 1][1].totalTime:
+            dr.plac = str(plac)
+        else:
+            plac = i + 1
+            dr.plac = str(plac)
 
     return [dr for _, dr in finished] + dnfs

@@ -104,4 +104,4 @@ class Result(BaseModel):
 
 
 class SubmitResultsRequest(BaseModel):
-    token: str
+    competition_id: int
