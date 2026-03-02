@@ -247,7 +247,7 @@ export default function Resultatvisare() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold pb-2">Resultatvisare:</h1>
+			<h1 className="text-xl font-bold pb-2">Resultatvisare</h1>
 			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
