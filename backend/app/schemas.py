@@ -27,6 +27,7 @@ class TimeEntryOut(BaseModel):
     competitor_id: int | None = None
     station_id: int | None = None
     timestamp: datetime
+    start_number: str | None = None
     competition_id: int
 
     model_config = ConfigDict(from_attributes=True)
@@ -65,6 +66,7 @@ class TimeEntryUpdate(BaseModel):
     competitor_id: int | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
+    start_number: str | None = None
     competition_id: int | None = None
 
 

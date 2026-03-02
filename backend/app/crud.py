@@ -64,6 +64,7 @@ def record_time_for_start_number(
         timestamp=timestamp,
         station_id=station_id,
         competition_id=competition_id,
+        start_number=start_number,
         competitor_id=competitor.id if competitor else None,
     )
 
@@ -140,6 +141,7 @@ def update_time_entry(
     competitor_id: int | None,
     timestamp: datetime | None,
     station_id: int | None,
+    start_number: str | None,
     competition_id: int | None,
 ) -> TimeEntry | None:
     entry = db.query(TimeEntry).filter(TimeEntry.id == id).first()
@@ -155,6 +157,8 @@ def update_time_entry(
         entry.station_id = station_id
     if competition_id is not None:
         entry.competition_id = competition_id
+    if start_number is not None:
+        entry.start_number = start_number
 
     db.commit()
     db.refresh(entry)

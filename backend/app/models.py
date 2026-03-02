@@ -43,7 +43,8 @@ class TimeEntry(Base):
         nullable=False,
         default=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
-    competition_id = mapped_column(
+    start_number: Mapped[str] = mapped_column(String, nullable=True)
+    competition_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("competitions.id", ondelete="CASCADE")
     )
 

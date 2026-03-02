@@ -221,6 +221,7 @@ export default function Admin() {
 			competitor_id: competitor.id,
 			timestamp: timeData?.find((t) => t.id === timeId)?.timestamp ?? '-',
 			station_id: row[0].id,
+			start_number: newValue,
 			competition_id: competition,
 		});
 	}
@@ -274,7 +275,12 @@ export default function Admin() {
 
 			table.push([
 				{ value: station?.station_name ?? '-', correct: true, mutable: false, id: station?.id ?? 0 },
-				{ value: competitor?.start_number ?? '-', correct: true, mutable: true, id: timeSlot.id },
+				{
+					value: competitor?.start_number ?? timeSlot.start_number ?? '-',
+					correct: true,
+					mutable: true,
+					id: timeSlot.id,
+				},
 				{ value: formatTime(timeSlot.timestamp), correct: true, mutable: false, id: timeSlot.id },
 			]);
 		});
