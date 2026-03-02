@@ -25,4 +25,4 @@ print(f"API_BASE_URL = {api_url}")
 print(f"Starting server on {host}:{port}")
 
 # Start Uvicorn
-uvicorn.run(app, host=host, port=port, reload=False)
+uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
