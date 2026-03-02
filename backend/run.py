@@ -18,7 +18,8 @@ else:
 # Determine host & port from API_BASE_URL
 api_url = os.getenv("API_BASE_URL", "http://127.0.0.1:8004")
 parsed = urlparse(api_url)
-host = parsed.hostname or "127.0.0.1"
+#host = parsed.hostname or "127.0.0.1"
+host = "130.235.240.21"
 port = parsed.port or 8004
 
 print(f"API_BASE_URL = {api_url}")
