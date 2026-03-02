@@ -128,7 +128,7 @@ export default function StationRegistrering() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-bold pb-4">Hantera stationer:</h1>
+			<h1 className="text-xl font-bold pb-4">Hantera stationer</h1>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
