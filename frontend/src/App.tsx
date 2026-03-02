@@ -163,7 +163,7 @@ export default function App() {
 	return (
   <ThemeProvider>
     <TooltipProvider>
-      <div className="max-h-screen overflow-hidden">
+      <div className="max-h-screen flex-col">
         <Navbar
           competitions={competitions}
           selectedCompetition={selectedCompetition}

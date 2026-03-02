@@ -25,7 +25,7 @@ import type { CompetitorData, StationData, TimeData } from '../types';
 export default function Admin() {
 	const { competition } = useCompetition();
 
-	const [chosenToken, setChosenToken] = useState("")
+	const [chosenToken, setChosenToken] = useState('');
 	const [tokenLoading, setTokenLoading] = useState(false);
 	const [tokenError, setTokenError] = useState<string | null>(null);
 
@@ -45,27 +45,26 @@ export default function Admin() {
 
 	const [resultView, setResultView] = useState<'resultat' | 'startnummer'>('startnummer');
 
-
 	const submitToken = async () => {
-		 if (!chosenToken.trim()) {
-      setTokenError("Please enter a token");
-      return;
-    }
+		if (!chosenToken.trim()) {
+			setTokenError('Please enter a token');
+			return;
+		}
 
-    setTokenLoading(true);
-    setTokenError(null);
+		setTokenLoading(true);
+		setTokenError(null);
 
-    try {
-      const result = await submitResults(chosenToken);
-      console.log("Backend responded:", result);
-    } catch (err: unknown) {
+		try {
+			const result = await submitResults(chosenToken);
+			console.log('Backend responded:', result);
+		} catch (err: unknown) {
 			if (err instanceof Error) setTokenError(err.message);
 			else if (typeof err === 'string') setTokenError(err);
 			else setTokenError('Ett okänt fel inträffade');
-    } finally {
-      setTokenLoading(false);
-    }
-  };
+		} finally {
+			setTokenLoading(false);
+		}
+	};
 
 	const fetchData = useCallback(async () => {
 		// Competitor data
@@ -247,37 +246,49 @@ export default function Admin() {
 		});
 	}
 
-	const validateStationDuplicates = useCallback((table: Cell[][]): Cell[][] => {
-		const updated = table.map((row) => [...row]);
+	const validateStationDuplicates = useCallback(
+		(table: Cell[][]): Cell[][] => {
+			const updated = table.map((row) => [...row]);
 
-		const seen = new Map<string, number[]>();
+			const seen = new Map<string, number[]>();
 
-		for (let i = 1; i < updated.length; i++) {
-			const row = updated[i];
+			for (let i = 1; i < updated.length; i++) {
+				const row = updated[i];
 
-			const stationId = row[0].id;
-			const startNumber = row[1].value;
+				const stationId = row[0].id;
+				const startNumber = row[1].value;
 
-			const key = `${stationId}-${startNumber}`;
+				const key = `${stationId}-${startNumber}`;
 
-			if (!seen.has(key)) {
-				seen.set(key, [i]);
-			} else {
-				seen.get(key)?.push(i);
+				if (!seen.has(key)) {
+					seen.set(key, [i]);
+				} else {
+					seen.get(key)?.push(i);
+				}
 			}
-		}
 
-		seen.forEach((indexes) => {
-			if (indexes.length > 1) {
-				indexes.forEach((i) => {
-					updated[i][0] = { ...updated[i][0], correct: false };
-					updated[i][1] = { ...updated[i][1], correct: false };
-				});
-			}
-		});
+			seen.forEach((indexes) => {
+				if (indexes.length > 1) {
+					indexes.forEach((i) => {
+						updated[i][0] = { ...updated[i][0], correct: false };
+						updated[i][1] = { ...updated[i][1], correct: false };
+					});
+				}
+			});
 
-		return updated;
-	}, []);
+			table.forEach((row, index) => {
+				if (index === 0) return;
+
+				const result = competitorData?.find((c) => c.start_number === row[1].value);
+				if (!result) {
+					updated[index][1] = { ...updated[index][1], correct: false };
+				}
+			});
+
+			return updated;
+		},
+		[competitorData],
+	);
 
 	// Bygg stationstabell
 	useEffect(() => {
@@ -452,7 +463,7 @@ export default function Admin() {
 					onClick={submitToken}
 					disabled={tokenLoading || !chosenToken.trim()}
 				>
-					{tokenLoading ? "Submitting..." : "Submit token"}
+					{tokenLoading ? 'Submitting...' : 'Submit token'}
 				</button>
 
 				{tokenError && <p className="text-sm text-destructive">{tokenError}</p>}

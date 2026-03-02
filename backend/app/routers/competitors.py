@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.models import Competitor
+from app.models import Competitor, TimeEntry
 
 from .. import crud, schemas
 from ..database import get_db
@@ -23,6 +23,17 @@ def reg_competitor(
     competitor = crud.record_new_reg(
         db, data.start_number, data.name, data.competition_id
     )
+
+    times = (
+        db.query(TimeEntry)
+        .filter_by(competition_id=data.competition_id)
+        .filter_by(start_number=data.start_number)
+        .all()
+    )
+    for time in times:
+        time.competitor_id = competitor.id
+    db.commit()
+
     return {
         "start_number": competitor.start_number,
         "name": competitor.name,
