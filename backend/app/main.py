@@ -43,6 +43,8 @@ app.add_middleware(
         "http://localhost:8000",
         "http://localhost:5177",
         "http://127.0.0.1:5177",
+        "http://100.84.14.107:8000",
+        "http://100.84.14.107:5173",
         os.getenv("API_BASE_URL", "http://127.0.0.1:8000"),
     ],
     allow_credentials=True,
