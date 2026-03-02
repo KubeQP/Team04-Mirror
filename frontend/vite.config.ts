@@ -5,21 +5,21 @@ import { defineConfig, type UserConfig } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+	plugins: [react(), tailwindcss()],
 
-    server: {
-        host: true,   // ← motsvarar "npm run dev -- --host"
-    },
+	server: {
+		host: true, // ← motsvarar "npm run dev -- --host"
+	},
 
-    test: {
-        globals: true,
-        environment: 'jsdom',
-        setupFiles: './src/setupTests.ts',
-    },
+	test: {
+		globals: true,
+		environment: 'jsdom',
+		setupFiles: './src/setupTests.ts',
+	},
 
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, './src'),
-        },
-    },
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, './src'),
+		},
+	},
 } as UserConfig);

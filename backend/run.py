@@ -1,9 +1,9 @@
 # backend/run.py
 import os
 from urllib.parse import urlparse
-from dotenv import load_dotenv
+
 import uvicorn
-from app.main import app
+from dotenv import load_dotenv
 
 # Load .env from same folder as the binary
 BASE_DIR = os.path.dirname(__file__)
