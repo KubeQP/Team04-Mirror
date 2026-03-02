@@ -68,10 +68,10 @@ export default function App() {
 	const handleSelectCompetition = useCallback(
 		(id: number) => {
 			setSelectedCompetition(id);
-			//localStorage.setItem('selectedCompetition', id.toString());
+			localStorage.setItem('selectedCompetition', id.toString());
 			console.log('Valde tävling med ID:', id);
 			setCompetition(id);
-			//localStorage.setItem('competition', id.toString());
+			localStorage.setItem('competition', id.toString());
 		},
 		[setCompetition],
 	);
