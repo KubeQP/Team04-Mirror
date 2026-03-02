@@ -4,22 +4,24 @@ import path from 'path';
 import { defineConfig, type UserConfig } from 'vite';
 
 // https://vite.dev/config/
-export default defineConfig({
-	plugins: [react(), tailwindcss()],
+export default defineConfig(({ mode }) => {
+	return {
+		plugins: [react(), tailwindcss()],
 
-	server: {
-		host: true, // ← motsvarar "npm run dev -- --host"
-	},
-
-	test: {
-		globals: true,
-		environment: 'jsdom',
-		setupFiles: './src/setupTests.ts',
-	},
-
-	resolve: {
-		alias: {
-			'@': path.resolve(__dirname, './src'),
+		server: {
+			host: mode === 'production',
 		},
-	},
-} as UserConfig);
+
+		test: {
+			globals: true,
+			environment: 'jsdom',
+			setupFiles: './src/setupTests.ts',
+		},
+
+		resolve: {
+			alias: {
+				'@': path.resolve(__dirname, './src'),
+			},
+		},
+	} as UserConfig;
+});
