@@ -1,5 +1,6 @@
 # backend/app/crud.py
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -13,8 +14,6 @@ def _as_utc(dt: datetime) -> datetime:
         return dt.replace(tzinfo=UTC)
 
     return dt.astimezone(UTC)
-
-from typing import Any
 
 
 def get_competitors(db: Session) -> list[Competitor]:

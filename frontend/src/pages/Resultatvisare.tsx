@@ -1,5 +1,5 @@
 import { CrownIcon } from 'lucide-react';
-import { type JSX, useCallback,useEffect, useState } from 'react';
+import { type JSX, useCallback, useEffect, useState } from 'react';
 
 import { useCompetition } from '@/components/Competition';
 import { ScrollArea } from '@/components/ui/scroll-area';
