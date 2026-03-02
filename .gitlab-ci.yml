@@ -190,7 +190,7 @@ frontend-build:
 # ---------------------------
 backend-build-linux:
   stage: build-backend
-  image: python:3.12
+  image: python:3.11-bullseye
   script:
     - cd backend
     - source .venv/bin/activate
