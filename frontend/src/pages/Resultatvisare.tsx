@@ -68,31 +68,6 @@ export default function Resultatvisare() {
 	}, [competition]);
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setCompetitorData(await getCompetitorData());
-			} catch (err: unknown) {
-				setCompetitorError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel');
-			} finally {
-				setCompetitorLoading(false);
-			}
-
-			try {
-				setTimeData(await getTimeData());
-			} catch (err: unknown) {
-				setTimeError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel');
-			} finally {
-				setTimeLoading(false);
-			}
-
-			try {
-				setStationData(await getStationData());
-			} catch (err: unknown) {
-				setStationError(err instanceof Error ? err.message : typeof err === 'string' ? err : 'Okänt fel');
-			} finally {
-				setStationLoading(false);
-			}
-		};
 		fetchData();
 	}, [fetchData]);
 
