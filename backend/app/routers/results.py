@@ -9,7 +9,9 @@ router = APIRouter(prefix="/results", tags=["results"])
 
 
 @router.post("/submit", response_model=schemas.Result)
-def submit_results(data: schemas.SubmitResultsRequest, db: Session = Depends(get_db)) -> schemas.Result:
+def submit_results(
+    data: schemas.SubmitResultsRequest, db: Session = Depends(get_db)
+) -> schemas.Result:
     rows = crud.get_results(
         db, data.token
     )  # returnerar List[DriverResult] (pydantic) eller ORM

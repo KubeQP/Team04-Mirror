@@ -2,17 +2,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 import { getCompetitionData } from './api/getCompetitionData';
 import { createCompetition } from './api/postCompetitionData';
@@ -50,7 +50,7 @@ const navigationData = [
 
 export default function App() {
 	const [dialogOpen, setDialogOpen] = useState(false);
-	const [token, setToken] = useState("")
+	const [token, setToken] = useState('');
 
 	const { setCompetition } = useCompetition();
 	const [competitorsVersion, setCompetitorsVersion] = useState(0);
@@ -99,22 +99,19 @@ export default function App() {
 		fetchData();
 	}, [fetchData]);
 
-
 	const openCreateCompetitionDialog = () => {
-  	setDialogOpen(true);
+		setDialogOpen(true);
 	};
 
 	const handleAddCompetition = async () => {
-		if (!token.trim())
-			return;
+		if (!token.trim()) return;
 
 		try {
 			const newCompetition = await createCompetition(token);
 			setCompetitionData([...competitions, newCompetition]);
 
-
 			setDialogOpen(false);
-			setToken("");
+			setToken('');
 
 			// Välj den nya tävlingen automatiskt
 			handleSelectCompetition(newCompetition.id);
@@ -161,82 +158,72 @@ export default function App() {
 	};
 
 	return (
-  <ThemeProvider>
-    <TooltipProvider>
-      <div className="max-h-screen flex-col">
-        <Navbar
-          competitions={competitions}
-          selectedCompetition={selectedCompetition}
-          handleAddCompetition={openCreateCompetitionDialog}
-          handleRemoveCompetition={handleRemoveCompetition}
-          handleSelectCompetition={handleSelectCompetition}
-          navigationData={navigationData}
-        />
+		<ThemeProvider>
+			<TooltipProvider>
+				<div className="max-h-screen flex-col">
+					<Navbar
+						competitions={competitions}
+						selectedCompetition={selectedCompetition}
+						handleAddCompetition={openCreateCompetitionDialog}
+						handleRemoveCompetition={handleRemoveCompetition}
+						handleSelectCompetition={handleSelectCompetition}
+						navigationData={navigationData}
+					/>
 
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* ✅ Create competition dialog (opened from Navbar button) */}
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Skapa ny tävling</DialogTitle>
-                <DialogDescription>Ange token för tävlingen.</DialogDescription>
-              </DialogHeader>
+					<main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+						{/* ✅ Create competition dialog (opened from Navbar button) */}
+						<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+							<DialogContent className="sm:max-w-md">
+								<DialogHeader>
+									<DialogTitle>Skapa ny tävling</DialogTitle>
+									<DialogDescription>Ange token för tävlingen.</DialogDescription>
+								</DialogHeader>
 
-              <div className="grid gap-2">
-                <Label htmlFor="token">Token</Label>
-                <Input
-                  id="token"
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  placeholder="Ange token..."
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && token.trim()) {
-                      e.preventDefault();
-                      handleAddCompetition();
-                    }
-                  }}
-                />
-              </div>
+								<div className="grid gap-2">
+									<Label htmlFor="token">Token</Label>
+									<Input
+										id="token"
+										value={token}
+										onChange={(e) => setToken(e.target.value)}
+										placeholder="Ange token..."
+										onKeyDown={(e) => {
+											if (e.key === 'Enter' && token.trim()) {
+												e.preventDefault();
+												handleAddCompetition();
+											}
+										}}
+									/>
+								</div>
 
-              <DialogFooter className="sm:justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setDialogOpen(false)}
-                >
-                  Avbryt
-                </Button>
+								<DialogFooter className="sm:justify-end gap-2">
+									<Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
+										Avbryt
+									</Button>
 
-                <Button
-                  type="button"
-                  onClick={handleAddCompetition}
-                  disabled={!token.trim()}
-                >
-                  Skapa
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+									<Button type="button" onClick={handleAddCompetition} disabled={!token.trim()}>
+										Skapa
+									</Button>
+								</DialogFooter>
+							</DialogContent>
+						</Dialog>
 
-          {/* ✅ Existing page content */}
-          {competitionLoading ? (
-            <div className="text-center py-20 text-gray-500">Laddar tävlingar...</div>
-          ) : competitionError ? (
-            <div className="text-center py-20 text-red-500">
-              Fel vid hämtning av tävlingar: {competitionError}
-            </div>
-          ) : competitions.length === 0 ? (
-            <div className="text-center py-20 text-gray-500">
-              Inga tävlingar hittades. Lägg till en ny tävling ovan.
-            </div>
-          ) : (
-            <Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
-          )}
-        </main>
+						{/* ✅ Existing page content */}
+						{competitionLoading ? (
+							<div className="text-center py-20 text-gray-500">Laddar tävlingar...</div>
+						) : competitionError ? (
+							<div className="text-center py-20 text-red-500">Fel vid hämtning av tävlingar: {competitionError}</div>
+						) : competitions.length === 0 ? (
+							<div className="text-center py-20 text-gray-500">
+								Inga tävlingar hittades. Lägg till en ny tävling ovan.
+							</div>
+						) : (
+							<Outlet context={{ competitorsVersion, notifyCompetitorAdded }} />
+						)}
+					</main>
 
-        <Toaster />
-      </div>
-    </TooltipProvider>
-  </ThemeProvider>
-);
+					<Toaster />
+				</div>
+			</TooltipProvider>
+		</ThemeProvider>
+	);
 }

@@ -78,6 +78,7 @@ class CompetitionsReg(BaseModel):
 class CompetitionsCreate(BaseModel):
     token: str
 
+
 class CompetitionsOut(BaseModel):
     id: int
     token: str | None = None
