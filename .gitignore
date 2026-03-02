@@ -78,3 +78,58 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.env/
+.venv/
+venv/
+ENV/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Node / frontend
+# =========================
+node_modules/
+dist/
+build/
+.vite/
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Logs & runtime
+# =========================
+*.log
+logs/
+
+# =========================
+# OS / editor junk
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# =========================
+# Build artifacts / temp
+# =========================
+*.tmp
+*.swp

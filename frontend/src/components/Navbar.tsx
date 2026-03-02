@@ -1,6 +1,9 @@
 import { MenuIcon, TimerIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
+import type { CompetitionData } from '@/types';
+
+import { CompetitionDropdown } from './CompetitionDropdown';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
@@ -9,9 +12,25 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui
 type NavigationItem = {
 	title: string;
 	href: string;
-}[];
+};
 
-const Navbar = ({ navigationData }: { navigationData: NavigationItem }) => {
+interface NavbarProps {
+	competitions: Array<CompetitionData>;
+	selectedCompetition: number | null;
+	handleAddCompetition: () => void;
+	handleRemoveCompetition: (id: number) => void;
+	handleSelectCompetition: (id: number) => void;
+	navigationData: NavigationItem[];
+}
+
+const Navbar = ({
+	competitions,
+	selectedCompetition,
+	handleAddCompetition,
+	handleRemoveCompetition,
+	handleSelectCompetition,
+	navigationData,
+}: NavbarProps) => {
 	return (
 		<header className="sticky top-0 z-50 border-b bg-background mb-4">
 			<div className="mx-auto flex max-w-7xl items-center font-semibold justify-between gap-8 px-4 py-6 sm:px-6">
@@ -43,7 +62,7 @@ const Navbar = ({ navigationData }: { navigationData: NavigationItem }) => {
 						<div className="h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center">
 							<TimerIcon className="size-5" />
 						</div>
-						<p className="text-primary">PlaceholderAppName</p>
+						<p className="text-primary">Team 04</p>
 					</NavLink>
 					{navigationData.slice(navigationData.length / 2 + 1).map((item) => (
 						<NavLink
@@ -70,7 +89,14 @@ const Navbar = ({ navigationData }: { navigationData: NavigationItem }) => {
 					))}
 				</div>
 
-				<div className="hidden absolute right-6 md:block">
+				<div className="hidden absolute right-6 md:flex gap-3 items-center">
+					<CompetitionDropdown
+						competitions={competitions}
+						selectedCompetition={selectedCompetition}
+						onAdd={handleAddCompetition}
+						onRemove={handleRemoveCompetition}
+						onSelect={handleSelectCompetition}
+					/>
 					<ThemeToggle />
 				</div>
 
@@ -94,6 +120,16 @@ const Navbar = ({ navigationData }: { navigationData: NavigationItem }) => {
 							</SheetHeader>
 
 							<nav className="mt-4 flex flex-col gap-4 ml-2">
+								<div className="mb-4">
+									<CompetitionDropdown
+										competitions={competitions}
+										selectedCompetition={selectedCompetition}
+										onAdd={handleAddCompetition}
+										onRemove={handleRemoveCompetition}
+										onSelect={handleSelectCompetition}
+									/>
+								</div>
+
 								{navigationData.map((item) => (
 									<NavLink key={item.href} to={item.href} className="text-lg font-medium hover:text-primary">
 										{item.title}

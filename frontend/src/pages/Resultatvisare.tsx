@@ -1,6 +1,7 @@
 import { CrownIcon } from 'lucide-react';
-import { type JSX, useEffect, useState } from 'react';
+import { type JSX, useCallback,useEffect, useState } from 'react';
 
+import { useCompetition } from '@/components/Competition';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -10,7 +11,10 @@ import { getTimeData } from '../api/getTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 
 export default function Resultatvisare() {
-	const [competitorData, setCompetitorData] = useState<CompetitorData[] | null>(null);
+	//declaring constants for the imports
+	const { competition } = useCompetition();
+
+	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
 	const [competitorError, setCompetitorError] = useState<string | null>(null);
 
@@ -21,6 +25,47 @@ export default function Resultatvisare() {
 	const [stationData, setStationData] = useState<StationData[] | null>(null);
 	const [stationLoading, setStationLoading] = useState(true);
 	const [stationError, setStationError] = useState<string | null>(null);
+
+	const fetchData = useCallback(async () => {
+		// Competitor data
+		try {
+			const result = await getCompetitorData();
+			setCompetitorData(result.filter((c) => c.competition_id === competition));
+			console.log('Fetched competitor data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setCompetitorError(err.message);
+			else if (typeof err === 'string') setCompetitorError(err);
+			else setCompetitorError('Ett okänt fel inträffade');
+		} finally {
+			setCompetitorLoading(false);
+		}
+
+		// Time data
+		try {
+			const result = await getTimeData();
+			setTimeData(result.filter((c) => c.competition_id === competition));
+			console.log('Fetched time data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setTimeError(err.message);
+			else if (typeof err === 'string') setTimeError(err);
+			else setTimeError('Ett okänt fel inträffade');
+		} finally {
+			setTimeLoading(false);
+		}
+
+		// Station data
+		try {
+			const result = await getStationData();
+			setStationData(result.filter((c) => c.competition_id === competition));
+			console.log('Fetched station data');
+		} catch (err: unknown) {
+			if (err instanceof Error) setStationError(err.message);
+			else if (typeof err === 'string') setStationError(err);
+			else setStationError('Ett okänt fel inträffade');
+		} finally {
+			setStationLoading(false);
+		}
+	}, [competition]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -49,7 +94,7 @@ export default function Resultatvisare() {
 			}
 		};
 		fetchData();
-	}, []);
+	}, [fetchData]);
 
 	function formatTotalTime(totalSeconds: number) {
 		const h = Math.floor(totalSeconds / 3600);

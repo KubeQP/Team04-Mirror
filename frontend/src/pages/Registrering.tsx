@@ -1,7 +1,8 @@
 import { MoreHorizontalIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
+import { useCompetition } from '@/components/Competition';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -30,6 +31,7 @@ import { API_BASE_URL } from '../config/api';
 type Competitor = {
 	start_number: string;
 	name: string;
+	competition_id: number;
 };
 
 type OutletCtx = {
@@ -38,6 +40,7 @@ type OutletCtx = {
 };
 
 export default function Registrering() {
+	const { competition } = useCompetition();
 	const { notifyCompetitorAdded } = useOutletContext<OutletCtx>();
 
 	const [reg, setReg] = useState('');
@@ -54,16 +57,16 @@ export default function Registrering() {
 		setEditName(competitor.name);
 	};
 
-	const fetchCompetitors = async () => {
+	const fetchCompetitors = useCallback(async () => {
 		const res = await fetch(`${API_BASE_URL}/api/competitors/`);
 		if (!res.ok) return;
 		const data = await res.json();
-		setCompetitors(data);
-	};
+		setCompetitors((data as Array<Competitor>).filter((c) => c.competition_id === competition));
+	}, [competition]);
 
 	useEffect(() => {
 		fetchCompetitors();
-	}, []);
+	}, [fetchCompetitors]);
 
 	const addReg = async () => {
 		console.log('add reg');
@@ -94,6 +97,7 @@ export default function Registrering() {
 				body: JSON.stringify({
 					start_number: formattedReg,
 					name: name,
+					competition_id: competition,
 				}),
 			});
 
@@ -135,8 +139,13 @@ export default function Registrering() {
 								id="startNbrInput"
 								placeholder="123"
 								type="text"
+								inputMode="numeric"
+								maxLength={3}
 								value={reg}
-								onChange={(e) => setReg(e.target.value)}
+								onChange={(e) => {
+									const value = e.target.value.replace(/\D/g, '').slice(0, 3);
+									setReg(value);
+								}}
 							/>
 						</Field>
 						<Field>

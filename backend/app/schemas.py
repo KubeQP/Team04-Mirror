@@ -10,12 +10,14 @@ class RecordTimeIn(BaseModel):
     start_number: str | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
+    competition_id: int
 
 
 class CompetitorOut(BaseModel):
     id: int
     start_number: str
     name: str
+    competition_id: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,6 +27,8 @@ class TimeEntryOut(BaseModel):
     competitor_id: int | None = None
     station_id: int | None = None
     timestamp: datetime
+    start_number: str | None = None
+    competition_id: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,17 +36,20 @@ class TimeEntryOut(BaseModel):
 class CompetitorReg(BaseModel):
     start_number: str
     name: str
+    competition_id: int
 
 
 class StationReg(BaseModel):
     station_name: str
     order: str
+    competition_id: int
 
 
 class StationOut(BaseModel):
     id: int
     station_name: str
     order: str
+    competition_id: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -51,6 +58,7 @@ class CompetitorUpdate(BaseModel):
     id: int | None = None
     start_number: str | None = None
     name: str | None = None
+    competition_id: int | None = None
 
 
 class TimeEntryUpdate(BaseModel):
@@ -58,3 +66,31 @@ class TimeEntryUpdate(BaseModel):
     competitor_id: int | None = None
     timestamp: datetime | None = None
     station_id: int | None = None
+    start_number: str | None = None
+    competition_id: int | None = None
+
+
+class CompetitionsReg(BaseModel):
+    id: int
+
+
+class CompetitionsOut(BaseModel):
+    id: int
+
+
+class CompetitionsRemove(BaseModel):
+    id: int
+
+
+class DriverResult(BaseModel):
+    plac: str
+    startNbr: str
+    name: str
+    totalTime: str
+    startTime: str
+    endTime: str
+
+
+class Result(BaseModel):
+    teamToken: str
+    jsonResult: list[DriverResult]
