@@ -20,7 +20,7 @@
 
 \subsection*{2. Ladda ner och packa upp}
 \begin{itemize}[leftmargin=*]
-    \item Hämta zip-filen som innehåller \texttt{app} mappen och dokumentation.
+    \item Hämta zip-filen som innehåller \texttt{app}-mappen och dokumentation.
     \item Packa upp zip-filen på servern i önskad katalog.
 \end{itemize}
 
@@ -37,12 +37,36 @@
 
 \subsection*{5. Starta applikationen}
 \begin{itemize}[leftmargin=*]
-    \item Gå till \texttt{app/backend}.
+    \item Gå till backend-mappen:
+    \begin{verbatim}
+    cd app/backend
+    \end{verbatim}
+
+    \item Starta en ny screen-session:
+    \begin{verbatim}
+    screen -S team04
+    \end{verbatim}
+
     \item Kör backend-binären:
     \begin{verbatim}
     ./run
     \end{verbatim}
-    \item Applikationen startar på den host och port som är satt innan programet kompilerades. (exempel: \texttt{http://100.84.14.107:8000}).
+
+    \item För att lämna screen men låta programmet fortsätta köra:
+    \begin{verbatim}
+    Ctrl + A, sedan D
+    \end{verbatim}
+    (Detta kallas att "detach:a" sessionen.)
+
+    \item För att se aktiva screen-sessioner:
+    \begin{verbatim}
+    screen -ls
+    \end{verbatim}
+
+    \item För att återansluta till sessionen:
+    \begin{verbatim}
+    screen -r team04
+    \end{verbatim}
 \end{itemize}
 
 \subsection*{6. Verifiering}
@@ -54,6 +78,7 @@
 \begin{itemize}[leftmargin=*]
     \item Inga utvecklingsberoenden behövs på servern.
     \item Endast \texttt{app}-mappen behöver laddas upp.
+    \item Screen gör att applikationen fortsätter köra även om SSH-anslutningen stängs.
 \end{itemize}
 
 \end{document}
