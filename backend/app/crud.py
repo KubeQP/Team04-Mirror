@@ -225,9 +225,9 @@ def fmt_timedelta(td: timedelta) -> str:
 
 def get_results(db: Session, token: str) -> list[DriverResult]:
     competitors = get_competitors(db)
-    if token == "c2dd9cc9-1cee-4435-82f1-7283fd0ef883":
+    if token == "97cea6ae-fc50-45b6-b231-43c92b5b8832":
         competitors = [r for r in competitors if r.competition_id == 1]
-    elif token == "ef1246f1-ab17-4fb2-ad02-ec36824ac821":
+    elif token == "5de9dfe9-2ad3-4b42-a56c-55521a71f028":
         competitors = [r for r in competitors if r.competition_id == 2]
 
     finished: list[tuple[int, DriverResult]] = []

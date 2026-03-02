@@ -94,3 +94,7 @@ class DriverResult(BaseModel):
 class Result(BaseModel):
     teamToken: str
     jsonResult: list[DriverResult]
+
+
+class SubmitResultsRequest(BaseModel):
+    token: str

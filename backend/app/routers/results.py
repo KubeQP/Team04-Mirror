@@ -9,10 +9,9 @@ router = APIRouter(prefix="/results", tags=["results"])
 
 
 @router.post("/submit", response_model=schemas.Result)
-def submit_results(db: Session = Depends(get_db)) -> schemas.Result:
-    token = "c2dd9cc9-1cee-4435-82f1-7283fd0ef883"
+def submit_results(data: schemas.SubmitResultsRequest, db: Session = Depends(get_db)) -> schemas.Result:
     rows = crud.get_results(
-        db, token
+        db, data.token
     )  # returnerar List[DriverResult] (pydantic) eller ORM
 
-    return schemas.Result(teamToken=token, jsonResult=rows)
+    return schemas.Result(teamToken=data.token, jsonResult=rows)
