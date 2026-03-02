@@ -42,8 +42,10 @@ I frontenden möts användaren av en startsida. På samtliga sidor finns en knap
 Frontend innehåller följande sidor:
 
 \subsection{Stationshantering}
-Innehåller två inmatningsfält och en registreringsknapp där man kan registrera stationer genom att skriva in stationsnamn och ordning.  
-Under formuläret visas en tabell med de registrerade stationerna. På varje stationsrad finns även en radera-funktion som tar bort stationen. 
+Innehåller ett inmatningsfält och en registreringsknapp där man kan registrera stationer genom att skriva in stationsnamn och trycka på knappen. 
+Stationen kommer automatiskt komma sist i ordningen men det kan ändras i tabellen nedan.
+Under formuläret visas en tabell med de registrerade stationerna. 
+På varje stationsrad finns pilar där man kan ändra ordning på stationerna och även en radera-funktion som tar bort stationen. 
 
 \begin{figure}[H]
   \centering
@@ -64,8 +66,11 @@ Under formuläret visas en tabell med de registrerade tävlande. Det finns även
   \label{fig:Registreringssida}
 \end{figure}
 
-\subsection{Startsidan}
-Innehåller en resultatvisare som har en lista på alla tävlande med rang, startnummer, namn och totaltid, sorterad på totaltid.
+\subsection{Resultatvisare}
+Innehåller en resultatvisare som har en lista på alla tävlande med rang, startnummer, namn, stationstid och totaltid, sorterad på totaltid. 
+Under varje stationstid står det differansen till förra stationen. 
+För att förare ska visas upp krävs det att de har en starttid.
+De kommer även inte visas upp om de har mer än två tider på samma station eller om det finns en tidigare tidpunkt på en senare station.
 
 \begin{figure}[H]
   \centering
@@ -74,12 +79,12 @@ Innehåller en resultatvisare som har en lista på alla tävlande med rang, star
   \label{fig:PlaceHolderAppName}
 \end{figure}
 
-\subsection{Stopptid}
+\subsection{Tidsregistrering}
 Innehåller två dropdown-menyer och ett sökfält där man väljer bland stationer och registrerade tävlande.  
 
 Det finns två knappar:
 \begin{enumerate}
-  \item Registrerar stopptiden
+  \item Registrerar tiden
   \item Uppdaterar listan
 \end{enumerate}
 
@@ -93,15 +98,17 @@ Under dessa visas 2 tabeller: en tabell över registrerade tävlande med deras s
 \end{figure}
 
 \subsection{Admin}
-En kontinuerligt uppdaterad vy som visar registrerade tävlande med rang, startnummer, namn och total tid.
+En kontinuerligt uppdaterad vy som visar registrerade tävlande med startnummer, namn, tidpunkter på varje station och total tid.
 
 Här presenteras all information om de tävlande i två tabeller:
 \begin{itemize}
   \item Station, startnummer och tid
-  \item Startnummer, namn, starttid, måltid och totalt resultat (sorterad på startnummer)
+  \item Startnummer, namn, tidpunkter för varje station och totalt resultat (sorterad på startnummer)
 \end{itemize}
 
 Röda rutor indikerar felaktig registrering.
+Till exempel om det är två eller fler tider på samma station.
+Då ser man även alla tiderna.
 
 \begin{figure}[H]
   \centering
