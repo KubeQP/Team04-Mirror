@@ -247,37 +247,49 @@ export default function Admin() {
 		});
 	}
 
-	const validateStationDuplicates = useCallback((table: Cell[][]): Cell[][] => {
-		const updated = table.map((row) => [...row]);
+	const validateStationDuplicates = useCallback(
+		(table: Cell[][]): Cell[][] => {
+			const updated = table.map((row) => [...row]);
 
-		const seen = new Map<string, number[]>();
+			const seen = new Map<string, number[]>();
 
-		for (let i = 1; i < updated.length; i++) {
-			const row = updated[i];
+			for (let i = 1; i < updated.length; i++) {
+				const row = updated[i];
 
-			const stationId = row[0].id;
-			const startNumber = row[1].value;
+				const stationId = row[0].id;
+				const startNumber = row[1].value;
 
-			const key = `${stationId}-${startNumber}`;
+				const key = `${stationId}-${startNumber}`;
 
-			if (!seen.has(key)) {
-				seen.set(key, [i]);
-			} else {
-				seen.get(key)?.push(i);
+				if (!seen.has(key)) {
+					seen.set(key, [i]);
+				} else {
+					seen.get(key)?.push(i);
+				}
 			}
-		}
 
-		seen.forEach((indexes) => {
-			if (indexes.length > 1) {
-				indexes.forEach((i) => {
-					updated[i][0] = { ...updated[i][0], correct: false };
-					updated[i][1] = { ...updated[i][1], correct: false };
-				});
-			}
-		});
+			seen.forEach((indexes) => {
+				if (indexes.length > 1) {
+					indexes.forEach((i) => {
+						updated[i][0] = { ...updated[i][0], correct: false };
+						updated[i][1] = { ...updated[i][1], correct: false };
+					});
+				}
+			});
 
-		return updated;
-	}, []);
+			table.forEach((row, index) => {
+				if (index === 0) return;
+
+				const result = competitorData?.find((c) => c.start_number === row[1].value);
+				if (!result) {
+					updated[index][1] = { ...updated[index][1], correct: false };
+				}
+			});
+
+			return updated;
+		},
+		[competitorData],
+	);
 
 	// Bygg stationstabell
 	useEffect(() => {
