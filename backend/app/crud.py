@@ -1,5 +1,6 @@
 # backend/app/crud.py
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -104,9 +105,23 @@ def record_new_station(
     return entry
 
 
+def update_station_order(db: Session, stations: list[dict[str, Any]]) -> None:
+    for station_data in stations:
+        station = (
+            db.query(Station)
+            .filter(Station.station_name == station_data["station_name"])
+            .first()
+        )
+
+        if station:
+            station.order = int(station_data["order"])  # type: ignore
+
+    db.commit()
+
+
 def get_stations(db: Session) -> list[Station]:
     """Hämta alla stationer från databasen."""
-    return db.query(Station).all()
+    return db.query(Station).order_by(Station.order).all()
 
 
 def update_competitor(
