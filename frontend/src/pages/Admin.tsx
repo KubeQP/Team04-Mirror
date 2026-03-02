@@ -25,7 +25,7 @@ import type { CompetitorData, StationData, TimeData } from '../types';
 export default function Admin() {
 	const { competition } = useCompetition();
 
-	const [chosenToken, setChosenToken] = useState("")
+	const [chosenToken, setChosenToken] = useState('');
 	const [tokenLoading, setTokenLoading] = useState(false);
 	const [tokenError, setTokenError] = useState<string | null>(null);
 
@@ -45,27 +45,26 @@ export default function Admin() {
 
 	const [resultView, setResultView] = useState<'resultat' | 'startnummer'>('startnummer');
 
-
 	const submitToken = async () => {
-		 if (!chosenToken.trim()) {
-      setTokenError("Please enter a token");
-      return;
-    }
+		if (!chosenToken.trim()) {
+			setTokenError('Please enter a token');
+			return;
+		}
 
-    setTokenLoading(true);
-    setTokenError(null);
+		setTokenLoading(true);
+		setTokenError(null);
 
-    try {
-      const result = await submitResults(chosenToken);
-      console.log("Backend responded:", result);
-    } catch (err: unknown) {
+		try {
+			const result = await submitResults(chosenToken);
+			console.log('Backend responded:', result);
+		} catch (err: unknown) {
 			if (err instanceof Error) setTokenError(err.message);
 			else if (typeof err === 'string') setTokenError(err);
 			else setTokenError('Ett okänt fel inträffade');
-    } finally {
-      setTokenLoading(false);
-    }
-  };
+		} finally {
+			setTokenLoading(false);
+		}
+	};
 
 	const fetchData = useCallback(async () => {
 		// Competitor data
@@ -464,7 +463,7 @@ export default function Admin() {
 					onClick={submitToken}
 					disabled={tokenLoading || !chosenToken.trim()}
 				>
-					{tokenLoading ? "Submitting..." : "Submit token"}
+					{tokenLoading ? 'Submitting...' : 'Submit token'}
 				</button>
 
 				{tokenError && <p className="text-sm text-destructive">{tokenError}</p>}
