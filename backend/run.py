@@ -1,6 +1,8 @@
 # backend/run.py
 import os
 from urllib.parse import urlparse
+from app.main import app
+
 
 import uvicorn
 from dotenv import load_dotenv
@@ -23,4 +25,4 @@ print(f"API_BASE_URL = {api_url}")
 print(f"Starting server on {host}:{port}")
 
 # Start Uvicorn
-uvicorn.run("app.main:app", host=host, port=port, reload=False)
+uvicorn.run(app, host=host, port=port, reload=False)
