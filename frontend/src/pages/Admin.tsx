@@ -17,12 +17,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getCompetitorData } from '../api/getCompetitorData';
 import { getStationData } from '../api/getStationData';
 import { getTimeData } from '../api/getTimeData';
+import { submitResults } from '../api/postResults';
 import { editTimeData } from '../api/putTimeData';
 import type { CompetitorData, StationData, TimeData } from '../types';
 // src/pages/Admin.tsx
 
 export default function Admin() {
 	const { competition } = useCompetition();
+
+	const [chosenToken, setChosenToken] = useState("")
+	const [tokenLoading, setTokenLoading] = useState(false);
+	const [tokenError, setTokenError] = useState<string | null>(null);
 
 	const [competitorData, setCompetitorData] = useState<Array<CompetitorData> | null>(null);
 	const [competitorLoading, setCompetitorLoading] = useState(true);
@@ -39,6 +44,28 @@ export default function Admin() {
 	const [stationTable, setStationTable] = useState<Cell[][]>([]);
 
 	const [resultView, setResultView] = useState<'resultat' | 'startnummer'>('startnummer');
+
+
+	const submitToken = async () => {
+		 if (!chosenToken.trim()) {
+      setTokenError("Please enter a token");
+      return;
+    }
+
+    setTokenLoading(true);
+    setTokenError(null);
+
+    try {
+      const result = await submitResults(chosenToken);
+      console.log("Backend responded:", result);
+    } catch (err: unknown) {
+			if (err instanceof Error) setTokenError(err.message);
+			else if (typeof err === 'string') setTokenError(err);
+			else setTokenError('Ett okänt fel inträffade');
+    } finally {
+      setTokenLoading(false);
+    }
+  };
 
 	const fetchData = useCallback(async () => {
 		// Competitor data
@@ -409,6 +436,27 @@ export default function Admin() {
 	return (
 		<div>
 			<h1 className="text-xl font-bold pb-4">Adminsida:</h1>
+			<div className="mb-6 flex items-end gap-3">
+				<div className="flex-1">
+					<label className="text-sm font-medium">Team token</label>
+					<Input
+						value={chosenToken}
+						onChange={(e) => setChosenToken(e.target.value)}
+						placeholder="Enter token..."
+						disabled={tokenLoading}
+					/>
+				</div>
+
+				<button
+					className="px-4 py-2 rounded bg-primary text-primary-foreground disabled:opacity-50"
+					onClick={submitToken}
+					disabled={tokenLoading || !chosenToken.trim()}
+				>
+					{tokenLoading ? "Submitting..." : "Submit token"}
+				</button>
+
+				{tokenError && <p className="text-sm text-destructive">{tokenError}</p>}
+			</div>
 			<div>
 				{competitorLoading || timeLoading || stationLoading ? (
 					<p>Laddar data...</p>
