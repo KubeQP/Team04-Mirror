@@ -111,23 +111,27 @@ export default function Resultatvisare() {
 		stationTimes: (JSX.Element | string)[];
 	}
 
-	let Results: ResultObject[] = [];
+	let results: ResultObject[] = [];
 	let tableArray: (string | JSX.Element)[][] = [];
+
+	const roundToNearestSecond = (date: Date) => {
+		return new Date(Math.round(date.getTime() / 1000) * 1000);
+	};
 
 	if (competitorData && timeData && stationData) {
 		const relevantStations = stationData;
 
-		Results = competitorData
+		results = competitorData
 			.map((competitor) => {
-				// Collect exactly one timestamp per station
 				const allStationTimes: (Date | null)[] = relevantStations.map((station) => {
 					const matches = timeData.filter((td) => td.competitor_id === competitor.id && td.station_id === station.id);
 
-					// Must be exactly one timestamp
 					if (matches.length !== 1) return null;
 
-					const date = new Date(matches[0].timestamp);
-					return isNaN(date.getTime()) ? null : date;
+					const rawDate = new Date(matches[0].timestamp);
+					if (isNaN(rawDate.getTime())) return null;
+
+					return roundToNearestSecond(rawDate);
 				});
 
 				const start = allStationTimes[0];
@@ -142,8 +146,7 @@ export default function Resultatvisare() {
 					}
 				}
 
-				// Must have valid start + finish
-				if (!start) return null;
+				if (!start || !finish) return null;
 
 				const stationTimes: (JSX.Element | string)[] = [];
 
@@ -163,8 +166,8 @@ export default function Resultatvisare() {
 						continue;
 					}
 
-					if (prev && curr > prev) {
-						const diffSeconds = Math.round((curr.getTime() - prev.getTime()) / 1000);
+					if (prev) {
+						const diffSeconds = (curr.getTime() - prev.getTime()) / 1000;
 
 						stationTimes.push(
 							<div className="flex flex-col">
@@ -176,7 +179,8 @@ export default function Resultatvisare() {
 						stationTimes.push(timeString);
 					}
 				}
-				const totalSeconds = finish ? Math.round((finish.getTime() - start.getTime()) / 1000) : -1;
+
+				const totalSeconds = (finish.getTime() - start.getTime()) / 1000;
 
 				return {
 					Rang: 0,
@@ -188,18 +192,31 @@ export default function Resultatvisare() {
 			})
 			.filter((r): r is ResultObject => r !== null);
 
-		Results.sort((a, b) => {
+		results.sort((a, b) => {
 			if (a.Total < 0) return 1;
 			if (b.Total < 0) return -1;
 			return a.Total - b.Total;
 		});
-		Results.forEach((r, i) => (r.Rang = i + 1));
+
+		results.forEach((_, i) => {
+			if (i === 0) {
+				results[i].Rang = 1;
+
+				return;
+			}
+
+			if (results[i].Total === results[i - 1].Total) {
+				results[i].Rang = results[i - 1].Rang;
+			} else {
+				results[i].Rang = i + 1;
+			}
+		});
 
 		const headerRow: string[] = ['Rang', 'Nr.', 'Namn', ...relevantStations.map((s) => s.station_name), 'Totaltid'];
 
 		tableArray = [
 			headerRow,
-			...Results.map((r) => [
+			...results.map((r) => [
 				r.Rang.toString(),
 				r.Nr,
 				r.Name,
