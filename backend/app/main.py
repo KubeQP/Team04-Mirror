@@ -2,7 +2,6 @@
 import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime
 from urllib.parse import urlparse
 
 from dotenv import load_dotenv
@@ -11,78 +10,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
-from .database import Base, SessionLocal, engine
-from .models import Competition, Competitor, Station, TimeEntry
+from .database import Base, engine
 from .routers import competitions, competitors, results, stations, times
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+async def lifespan(_: FastAPI) -> AsyncGenerator[None]:
     # Körs vid uppstart
     # Lägg till temporär testdata, om databasen är tom.
     # Bra under utveckling/testining, men ta bort i produktion!
     # EDIT: Detta kan nog styras via en ENV-variabel senare, för att
     # skilja på dev/prod. Vi vill ju inte att testdata skickas med i
     # produktion eller release builds.
-    db = SessionLocal()
-    if db.query(Competitor).count() == 0:
-        competition0 = Competition()
-        db.add(competition0)
-        db.commit()
-        competitors = []
-        competitors.append(
-            Competitor(start_number="123", name="Alice", competition_id=1)
-        )
-        competitors.append(Competitor(start_number="458", name="Bob", competition_id=1))
-
-        db.add_all(competitors)
-        db.commit()
-
-        for i in competitors:
-            db.refresh(i)
-
-        station1 = Station(station_name="start", order="0", competition_id=1)
-        station2 = Station(station_name="mål", order="1", competition_id=1)
-        db.add_all([station1, station2])
-        db.commit()
-
-        db.refresh(station1)
-        db.refresh(station2)
-
-        db.add_all(
-            [
-                # Alice (competitors[0]) – finisher
-                TimeEntry(
-                    competitor_id=competitors[0].id,
-                    timestamp=datetime(2025, 6, 27, 12, 31, 39),
-                    station_id=station1.id,
-                    competition_id=1,
-                ),
-                TimeEntry(
-                    competitor_id=competitors[1].id,
-                    timestamp=datetime(2025, 6, 27, 12, 32, 15),
-                    station_id=station1.id,
-                    competition_id=1,
-                ),
-                TimeEntry(
-                    competitor_id=competitors[0].id,
-                    timestamp=datetime(2025, 6, 27, 12, 47, 38),
-                    station_id=station2.id,
-                    competition_id=1,
-                ),
-                TimeEntry(
-                    competitor_id=competitors[1].id,
-                    timestamp=datetime(2025, 6, 27, 12, 52, 5),
-                    station_id=station2.id,
-                    competition_id=1,
-                ),
-            ]
-        )
-        db.commit()
-
-    db.close()
 
     yield  # startup done
 
