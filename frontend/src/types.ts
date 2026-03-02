@@ -28,3 +28,19 @@ export interface StationData {
 export interface CompetitionData {
 	id: number;
 }
+
+// ../types/results.ts
+
+export type DriverResult = {
+  plac: string;
+  startNbr: string;
+  name: string;
+  totalTime: string;
+  startTime: string;
+  endTime: string;
+};
+
+export type Result = {
+  teamToken: string;
+  jsonResult: DriverResult[];
+};
