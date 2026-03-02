@@ -28,6 +28,7 @@ export interface StationData {
 
 export interface CompetitionData {
 	id: number;
+	token: string;
 }
 
 // ../types/results.ts
