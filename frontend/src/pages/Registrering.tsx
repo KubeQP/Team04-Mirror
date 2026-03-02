@@ -205,14 +205,14 @@ export default function Registrering() {
 						</DialogTrigger>
 						<DialogContent className="sm:max-w-md">
 							<DialogHeader>
-								<DialogDescription>Paste in the competitiors you wish to import with the format.</DialogDescription>
+								<DialogDescription>Klistra in de tävlande man vill importa med foljande format.</DialogDescription>
 							</DialogHeader>
 							<div className="flex items-center gap-2">
 								<div className="grid flex-1 gap-2">
 									<Textarea
 										id="textarea-message"
 										placeholder="019, Alice och Bob
-									039, Charlie och Denver"
+039, Charlie och Denver"
 										value={textareaValue}
 										onChange={(e) => setTextareaValue(e.target.value)}
 									/>
