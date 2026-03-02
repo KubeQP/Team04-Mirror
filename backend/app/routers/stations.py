@@ -30,7 +30,7 @@ def reg_station(
     }
 
 
-@router.patch("/updateOrder")
+@router.patch("/updateOrder/")
 def update_station_order(
     stations: list[schemas.StationReg],
     db: Session = Depends(get_db),
