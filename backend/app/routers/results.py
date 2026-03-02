@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from .. import crud, schemas
 from ..database import get_db
+from ..models import Competition
 
 router = APIRouter(prefix="/results", tags=["results"])
 
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/results", tags=["results"])
 def submit_results(
     data: schemas.SubmitResultsRequest, db: Session = Depends(get_db)
 ) -> schemas.Result:
-    competition = db.query(crud.Competition).filter_by(id=data.competition_id).first()
+    competition = db.query(Competition).filter_by(id=data.competition_id).first()
     if not competition:
         return schemas.Result(teamToken="", jsonResult=[])
 
