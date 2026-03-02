@@ -99,11 +99,17 @@ export default function RegistreringStoppTid() {
 	);
 
 	const recordStopTimeNow = async () => {
+		if (!selectedStartNumber?.trim()) throw new Error('Startnummer måste anges');
+		if (isNaN(Number(selectedStartNumber))) throw new Error('Startnummer måste vara ett nummer');
+
+		const selectedStartNumberWithoutInitialZeros = selectedStartNumber.replace(/^0+/, '');
+		const formattedSelectedStartNumber = selectedStartNumberWithoutInitialZeros.padStart(3, '0');
+
 		const response = await fetch(`${API_BASE_URL}/api/times/record`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				start_number: selectedStartNumber,
+				start_number: formattedSelectedStartNumber,
 				station_id: selectedStationId,
 				timestamp: new Date().toISOString(),
 				competition_id: competition,
@@ -117,7 +123,7 @@ export default function RegistreringStoppTid() {
 		// Create local entry
 		const newEntry: LocalTimeEntry = {
 			id,
-			start_number: selectedStartNumber || null,
+			start_number: formattedSelectedStartNumber || null,
 			name: selectedCompetitor?.name,
 			station_id: selectedStationId as number,
 			station_name: stations.find((s) => s.id === selectedStationId)?.station_name,
@@ -199,71 +205,72 @@ export default function RegistreringStoppTid() {
 					</Tooltip>
 				</div>
 			</Field>
-			<Field className="my-4">
-				<FieldLabel>Välj tävlande</FieldLabel>
-				<Field orientation="horizontal" className="gap-2">
-					<Combobox
-						items={competitors}
-						value={selectedStartNumber ?? ''}
-						onInputValueChange={(value) => setSelectedStartNumber(value === '' ? null : value)}
-					>
-						<ComboboxInput placeholder="Sök tävlande..." className="w-1/4" maxLength={3} />
-						<ComboboxContent>
-							<ComboboxEmpty>Kunde inte hitta några tävlande.</ComboboxEmpty>
-							<ComboboxList>
-								{(competitor: Competitor) => (
-									<ComboboxItem key={competitor.start_number} value={competitor.start_number}>
-										<Item size="sm" className="p-0">
-											<ItemContent>
-												<ItemTitle className="whitespace-nowrap">{competitor.start_number}</ItemTitle>
-												<ItemDescription>{competitor.name}</ItemDescription>
-											</ItemContent>
-										</Item>
-									</ComboboxItem>
-								)}
-							</ComboboxList>
-						</ComboboxContent>
-					</Combobox>
-					<Button
-						type="button"
-						disabled={!selectedStationId}
-						onClick={async () => {
-							toast.promise(recordStopTimeNow(), {
-								loading: 'Registrerar stopptid...',
-								success: () =>
-									selectedStartNumber
-										? `Stopptid registrerad för: ${selectedCompetitor?.name ?? ''} (${selectedStartNumber})`
-										: 'Stopptid registrerad utan kopplad tävlande',
-								error: 'Kunde inte registrera stopptid',
-							});
-						}}
-					>
-						Registrera tid nu
-					</Button>
-					<Button
-						type="button"
-						variant="secondary"
-						onClick={async () => {
-							toast.promise(
-								(async () => {
-									await fetchData();
+			<form
+				onSubmit={async (e) => {
+					e.preventDefault();
+					toast.promise(recordStopTimeNow(), {
+						loading: 'Registrerar stopptid...',
+						success: () =>
+							selectedStartNumber
+								? `Stopptid registrerad för: ${selectedCompetitor?.name ?? ''} (${selectedStartNumber})`
+								: 'Stopptid registrerad utan kopplad tävlande',
+						error: 'Kunde inte registrera stopptid',
+					});
+				}}
+			>
+				<Field className="my-4">
+					<FieldLabel>Välj tävlande</FieldLabel>
+					<Field orientation="horizontal" className="gap-2">
+						<Combobox
+							items={competitors}
+							value={selectedStartNumber ?? ''}
+							onInputValueChange={(value) => setSelectedStartNumber(value === '' ? null : value)}
+						>
+							<ComboboxInput placeholder="Sök tävlande..." className="w-1/4" maxLength={3} />
+							<ComboboxContent>
+								<ComboboxEmpty>Kunde inte hitta några tävlande.</ComboboxEmpty>
+								<ComboboxList>
+									{(competitor: Competitor) => (
+										<ComboboxItem key={competitor.start_number} value={competitor.start_number}>
+											<Item size="sm" className="p-0">
+												<ItemContent>
+													<ItemTitle className="whitespace-nowrap">{competitor.start_number}</ItemTitle>
+													<ItemDescription>{competitor.name}</ItemDescription>
+												</ItemContent>
+											</Item>
+										</ComboboxItem>
+									)}
+								</ComboboxList>
+							</ComboboxContent>
+						</Combobox>
+						<Button type="submit" disabled={!selectedStationId}>
+							Registrera tid nu
+						</Button>
+						<Button
+							type="button"
+							variant="secondary"
+							onClick={async () => {
+								toast.promise(
+									(async () => {
+										await fetchData();
 
-									// Spela ljud NU – webbläsaren tillåter detta eftersom det sker efter klick
-									const audio = new Audio(vineBoom); // public/assets
-									audio.play().catch(() => console.warn('Kunde inte spela ljud'));
-								})(),
-								{
-									loading: 'Uppdaterar lista...',
-									success: 'Lista uppdaterad',
-									error: 'Kunde inte uppdatera lista',
-								},
-							);
-						}}
-					>
-						Uppdatera lista
-					</Button>
+										// Spela ljud NU – webbläsaren tillåter detta eftersom det sker efter klick
+										const audio = new Audio(vineBoom); // public/assets
+										audio.play().catch(() => console.warn('Kunde inte spela ljud'));
+									})(),
+									{
+										loading: 'Uppdaterar lista...',
+										success: 'Lista uppdaterad',
+										error: 'Kunde inte uppdatera lista',
+									},
+								);
+							}}
+						>
+							Uppdatera lista
+						</Button>
+					</Field>
 				</Field>
-			</Field>
+			</form>
 			<div className="flex gap-6 mt-8">
 				<div className="w-full">
 					<h2 className="text-lg font-semibold mb-2">Alla tävlande</h2>
